@@ -1,55 +1,76 @@
-import React from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { ROUTES } from '@app/shared/constants';
+import { css } from '@linaria/core';
 
-import { ThemeProvider } from '@theme-ui/core';
-import theme from '@app/theme';
-import { Loader } from '@app/components/BeamLoader';
-import { DexLayout } from './components/Dex/DexLayout';
-import Trading from '@app/pages/Trading';
-import ProvideLiquidity from '@app/pages/ProvideLiquidity/ProvideLiquidity';
+import { actions as sharedActions, selectors as sharedSelectors } from '@app/shared/store';
+import 'react-toastify/dist/ReactToastify.css';
+
+import { useNavigate, useRoutes } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { MainContainer } from './containers/Main';
+import { ToastContainer } from 'react-toastify';
+import { Scrollbars } from 'react-custom-scrollbars';
 
 import './styles';
-import './styles.css';
 
-import { WalletApiConnector } from './components/WalletApiConnector';
-import { DexProvider } from './contexts/Dex/DexContext';
-import { TransactionProvider } from './library/transaction-react/context/TransactionProvider';
-import { TransactionMonitor } from './library/transaction-react/TransactionMonitor';
-import { observer } from 'mobx-react-lite';
-import { useStoreAccessor } from './contexts/Store/StoreAccessorContext';
-import { ApiProvider } from './contexts/Dex/ApiContext';
-import PoolsList from './pages/PoolsList';
-import CreatePool from './pages/PoolCreation';
+const trackStyle = css`
+  z-index: 999;
+  border-radius: 3px;
+  background-color: rgba(255, 255, 255, 0.2);
+`;
+
+const routes = [
+  {
+    path: '/',
+    element: <>hallo</>,
+  },
+  {
+    path: `${ROUTES.MAIN.BASE}/*`,
+    element: <MainContainer />,
+  }
+];
 
 const App = () => {
+  const dispatch = useDispatch();
+  const content = useRoutes(routes);
   const navigate = useNavigate();
+  const navigateURL = useSelector(sharedSelectors.selectRouterLink());
 
-  const storeAccessor = useStoreAccessor();
-
-  const TransactionMonitorObserver = observer(({transactions, showStatusBlock} : any) => {
-    return <><TransactionMonitor shaderTransactions={transactions} showStatusBlock={false} /></>
-  });
+  useEffect(() => {
+    if (navigateURL) {
+      navigate(navigateURL);
+      dispatch(sharedActions.navigate(''));
+    }
+  }, [navigateURL, dispatch, navigate]);
 
   return (
-      <ThemeProvider theme={theme}>
-        <WalletApiConnector>
-          <ApiProvider>
-            <DexProvider>
-              <TransactionProvider>
-                <DexLayout>
-                  <Routes>
-                    <Route index element={<PoolsList />} />
-                    <Route path='/pools/trading' element={<Trading />} />
-                    <Route path='/pools/provide-liquidity' element={<ProvideLiquidity />} />
-                    <Route path='/create-pool' element={<CreatePool />} />
-                  </Routes>
-                </DexLayout>
-                <TransactionMonitorObserver transactions={storeAccessor.transactionsStore.transactions} showStatusBlock={true} />
-              </TransactionProvider>
-            </DexProvider>
-          </ApiProvider>
-        </WalletApiConnector>
-      </ThemeProvider>
+    <Scrollbars
+        renderThumbVertical={(props) => <div {...props} className={trackStyle} />}
+      >
+      {content}
+      <ToastContainer
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar
+          newestOnTop={false}
+          closeOnClick
+          closeButton={false}
+          rtl={false}
+          pauseOnFocusLoss={false}
+          draggable={false}
+          pauseOnHover={false}
+          icon={false}
+          toastStyle={{
+            textAlign: 'center',
+            background: '#22536C',
+            color: 'white',
+            width: '90%',
+            margin: '0 auto 36px',
+            borderRadius: '10px',
+          }}
+        />
+    </Scrollbars>
   );
 };
 

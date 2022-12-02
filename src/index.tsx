@@ -1,20 +1,23 @@
 import * as React from 'react';
-import { createRoot } from 'react-dom/client';
-import { HashRouter as Router } from 'react-router-dom';
+import * as ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { MemoryRouter } from 'react-router-dom';
 import 'babel-polyfill';
 
+import configureStore from '@app/store/store';
 import App from './app';
-import { StoreAccessorProvider } from '@app/contexts/Store/StoreAccessorContext';
+
+const { store } = configureStore();
 
 window.global = window;
 
-const container = document.getElementById('root');
-const root = createRoot(container);
+export default store;
 
-root.render(
-  <Router>
-    <StoreAccessorProvider>
+ReactDOM.render(
+  <MemoryRouter>
+    <Provider store={store}>
       <App />
-    </StoreAccessorProvider>
-  </Router>
+    </Provider>
+  </MemoryRouter>,
+  document.getElementById('root'),
 );

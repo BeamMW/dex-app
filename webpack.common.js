@@ -2,15 +2,11 @@ const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
-const { DefinePlugin } = require('webpack');
 
 module.exports = {
   target: 'web',
   mode: 'development',
   devtool: 'eval-source-map',
-  experiments: {
-    topLevelAwait: true
-  },
   devServer: {
     port: 13666
   },
@@ -34,10 +30,7 @@ module.exports = {
       },
       {
         test: /\.svg$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'svg-react-loader',
-        },
+        use: ['@svgr/webpack', 'svgo-loader'],
       },
       {
         test: /\.css$/,
@@ -58,28 +51,14 @@ module.exports = {
     ],
   },
   plugins: [
-    new DefinePlugin({
-      'process.env.NODE_DEBUG': JSON.stringify(process.env.NODE_DEBUG),
-      'process.env.NODE_ENV' : JSON.stringify('development')
-    }),
     new MiniCssExtractPlugin({
       filename: 'styles.css',
     }),
     new CopyWebpackPlugin({
       patterns: [
-         {
-           from: path.join(__dirname, 'src/wasm'),
-           to: path.join(__dirname, 'html/'),
-           context: 'public',
-         },
         {
-          from: path.join(__dirname, 'src/app/assets/icons'),
-          to: path.join(__dirname, 'html/app/assets/icons'),
-          context: 'public',
-        },
-        {
-          from: path.join(__dirname, 'src/app/assets/fonts'),
-          to: path.join(__dirname, 'html/assets/fonts'),
+          from: path.join(__dirname, 'src/wasm'),
+          to: path.join(__dirname, 'html/'),
           context: 'public',
         },
         {
