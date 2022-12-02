@@ -24,8 +24,8 @@ export function remoteEventChannel() {
         }
       }
     }, (err) => {
-        Utils.download("./pipe_app.wasm", (err, bytes) => {
-            Utils.callApi("ev_subunsub", {ev_txs_changed: true, ev_system_state: true}, 
+        Utils.download("./amm.wasm", (err, bytes) => {
+            Utils.callApi("ev_subunsub", {ev_txs_changed: true, ev_system_state: true},
               (error, result, full) => {
                 if (result) {
                   //action
