@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { ROUTES } from '@app/shared/constants';
 import { css } from '@linaria/core';
 
 import { actions as sharedActions, selectors as sharedSelectors } from '@app/shared/store';
@@ -8,11 +7,12 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useRoutes } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { MainContainer } from './containers/Main';
 import { ToastContainer } from 'react-toastify';
 import { Scrollbars } from 'react-custom-scrollbars';
 
 import './styles';
+import { PoolsContainer } from "@app/containers";
+import { ROUTES } from "@app/shared/constants";
 
 const trackStyle = css`
   z-index: 999;
@@ -22,13 +22,10 @@ const trackStyle = css`
 
 const routes = [
   {
-    path: '/',
-    element: <>hallo</>,
+    path:ROUTES.POOLS.BASE,
+    element: <PoolsContainer/>
   },
-  {
-    path: `${ROUTES.MAIN.BASE}/*`,
-    element: <MainContainer />,
-  }
+
 ];
 
 const App = () => {

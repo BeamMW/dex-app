@@ -1,13 +1,10 @@
 import {
-  call, take, fork, takeLatest, put, select
+  call, take,
 } from 'redux-saga/effects';
 
 import { eventChannel, END } from 'redux-saga';
-import { actions } from '@app/shared/store/index';
-import { actions as mainActions } from '@app/containers/Main/store/index';
-import { navigate, setSystemState } from '@app/shared/store/actions';
+import {  setSystemState } from '@app/shared/store/actions';
 import store from '../../../index';
-import { SharedStateType } from '../interface';
 
 import Utils from '@core/utils.js';
 

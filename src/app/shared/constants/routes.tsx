@@ -1,14 +1,13 @@
 export const ROUTES = {
-  MAIN: {
-    BASE: '/main',
-    MAIN_PAGE: '/main/main_page',
+  POOLS: {
+    BASE: '/',
   },
 };
 
 export const ROUTES_PATH = {
-  MAIN: {
+  POOLS: {
     BASE: '/',
-    MAIN_PAGE: '/main_page',
+    CREATE_POOL: '/create',
   },
-  
+
 };
