@@ -1,17 +1,20 @@
-import React, { useEffect } from 'react';
-import { css } from '@linaria/core';
+import React, { useEffect } from "react";
+import { css } from "@linaria/core";
 
-import { actions as sharedActions, selectors as sharedSelectors } from '@app/shared/store';
-import 'react-toastify/dist/ReactToastify.css';
+import {
+  actions as sharedActions,
+  selectors as sharedSelectors,
+} from "@app/shared/store";
+import "react-toastify/dist/ReactToastify.css";
 
-import { useNavigate, useRoutes } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useRoutes } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
-import { ToastContainer } from 'react-toastify';
-import { Scrollbars } from 'react-custom-scrollbars';
+import { ToastContainer } from "react-toastify";
+import { Scrollbars } from "react-custom-scrollbars";
 
-import './styles';
-import { PoolsContainer } from "@app/containers";
+import "./styles";
+import { PoolsContainer, CreatePool } from "@app/containers";
 import { ROUTES } from "@app/shared/constants";
 
 const trackStyle = css`
@@ -22,10 +25,13 @@ const trackStyle = css`
 
 const routes = [
   {
-    path:ROUTES.POOLS.BASE,
-    element: <PoolsContainer/>
+    path: ROUTES.POOLS.BASE,
+    element: <PoolsContainer />,
   },
-
+  {
+    path: ROUTES.POOLS.CREATE_POOL,
+    element: <CreatePool />,
+  },
 ];
 
 const App = () => {
@@ -37,36 +43,36 @@ const App = () => {
   useEffect(() => {
     if (navigateURL) {
       navigate(navigateURL);
-      dispatch(sharedActions.navigate(''));
+      dispatch(sharedActions.navigate(""));
     }
   }, [navigateURL, dispatch, navigate]);
 
   return (
     <Scrollbars
-        renderThumbVertical={(props) => <div {...props} className={trackStyle} />}
-      >
+      renderThumbVertical={(props) => <div {...props} className={trackStyle} />}
+    >
       {content}
       <ToastContainer
-          position="bottom-right"
-          autoClose={3000}
-          hideProgressBar
-          newestOnTop={false}
-          closeOnClick
-          closeButton={false}
-          rtl={false}
-          pauseOnFocusLoss={false}
-          draggable={false}
-          pauseOnHover={false}
-          icon={false}
-          toastStyle={{
-            textAlign: 'center',
-            background: '#22536C',
-            color: 'white',
-            width: '90%',
-            margin: '0 auto 36px',
-            borderRadius: '10px',
-          }}
-        />
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar
+        newestOnTop={false}
+        closeOnClick
+        closeButton={false}
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable={false}
+        pauseOnHover={false}
+        icon={false}
+        toastStyle={{
+          textAlign: "center",
+          background: "#22536C",
+          color: "white",
+          width: "90%",
+          margin: "0 auto 36px",
+          borderRadius: "10px",
+        }}
+      />
     </Scrollbars>
   );
 };

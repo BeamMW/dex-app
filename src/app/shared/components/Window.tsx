@@ -1,16 +1,17 @@
-import React, { useRef } from 'react';
-import { styled } from '@linaria/react';
-import Utils from '@core/utils.js';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { css } from '@linaria/core';
+import React, { useRef } from "react";
+import { styled } from "@linaria/react";
+import Utils from "@core/utils.js";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { css } from "@linaria/core";
 
 interface WindowProps {
   onPrevious?: React.MouseEventHandler | undefined;
 }
 
 const Container = styled.div<{ bgColor: string }>`
-  background-color: ${({ bgColor }) => Utils.isWeb() ? bgColor : 'transparent'};
+  background-color: ${({ bgColor }) =>
+    Utils.isWeb() ? bgColor : "transparent"};
   min-height: 100%;
   display: flex;
   flex-direction: column;
@@ -34,7 +35,7 @@ const StyledTitle = styled.div`
       max-width: 230px !important;
       margin-bottom: 0 !important;
       margin-right: 30px !important;
-    }  
+    }
   }
 `;
 
@@ -73,18 +74,13 @@ const NewButtonClass = css`
   margin-right: 30px !important;
 `;
 
-const Window: React.FC<WindowProps> = ({
-  children,
-  onPrevious
-}) => {
-  const navigate = useNavigate();
+const Window: React.FC<WindowProps> = ({ children, onPrevious }) => {
   const rootRef = useRef();
-  const dispatch = useDispatch();
-  
+
   return (
     <>
       <Container bgColor={Utils.getStyles().background_main} ref={rootRef}>
-        { children }
+        {children}
       </Container>
     </>
   );
