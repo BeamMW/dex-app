@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
-import { styled } from '@linaria/react';
-import Button from '@app/shared/components/Button';
-import { IconEye, IconEyeCrossed } from '@app/shared/icons';
-import { css } from '@linaria/core';
+import React, { useState } from "react";
+import { styled } from "@linaria/react";
+import Button from "@app/shared/components/Button";
+import { IconEye, IconEyeCrossed } from "@app/shared/icons";
+import { css } from "@linaria/core";
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   valid?: boolean;
-  variant?: 'regular' | 'gray' | 'amount';
-  pallete?: 'purple' | 'blue';
-  margin?: 'none' | 'large';
+  variant?: "regular" | "gray" | "amount";
+  pallete?: "purple" | "blue";
+  margin?: "none" | "large";
 }
 
 const ContainerStyled = styled.div<InputProps>`
   position: relative;
-  min-height: 53px;
-  margin-bottom: ${({ margin }) => (margin === 'none' ? 0 : 50)}px;
+  //min-height: 53px;
+  margin-bottom: ${({ margin }) => (margin === "none" ? 0 : 50)}px;
 `;
 
 const InputStyled = styled.input<InputProps>`
@@ -65,12 +65,14 @@ const InputStyled = styled.input<InputProps>`
 `;
 
 const InputRegularStyled = styled(InputStyled)`
-  border-color: ${({ valid }) => (valid ? 'var(--color-green)' : 'var(--color-red)')};
+  border-color: ${({ valid }) =>
+    valid ? "var(--color-green)" : "var(--color-red)"};
 `;
 
 const InputGrayStyled = styled(InputStyled)`
   border-width: 1px;
-  border-color: ${({ valid }) => (valid ? 'rgba(255,255,255,0.3)' : 'var(--color-red)')};
+  border-color: ${({ valid }) =>
+    valid ? "rgba(255,255,255,0.3)" : "var(--color-red)"};
 `;
 
 const InputAmountStyled = styled(InputGrayStyled)<{ pallete: string }>`
@@ -85,7 +87,7 @@ const LabelStyled = styled.div<InputProps>`
   font-family: SFProDisplay;
   font-size: 14px;
   font-style: italic;
-  color: ${({ valid }) => (valid ? 'var(--color-gray)' : 'var(--color-red)')};
+  color: ${({ valid }) => (valid ? "var(--color-gray)" : "var(--color-red)")};
 `;
 
 const menuEyeStyle = css`
@@ -97,9 +99,18 @@ const menuEyeStyle = css`
 `;
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({
-    label, valid = true, variant = 'regular', margin = 'none', pallete, className, ...rest
-  }, ref) => {
+  (
+    {
+      label,
+      valid = true,
+      variant = "regular",
+      margin = "none",
+      pallete,
+      className,
+      ...rest
+    },
+    ref
+  ) => {
     const InputComponent = {
       regular: InputRegularStyled,
       gray: InputGrayStyled,
@@ -107,7 +118,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     }[variant];
 
     const [inputVisible, setInputVisible] = useState(false);
-    const [inputValue, setInputValue] = useState(rest.value ?? '');
+    const [inputValue, setInputValue] = useState(rest.value ?? "");
 
     const inputHandler = (e) => {
       if (rest?.onChange) rest?.onChange(e);
@@ -121,13 +132,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           valid={valid}
           pallete={pallete}
           {...rest}
-          type={inputVisible ? 'text' : rest.type}
-          className={!valid ? 'invalid' : ''}
+          type={inputVisible ? "text" : rest.type}
+          className={!valid ? "invalid" : ""}
           onChange={inputHandler}
         />
         {!!label && <LabelStyled valid={valid}>{label}</LabelStyled>}
 
-        {rest.type === 'password' && inputValue?.toString().length ? (
+        {rest.type === "password" && inputValue?.toString().length ? (
           <Button
             variant="icon"
             icon={!inputVisible ? IconEye : IconEyeCrossed}
@@ -142,7 +153,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         ) : null}
       </ContainerStyled>
     );
-  },
+  }
 );
 
 export default Input;
