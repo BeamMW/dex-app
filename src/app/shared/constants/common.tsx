@@ -1,0 +1,1 @@
+export const GROTHS_IN_BEAM = 100000000;

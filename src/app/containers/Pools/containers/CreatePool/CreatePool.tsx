@@ -1,7 +1,14 @@
 import React from "react";
 import "./index.scss";
 import { Title, Input, Select, Option, Button } from "@app/shared/components";
+import {useSelector} from "react-redux";
+import {selectAssetsList} from "@app/containers/Pools/store/selectors";
 export const CreatePool = () => {
+
+  const assetsList = useSelector(selectAssetsList());
+
+  console.log(assetsList)
+
   return (
     <div className="create-pool-wrapper">
       <Title variant="heading">Create Pool</Title>
@@ -48,6 +55,16 @@ export const CreatePool = () => {
           <Button>Create Pool</Button>
         </div>
       </div>
+      {
+       <ul>
+         {assetsList.map((el) => (
+             <li
+               >
+               {el.parsedMetadata.N}
+             </li>
+         ))}
+       </ul>
+      }
     </div>
   );
 };
