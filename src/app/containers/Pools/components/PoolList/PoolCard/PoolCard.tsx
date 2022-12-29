@@ -3,12 +3,12 @@ import React from "react";
 import {IAsset, IPoolCard} from "@core/types";
 import {fromGroths, getNameToken, getPoolKind} from "@core/appUtils";
 
-type PoolCardType = {
+interface IPoolCardType  {
   data: IPoolCard,
   assets: IAsset[]
 }
 
-export const PoolCard = ({data, assets}:PoolCardType) => {
+export const PoolCard = ({data, assets}: IPoolCardType) => {
 
   const nameToken1 = getNameToken(data.aid1, assets)
   const nameToken2 = getNameToken(data.aid2, assets)

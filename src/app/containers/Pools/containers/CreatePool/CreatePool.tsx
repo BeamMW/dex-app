@@ -7,8 +7,6 @@ export const CreatePool = () => {
 
   const assetsList = useSelector(selectAssetsList());
 
-  console.log(assetsList)
-
   return (
     <div className="create-pool-wrapper">
       <Title variant="heading">Create Pool</Title>
