@@ -1,8 +1,8 @@
-import { call, put, takeLatest } from 'redux-saga/effects';
+import {call, put, takeLatest} from 'redux-saga/effects';
 import {IAsset, IPoolCard} from "@core/types";
 import { actions } from '.';
 import {LoadAssetsList, LoadPoolsList} from "@core/api";
-import {parseMetadata} from "@core/appUtils";
+import {parseMetadata, parsePoolMetadata} from "@core/appUtils";
 
 
 
@@ -16,7 +16,10 @@ export function* loadParamsSaga(
         });
         yield put(actions.setAssetsList(assetsList));
         const poolsList = (yield call(LoadPoolsList, action.payload? action.payload : null)) as IPoolCard[];
-        yield put(actions.setPoolsList(poolsList));
+        const newPoolList = poolsList.map((pool)=>{
+           return   parsePoolMetadata(pool,pool.aid1, pool.aid2, assetsList)
+        })
+        yield put(actions.setPoolsList(newPoolList));
 
 
     }

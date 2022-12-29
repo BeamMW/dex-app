@@ -1,7 +1,8 @@
-import {IAsset, IPoolCard} from "@core/types";
+import {IAsset, IPoolCard, ITxStatus} from "@core/types";
 
 
 export interface DexStateType {
         assetsList: IAsset[];
         poolsList: IPoolCard[];
+        tx_status: ITxStatus
 }

@@ -17,6 +17,7 @@ export function remoteEventChannel() {
       "headless": false,
       "apiResultHandler": (error, result, full) => {
         console.log('api result data: ', result, full);
+        store.dispatch(mainActions.setTxStatus(result))
         if (!result.error) {
           emitter(full);
         }
@@ -26,6 +27,7 @@ export function remoteEventChannel() {
             Utils.callApi("ev_subunsub", {ev_txs_changed: true, ev_system_state: true},
               (error, result, full) => {
                 if (result) {
+                    console.log('def')
                  store.dispatch(mainActions.loadAppParams.request(bytes));
                  store.dispatch(mainActions.loadPoolsList.request(bytes));
                  }
@@ -52,7 +54,6 @@ function* sharedSaga() {
       switch (payload.id) {
         case 'ev_system_state':
           store.dispatch(setSystemState(payload.result));
-
           break;
         default:
           break;

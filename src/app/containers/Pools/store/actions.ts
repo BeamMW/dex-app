@@ -1,17 +1,20 @@
 import {createAction, createAsyncAction} from "typesafe-actions";
-import {IAsset, IPoolCard} from "@core/types";
+import {IAsset, IPoolCard, ITxStatus} from "@core/types";
+import {MainActionsTypes} from "@app/containers/Pools/store/constants";
 
-export const setAssetsList = createAction('@@MAIN/SET_ASSETS_LIST')<IAsset[]>();
-export const setPoolsList = createAction('@@MAIN/SET_POOLS_LIST')<IPoolCard[]>();
+export const setAssetsList = createAction(MainActionsTypes.SET_ASSETS_LIST)<IAsset[]>();
+export const setPoolsList = createAction(MainActionsTypes.SET_POOLS_LIST)<IPoolCard[]>();
+export const setTxStatus = createAction(MainActionsTypes.SET_TX_STATUS)<ITxStatus[]>();
+
 
 export const loadAppParams = createAsyncAction(
-    '@@MAIN/LOAD_PARAMS',
-    '@@MAIN/LOAD_PARAMS_SUCCESS',
-    '@@MAIN/LOAD_PARAMS_FAILURE',
+    MainActionsTypes.LOAD_PARAMS,
+    MainActionsTypes.LOAD_PARAMS_SUCCESS,
+    MainActionsTypes.LOAD_PARAMS_FAILURE
 )<ArrayBuffer>();
 
 export const loadPoolsList = createAsyncAction(
-    '@@MAIN/LOAD_POOLS_LIST',
-    '@@MAIN/LOAD_POOLS_LIST_SUCCESS',
-    '@@MAIN/LOAD_POOLS_LIST_FAILURE',
+    MainActionsTypes.LOAD_POOLS_LIST,
+    MainActionsTypes.LOAD_POOLS_LIST_SUCCESS,
+    MainActionsTypes.LOAD_POOLS_LIST_FAILURE,
 )<ArrayBuffer>();

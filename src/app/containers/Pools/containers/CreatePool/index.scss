@@ -25,6 +25,18 @@
       }
     }
 
+    .custom-select {
+      &__control{
+      background-color: var(--color-darkest-blue) !important;
+      }
+      &__menu{
+        background-color: var(--color-darkest-blue) !important;
+      }
+      &__single-value{
+        color: white;
+      }
+    }
+
     .price-wrapper{
       display: flex;
       font-size: 18px;

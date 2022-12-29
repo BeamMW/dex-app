@@ -14,7 +14,7 @@ import { ToastContainer } from "react-toastify";
 import { Scrollbars } from "react-custom-scrollbars";
 
 import "./styles";
-import { PoolsContainer, CreatePool } from "@app/containers";
+import { PoolsContainer, CreatePool, AddLiquidity } from "@app/containers";
 import { ROUTES } from "@app/shared/constants";
 
 const trackStyle = css`
@@ -31,6 +31,9 @@ const routes = [
   {
     path: ROUTES.POOLS.CREATE_POOL,
     element: <CreatePool />,
+  },  {
+    path: ROUTES.POOLS.ADD_LIQUIDITY,
+    element: <AddLiquidity />,
   },
 ];
 

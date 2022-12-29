@@ -1,7 +1,7 @@
 import React, { useCallback } from "react";
 import "./index.scss";
 import { Input, Button, Title } from "@app/shared/components";
-import { PoolCard } from "@app/containers/Pools/components/PoolList";
+import {PoolCard} from "@app/containers/Pools/components/PoolList";
 import { useNavigate } from "react-router-dom";
 import { ROUTES_PATH } from "@app/shared/constants";
 import {useSelector} from "react-redux";
