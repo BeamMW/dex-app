@@ -1,18 +1,19 @@
-import React from "react";
+import React, {useCallback} from "react";
 
 import {IAsset, IPoolCard} from "@core/types";
-import {fromGroths, getNameToken, getPoolKind} from "@core/appUtils";
+import {fromGroths, getNameToken, getPoolKind, parseIntToNum} from "@core/appUtils";
+import {ROUTES_PATH} from "@app/shared/constants";
+import {useNavigate} from "react-router-dom";
 
-type PoolCardType = {
+interface PoolCardType  {
   data: IPoolCard,
   assets: IAsset[]
 }
 
-export const PoolCard = ({data, assets}:PoolCardType) => {
+export const AddLiquidity = ({data, assets}:PoolCardType) => {
 
   const nameToken1 = getNameToken(data.aid1, assets)
   const nameToken2 = getNameToken(data.aid2, assets)
-
 
   return (
     <div className="pool-card-wrapper">
@@ -29,8 +30,8 @@ export const PoolCard = ({data, assets}:PoolCardType) => {
         <div className="pool-card-content">
           <div className="asset-count">{`${fromGroths(data.tok1)} ${nameToken1}`}</div>
           <div className="asset-count">{`${fromGroths(data.tok2)} ${nameToken2}`}</div>
-
-          <div className="asset-exchange-rate">1 BEAMX = 3 BEAM</div>
+          <div className="asset-exchange-rate">{`1 ${nameToken1} = ${parseIntToNum(data.k1_2)}  ${nameToken2}`}</div>
+          <div className="asset-exchange-rate">{`1 ${nameToken2} = ${parseIntToNum(data.k2_1)}  ${nameToken1}`}</div>
         </div>
       </div>
     </div>
