@@ -4,6 +4,7 @@ import {
 
 import { eventChannel, END } from 'redux-saga';
 import {  setSystemState } from '@app/shared/store/actions';
+import { actions as mainActions } from '@app/containers/Pools/store/index';
 import store from '../../../index';
 
 import Utils from '@core/utils.js';
@@ -25,9 +26,10 @@ export function remoteEventChannel() {
             Utils.callApi("ev_subunsub", {ev_txs_changed: true, ev_system_state: true},
               (error, result, full) => {
                 if (result) {
-                  //action
+                 store.dispatch(mainActions.loadAppParams.request(bytes));
+                 store.dispatch(mainActions.loadPoolsList.request(bytes));
+                 }
                 }
-              }
             );
         })
     });
@@ -46,6 +48,7 @@ function* sharedSaga() {
   while (true) {
     try {
       const payload: any = yield take(remoteChannel);
+      console.log(payload)
       switch (payload.id) {
         case 'ev_system_state':
           store.dispatch(setSystemState(payload.result));
