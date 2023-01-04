@@ -1,32 +1,36 @@
 import React, { useState} from 'react';
 import "./index.scss";
 import {useLocation} from "react-router";
-import {IAddLiquidity, IAsset, IPoolCard} from "@core/types";
+import {IAddLiquidity, IAsset, IError, IPoolCard} from "@core/types";
 import {Button, Input, Title} from "@app/shared/components";
 import {AddLiquidityApi} from "@core/api";
+import {toGroths} from "@core/appUtils";
+import {toast} from "react-toastify";
 
 export const AddLiquidity = () => {
     const data:IPoolCard = useLocation().state as IPoolCard
+    console.log(data)
     const defaultLiquidity:IAddLiquidity= {
         "aid1": data.aid1,
         "aid2": data.aid2,
         "kind": data.kind,
-        "val1": data.tok1,
-        "val2":  data.tok2,
+        "val1": 0,
+        "val2": 0,
         "bPredictOnly": 0
     }
     const [addLiquidity, setAddLiquidity] = useState<IAddLiquidity>(defaultLiquidity);
     console.log(addLiquidity)
     const onChangeValue = (value, aid) => {
         if(aid === 'aid1'){
-            setAddLiquidity({...addLiquidity, val1: Number(value)})
+            setAddLiquidity({...addLiquidity, val1: toGroths(value)})
         } else if( aid === 'aid2'){
-            setAddLiquidity({...addLiquidity, val2: Number(value)})
+            setAddLiquidity({...addLiquidity, val2: toGroths(value)})
+            console.log(addLiquidity)
         }
     }
-
     const onAddLiquidity = (data:IAddLiquidity):void => {
         AddLiquidityApi(data).then(e=>console.log(e))
+            .catch((error: IError)=>toast(error.error))
     }
 
     return (

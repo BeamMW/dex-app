@@ -93,3 +93,17 @@ export interface ITxStatus {
 export interface ITxId {
     txid: string
 }
+
+
+export interface IError {
+    answer: {
+        id: string,
+        jsonrpc: string
+        result: {
+            output: any
+            txid: string
+        }
+    }
+        error: string;
+
+}
