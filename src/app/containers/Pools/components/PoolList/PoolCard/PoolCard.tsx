@@ -15,8 +15,8 @@ export const PoolCard = ({data, assets}:PoolCardType) => {
   const nameToken2 = data.metadata2.N
   const isCreator = !!data.creator
   const navigate = useNavigate()
-
-
+  
+  
 
   const addLiquidityNavigation = useCallback(() => {
     navigate(ROUTES_PATH.POOLS.ADD_LIQUIDITY, {state: data});

@@ -1,4 +1,3 @@
-
 export enum MainActionsTypes{
     SET_ASSETS_LIST = '@@MAIN/SET_ASSETS_LIST',
     SET_POOLS_LIST = '@@MAIN/SET_POOLS_LIST',
@@ -15,5 +14,3 @@ export enum MainActionsTypes{
 
     SET_TX_STATUS = '@@MAIN/SET_TX_STATUS',
 }
-
-
