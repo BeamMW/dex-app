@@ -2,7 +2,8 @@ export const ROUTES = {
   POOLS: {
     BASE: "/",
     CREATE_POOL: "/create",
-    ADD_LIQUIDITY: `/add_liquidity/:aid1:aid2:kind`
+    ADD_LIQUIDITY: `/add_liquidity`,
+    TRADE_POOL: `/trade_pool/`
   },
 };
 
@@ -10,6 +11,7 @@ export const ROUTES_PATH = {
   POOLS: {
     BASE: "/",
     CREATE_POOL: "/create",
-    ADD_LIQUIDITY: "/add_liquidity/:aid1:aid2:kind"
+    ADD_LIQUIDITY: "/add_liquidity",
+    TRADE_POOL: `/trade_pool/`
   },
 };

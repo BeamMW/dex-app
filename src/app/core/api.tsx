@@ -1,5 +1,5 @@
 import Utils from '@core/utils.js';
-import {IAddLiquidity, ICreatePool, IError, ITxId} from "@core/types";
+import {IAddLiquidity, ICreatePool, IError, ITrade, ITxId} from "@core/types";
 
 const CID =  '4e0a28b2b2a83b811ad17ba8228b0645dbce2969fd453a68fbc0b60bc8860e02';
 
@@ -74,6 +74,18 @@ export function CreatePoolApi<T = any>([{aid1,aid2,kind}]:ICreatePool[]): Promis
 export function AddLiquidityApi<T = any>({aid1,aid2,kind, val1, val2, bPredictOnly }:IAddLiquidity,): Promise<T> {
     return new Promise((resolve, reject) => {
         Utils.invokeContract("action=pool_add_liquidity,aid1="+ aid1+ ",aid2="+ aid2 +",kind="+ kind +",val1="+ val1 +",val2="+ val2 +",bPredictOnly="+ bPredictOnly +",cid=" + CID,
+            (error, result, full) => {
+                if(error){
+                    reject(error)
+                }
+                onMakeTx(error, result, full).then((res: ITxId)=>{
+                    resolve({res, result})
+                })
+            });
+    });
+}export function TradePoolApi<T = any>({aid1,aid2,kind, val1_buy, bPredictOnly = 1 }:ITrade,): Promise<T> {
+    return new Promise((resolve, reject) => {
+        Utils.invokeContract("action=pool_trade,aid1="+ aid1+ ",aid2="+ aid2 +",kind="+ kind +",val1_buy="+ val1_buy +",cid=" + CID,
             (error, result, full) => {
                 if(error){
                     reject(error)

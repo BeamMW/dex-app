@@ -15,11 +15,14 @@ export const PoolCard = ({data, assets}:PoolCardType) => {
   const nameToken2 = data.metadata2.N
   const isCreator = !!data.creator
   const navigate = useNavigate()
-  
-  
+
+
 
   const addLiquidityNavigation = useCallback(() => {
     navigate(ROUTES_PATH.POOLS.ADD_LIQUIDITY, {state: data});
+  }, [navigate]);
+  const tradePoolNavigation = useCallback(() => {
+    navigate(ROUTES_PATH.POOLS.TRADE_POOL, {state: data});
   }, [navigate]);
 
   return (
@@ -42,6 +45,7 @@ export const PoolCard = ({data, assets}:PoolCardType) => {
         </div>
         <div className="pool-control-wrapper">
           {isCreator && <button onClick={addLiquidityNavigation}>Add Liquidity</button>}
+          <button onClick={tradePoolNavigation}>Trade</button>
         </div>
       </div>
     </div>

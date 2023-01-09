@@ -61,6 +61,11 @@ export interface IAddLiquidity extends ICreatePool{
     val2:number,
     bPredictOnly: number
 }
+export interface ITrade extends  ICreatePool{
+    val1_buy: number,
+    bPredictOnly: number
+}
+
 
 export interface ITsx {
     txId: string;
