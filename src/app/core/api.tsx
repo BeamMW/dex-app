@@ -3,28 +3,6 @@ import {IAddLiquidity, ICreatePool, IError, ITxId} from "@core/types";
 
 const CID =  '4e0a28b2b2a83b811ad17ba8228b0645dbce2969fd453a68fbc0b60bc8860e02';
 
-export function LoadFromContract<T = any>(payload): Promise<T> {
-    return new Promise((resolve, reject) => {
-        Utils.invokeContract("role=user,action=get_some_action,cid=" + CID,
-        (error, result, full) => {
-            resolve(result.data);
-        }, payload ? payload : null);
-    });
-}
-
-export function UserDeposit<T = any>(amount: number, aid: number): Promise<T> {
-    return new Promise((resolve, reject) => {
-        Utils.invokeContract("role=user,action=deposit,amount="+ amount +",aid=" + aid + ",cid=" + CID,
-        (error, result, full) => {
-            onMakeTx(error, result, full);
-            resolve(result);
-        });
-    });
-}
-
-const getTxStatus = (txid:string) => {
-
-}
 const onMakeTx = (err, sres, full, params: {id: number, vote: number} = null, toasted: string = null) => {
     if (err) {
         console.log(err, "Failed to generate transaction request")
@@ -78,8 +56,9 @@ export function AddLiquidityApi<T = any>({aid1,aid2,kind, val1, val2, bPredictOn
                 if(error){
                     reject(error)
                 }
-                onMakeTx(error, result, full).then((res: ITxId)=>{
-                    resolve({res, result})
+                onMakeTx(error, result, full)
+                    .then((res: ITxId)=>{
+                    resolve(res)
                 })
             });
     });

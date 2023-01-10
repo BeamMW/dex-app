@@ -8,6 +8,7 @@ import { actions as mainActions } from '@app/containers/Pools/store/index';
 import store from '../../../index';
 
 import Utils from '@core/utils.js';
+import { setTxStatus} from "@app/containers/Pools/store/actions";
 
 export function remoteEventChannel() {
   return eventChannel((emitter) => {
@@ -17,7 +18,6 @@ export function remoteEventChannel() {
       "headless": false,
       "apiResultHandler": (error, result, full) => {
         console.log('api result data: ', result, full);
-        store.dispatch(mainActions.setTxStatus(result))
         if (!result.error) {
           emitter(full);
         }
@@ -27,9 +27,9 @@ export function remoteEventChannel() {
             Utils.callApi("ev_subunsub", {ev_txs_changed: true, ev_system_state: true},
               (error, result, full) => {
                 if (result) {
-                    console.log('def')
+                  console.log("Object")
                  store.dispatch(mainActions.loadAppParams.request(bytes));
-                 store.dispatch(mainActions.loadPoolsList.request(bytes));
+                 // store.dispatch(mainActions.loadPoolsList.request(bytes));
                  }
                 }
             );
@@ -54,8 +54,12 @@ function* sharedSaga() {
       switch (payload.id) {
         case 'ev_system_state':
           store.dispatch(setSystemState(payload.result));
+          store.dispatch(mainActions.loadAppParams.request(null));
           break;
-        default:
+          case 'ev_txs_changed':
+          store.dispatch(setTxStatus(payload.result));
+          break;
+          default:
           break;
       }
     } catch (err) {

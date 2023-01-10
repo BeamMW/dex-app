@@ -1,32 +1,28 @@
 import React, {useCallback, useEffect, useState} from "react";
 import "./index.scss";
-import {Button, Input, Title} from "@app/shared/components";
-import { useSelector} from "react-redux";
-import {selectAssetsList, selectPoolsList, selectTxStatus} from "@app/containers/Pools/store/selectors";
+import {Button, Title} from "@app/shared/components";
+import {useDispatch, useSelector} from "react-redux";
+import {selectAssetsList, selectPoolsList, selectTxStatus, selectErrorMessage} from "@app/containers/Pools/store/selectors";
 import Select from 'react-select'
-import {IAsset, ICreatePool, IError, ITxId, Kind, TxStatus} from "@core/types";
-import {CreatePoolApi, LoadPoolsList} from "@core/api";
-import {ROUTES_PATH} from "@app/shared/constants";
+import {IAsset, ICreatePool, TxStatus} from "@core/types";
+import {kindSelect, ROUTES_PATH} from "@app/shared/constants";
 import {useNavigate} from "react-router-dom";
-import {parsePoolMetadata} from "@core/appUtils";
-import {actions} from "@app/containers/Pools/store";
-import store from "../../../../../index";
-import {toast} from "react-toastify";
+import * as mainActions from "@app/containers/Pools/store/actions";
 
 export const CreatePool = () => {
   const assetsList = useSelector(selectAssetsList());
   const poolsList = useSelector(selectPoolsList());
   const txStatus = useSelector(selectTxStatus());
+  const error = useSelector(selectErrorMessage());
   const [options, setOptions] = useState([])
   const [options2pair, setOptions2Pair] = useState([])
   const [currentToken1, setCurrentToken1] = useState(null);
   const [currentToken2, setCurrentToken2] = useState(null);
   const [currentKind, setCurrentKind] = useState(null);
   const [isValidate, setIsValidate] = useState(false);
-  const [txId, setTxId] = useState(null)
-  const [codeStatus, setCodeStatus] = useState(null)
 
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const requestData: ICreatePool[] = [{
     aid1: currentToken1,
@@ -34,65 +30,21 @@ export const CreatePool = () => {
     kind: currentKind
   }]
 
-  const kind = [
-    {value: 0, label: Kind.Low},
-    {value: 1, label: Kind.Mid},
-    {value: 2, label: Kind.High}
-  ]
-
   const addLiquidityNavigation = useCallback((state) => {
     navigate(ROUTES_PATH.POOLS.ADD_LIQUIDITY, {state});
   }, [navigate]);
-  const addMainNavigation = useCallback(() => {
-    navigate(ROUTES_PATH.POOLS.BASE);
-  }, [navigate]);
 
   useEffect(()=>{
-    checkTxStatus(txId, txStatus)
-    if (codeStatus && codeStatus === TxStatus.Completed) {
-      LoadPoolsList().then(res => {
-        const newPoolList = res.map((pool)=>{
-          return   parsePoolMetadata(pool,pool.aid1, pool.aid2, assetsList)
-        })
-        store.dispatch(actions.setPoolsList(newPoolList))
-      })
-    }  else if (codeStatus && codeStatus === TxStatus.Failed) {
-      toast("Transaction is failed", {
-        type:"error"
-      })
-      addMainNavigation()
-    }
-    else if (codeStatus && codeStatus === TxStatus.InProgress) {
-      console.log('In progress')
-    }
-
-  },[ codeStatus, txStatus])
-
-  useEffect(()=>{
-    if(codeStatus && codeStatus === TxStatus.Completed){
+    if(txStatus && txStatus === TxStatus.Completed){
       let newPool
-      console.log(poolsList)
       poolsList.filter(item => {
         if(item.aid1 === requestData[0].aid1 && item.aid2 === requestData[0].aid2 && item.kind === requestData[0].kind){
           newPool = item
-          console.log(item)
         }
       })
       addLiquidityNavigation(newPool)
     }
-  },[poolsList])
-
-  function checkTxStatus(txId:string, txList) {
-
-      if(txList !== null) {
-        txList.txs?.filter((item) => {
-          if (item.txId === txId) {
-            setCodeStatus(item.status)
-          }
-        })
-      } else
-        return  setCodeStatus(null)
-  }
+  },[txStatus])
 
   const  getOptions =  (list: IAsset[]) => {
     let options = [{
@@ -140,12 +92,9 @@ export const CreatePool = () => {
   useEffect(()=>{
     checkValidate()
   },[requestData])
-  const onCreatePool =  (data) => {
-       CreatePoolApi(data)
-           .then((res: ITxId)=>{
-        setTxId(res.txid)
-      })
-           .catch((error: IError)=>toast(error.error))
+
+  const onCreatePool =  (data: ICreatePool[]) => {
+    dispatch(mainActions.onCreatePool.request(data))
   }
 
   return (
@@ -188,7 +137,7 @@ export const CreatePool = () => {
             </div>
             <Select
                 classNamePrefix="custom-select"
-                options={kind} placeholder='Select fee'
+                options={kindSelect} placeholder='Select fee'
                 onChange={onChangeKind}
             />
           </div>

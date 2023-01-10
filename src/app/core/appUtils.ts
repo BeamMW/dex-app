@@ -1,4 +1,4 @@
-import {IAsset, Kind} from "@core/types";
+import {IAsset, ITxStatus, Kind} from "@core/types";
 import {ASSET_BEAM, GROTHS_IN_BEAM} from "@app/shared/constants";
 
 
@@ -64,4 +64,14 @@ export function toGroths(value: number): number {
 export function parseIntToNum(value:string):number {
     const val  = parseInt(value)
     return  parseInt(value) > 0 ? Math.floor(val) : 0;
+}
+
+export function checkTxStatus(txId:string, txList:ITxStatus[]) {
+    let status
+    txList.txs?.filter((item) => {
+        if (item.txId === txId) {
+            status = item.status
+        }
+    })
+    return status
 }

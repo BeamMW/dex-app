@@ -5,15 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e8e799a6-13d1-459a-bbd0-de93e54acc87" name="Changes" comment="feat: poolslist">
-      <change afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/constants.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dex-app.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/components/PoolList/PoolCard/PoolCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/components/PoolList/PoolCard/PoolCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/AddLiquidity/AddLiquidity.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/AddLiquidity/AddLiquidity.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/CreatePool.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/CreatePool.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/interfaces/DexStateType.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/interfaces/DexStateType.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/actions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/constants.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/constants.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/reducer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/reducer.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/saga.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/saga.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/selectors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/selectors.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/api.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/api.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/appUtils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/appUtils.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/constants/common.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/constants/common.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/store/saga.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/store/saga.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,7 +36,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="dappnet" />
+        <entry key="$PROJECT_DIR$" value="feat_trade" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -49,27 +53,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "js.linters.configure.manually.selectedeslint": "true",
-    "last_opened_file_path": "D:/develop/beam/dex-app/src",
-    "list.type.of.created.stylesheet": "SCSS",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.standard": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "D:\\develop\\beam\\dex-app\\node_modules\\eslint",
-    "node.js.selected.package.standard": "",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "yarn",
-    "prettierjs.PrettierConfiguration.Package": "D:\\develop\\beam\\dex-app\\src",
-    "settings.editor.selected.configurable": "settings.javascript.linters.eslint",
-    "ts.external.directory.path": "D:\\develop\\beam\\dex-app\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;js.linters.configure.manually.selectedeslint&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/develop/beam/dex-app/src&quot;,
+    &quot;list.type.of.created.stylesheet&quot;: &quot;SCSS&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.standard&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;D:\\develop\\beam\\dex-app\\node_modules\\eslint&quot;,
+    &quot;node.js.selected.package.standard&quot;: &quot;&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;D:\\develop\\beam\\dex-app\\src&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.linters.eslint&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;D:\\develop\\beam\\dex-app\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\develop\beam\dex-app\src\app\containers\Pools" />
@@ -89,6 +93,7 @@
       <workItem from="1671879548261" duration="2000" />
       <workItem from="1672042592247" duration="42000" />
       <workItem from="1672042649682" duration="87080000" />
+      <workItem from="1673331465523" duration="20429000" />
     </task>
     <task id="LOCAL-00001" summary="feat: poolslist">
       <created>1671878766165</created>
