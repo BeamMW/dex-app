@@ -6,4 +6,5 @@ const selectMain = (state: AppState) => state.main;
 
 export const selectAssetsList = () => createSelector(selectMain, (state) => state.assetsList);
 export const selectPoolsList = () => createSelector(selectMain, (state) => state.poolsList);
-export const selectTxStatus = () => createSelector(selectMain, (state) => state.tx_status);
+export const selectTxStatus = () => createSelector(selectMain, (state) => state.statusTransaction);
+export const selectErrorMessage = () => createSelector(selectMain, (state) => state.errorMessage.error);

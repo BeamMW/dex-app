@@ -9,7 +9,9 @@ type Action = ActionType<typeof actions>;
 const initialState: DexStateType = {
     assetsList: [],
     poolsList: [],
-    tx_status: null
+    tx_status: null,
+    statusTransaction: null ,
+    errorMessage: ''
 };
 
 
@@ -22,6 +24,12 @@ const reducer = createReducer<DexStateType, Action>(initialState)
     }))
     .handleAction(actions.setTxStatus, (state, action ) => produce(state, (nexState) => {
         nexState.tx_status = action.payload
+    }))
+    .handleAction(actions.setTransactionStatus, (state, action ) => produce(state, (nexState) => {
+        nexState.statusTransaction = action.payload
+    }))
+    .handleAction(actions.setErrorMessage, (state, action) => produce(state, (nexState) => {
+        nexState.errorMessage = action.payload;
     }))
 
 
