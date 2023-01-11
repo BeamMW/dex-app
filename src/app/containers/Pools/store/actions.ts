@@ -1,5 +1,5 @@
 import {createAction, createAsyncAction} from "typesafe-actions";
-import {IAddLiquidity, IAsset, ICreatePool, IPoolCard, ITxStatus} from "@core/types";
+import {IAddLiquidity, IAsset, ICreatePool, IPoolCard, ITrade, ITxStatus} from "@core/types";
 import {MainActionsTypes} from "@app/containers/Pools/store/constants";
 
 export const setAssetsList = createAction(MainActionsTypes.SET_ASSETS_LIST)<IAsset[]>();
@@ -30,4 +30,10 @@ export const onAddLiquidity = createAsyncAction(
     MainActionsTypes.ADD_LIQUIDITY_SUCCESS,
     MainActionsTypes.ADD_LIQUIDITY_FAILURE,
 )<IAddLiquidity, any>();
+
+export const onTradePool = createAsyncAction(
+    MainActionsTypes.TRADE_POOL,
+    MainActionsTypes.TRADE_POOL_SUCCESS,
+    MainActionsTypes.TRADE_POOL_FAILURE,
+)<ITrade, any>();
 

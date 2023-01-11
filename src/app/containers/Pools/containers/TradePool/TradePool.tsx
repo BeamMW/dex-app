@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react"
+import React, {useEffect, useMemo, useState} from "react"
 import { IPoolCard, ITrade} from "@core/types";
 import {useLocation} from "react-router";
 import {TradePoolApi} from "@core/api";
@@ -6,11 +6,17 @@ import {toGroths} from "@core/appUtils";
 import {Button, Input, Title} from "@app/shared/components";
 import Select from "react-select";
 import {useInput} from "@app/shared/hooks";
+import * as mainActions from "@app/containers/Pools/store/actions";
+import {useDispatch, useSelector} from "react-redux";
 import './index.scss'
+import {toast} from "react-toastify";
+import {selectErrorMessage} from "@app/containers/Pools/store/selectors";
 
 
 export const TradePool = () => {
     const data:IPoolCard = useLocation().state as IPoolCard
+    const dispatch = useDispatch()
+    const error = useSelector(selectErrorMessage());
 
     const [options, setOptions] = useState([])
     const [currentToken, setCurrentToken] = useState(data.aid1)
@@ -36,8 +42,15 @@ export const TradePool = () => {
         "bPredictOnly": 0
     }
     console.log(defaultLiquidity)
+
+    useMemo(()=>{
+        if(error) {
+            toast(error)
+        }
+
+    },[!error])
     const onTrade = (data: ITrade) =>{
-        TradePoolApi(data).then(e=>console.log({e})).catch(e=>console.log(e))
+        dispatch(mainActions.onTradePool.request(data))
     }
     return (
         <div className="create-pool-wrapper">

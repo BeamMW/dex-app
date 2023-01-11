@@ -1,7 +1,7 @@
 import {call, delay, put, select, takeLatest} from 'redux-saga/effects';
 import {IAsset, IPoolCard, ITxId, ITxStatus, TxStatus} from "@core/types";
 import {actions} from '.';
-import {AddLiquidityApi, CreatePoolApi, LoadAssetsList, LoadPoolsList} from "@core/api";
+import {AddLiquidityApi, CreatePoolApi, LoadAssetsList, LoadPoolsList, TradePoolApi} from "@core/api";
 import {checkTxStatus,  parseMetadata, parsePoolMetadata} from "@core/appUtils";
 import {AppState} from "@app/shared/interface";
 import * as mainActions from "@app/containers/Pools/store/actions";
@@ -79,11 +79,29 @@ export function* addLiquidity(
 
     }
 }
+export function* tradePool(
+    action: ReturnType<typeof mainActions.onTradePool.request>,
+
+): Generator{
+    try {
+        // @ts-ignore
+        const  { txid } = (yield call(TradePoolApi, action.payload ? action.payload : null)) as ITxId;
+        yield getStatus(txid)
+    }
+    catch (e) {
+        // @ts-ignore
+        yield put(mainActions.onTradePool.failure(e));
+        yield put(mainActions.setErrorMessage(e));
+
+
+    }
+}
 
     function* mainSaga() {
         yield takeLatest(mainActions.loadAppParams.request, loadParamsSaga);
         yield takeLatest(mainActions.onCreatePool.request, createPool);
         yield takeLatest(mainActions.onAddLiquidity.request, addLiquidity);
+        yield takeLatest(mainActions.onTradePool.request, tradePool);
     }
 
     export default mainSaga;

@@ -70,7 +70,7 @@ export function AddLiquidityApi<T = any>({aid1,aid2,kind, val1, val2, bPredictOn
                     reject(error)
                 }
                 onMakeTx(error, result, full).then((res: ITxId)=>{
-                    resolve({res, result})
+                    resolve(res)
                 })
             });
     });
