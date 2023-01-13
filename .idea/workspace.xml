@@ -5,23 +5,44 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e1fc8e27-7a2d-44db-afa9-446b73814ad2" name="Changes" comment="feat: poolslist">
+      <change afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/WithdrawPool/WithdrawPool.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/WithdrawPool/index.scss" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/WithdrawPool/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app/amm.wasm" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app/styles.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/manifest.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/newDex.dapp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/app.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/components/PoolList/PoolCard/PoolCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/components/PoolList/PoolCard/PoolCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/AddLiquidity/AddLiquidity.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/AddLiquidity/AddLiquidity.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/CreatePool.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/CreatePool.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolList/PoolsList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolList/PoolsList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolList/index.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolList/index.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolsContainer/PoolsContainer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolsContainer/PoolsContainer.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/TradePool/TradePool.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/TradePool/TradePool.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/interfaces/DexStateType.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/interfaces/DexStateType.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/actions.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/constants.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/constants.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/reducer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/reducer.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/saga.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/saga.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/selectors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/selectors.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/core/api.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/api.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/appUtils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/appUtils.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/constants/common.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/constants/common.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/constants/routes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/constants/routes.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/wasm/amm.wasm" beforeDir="false" afterPath="$PROJECT_DIR$/src/wasm/amm.wasm" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript JSX File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -38,21 +59,43 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "yarn",
-    "ts.external.directory.path": "D:\\develop\\beam\\dex-app\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;js.linters.configure.manually.selectedeslint&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/develop/beam/dex-app&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.standard&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;D:\\develop\\beam\\dex-app\\node_modules\\eslint&quot;,
+    &quot;node.js.selected.package.standard&quot;: &quot;&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;D:\\develop\\beam\\dex-app\\node_modules\\prettier&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.linters.eslint&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;D:\\develop\\beam\\dex-app\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
+  <component name="RunManager">
+    <configuration name="start" type="js.build_tools.npm" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="e1fc8e27-7a2d-44db-afa9-446b73814ad2" name="Changes" comment="feat: poolslist" />
@@ -60,7 +103,11 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1673420963209</updated>
-      <workItem from="1673420968516" duration="1029000" />
+      <workItem from="1673420968516" duration="4581000" />
+      <workItem from="1673436431821" duration="10314000" />
+      <workItem from="1673446953096" duration="17000" />
+      <workItem from="1673507736497" duration="18518000" />
+      <workItem from="1673594719322" duration="9832000" />
     </task>
     <servers />
   </component>

@@ -3,7 +3,8 @@ export const ROUTES = {
     BASE: "/",
     CREATE_POOL: "/create",
     ADD_LIQUIDITY: `/add_liquidity`,
-    TRADE_POOL: `/trade_pool/`
+    TRADE_POOL: `/trade_pool/`,
+    WITHDRAW_POOL: `/withdraw_pool/`
   },
 };
 
@@ -12,6 +13,7 @@ export const ROUTES_PATH = {
     BASE: "/",
     CREATE_POOL: "/create",
     ADD_LIQUIDITY: "/add_liquidity",
-    TRADE_POOL: `/trade_pool/`
+    TRADE_POOL: `/trade_pool/`,
+    WITHDRAW_POOL: `/withdraw_pool/`
   },
 };

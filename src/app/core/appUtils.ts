@@ -1,8 +1,5 @@
-import {IAsset, ITxStatus, Kind} from "@core/types";
+import { IAddLiquidity, IAsset, ICreatePool, IPoolCard, ITrade, ITxStatus, Kind } from "@core/types";
 import {ASSET_BEAM, GROTHS_IN_BEAM} from "@app/shared/constants";
-
-
-const beam = "BEAM"
 
 export function parseMetadata(metadata) {
     const splittedMetadata = metadata.split(';');
@@ -75,3 +72,26 @@ export function checkTxStatus(txId:string, txList:ITxStatus[]) {
     })
     return status
 }
+
+export function setDataRequest(data) {
+    return  {...data, bPredictOnly: 0}
+}
+export function onFilter(data: IPoolCard[], filter, assetsList:IAsset[]){
+    switch (filter) {
+        case 'all': {
+            return data
+        }
+        case 'my': {
+            return data.filter(el=>el.creator )
+        }
+        case 'liquid': {
+            return data.filter(el=>el.ctl)
+        }
+        case 'empty': {
+            return data.filter(el=>!el.ctl)
+        }
+        default:
+            return data
+    }
+}
+

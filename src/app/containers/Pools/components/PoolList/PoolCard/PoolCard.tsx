@@ -1,29 +1,53 @@
-import React, {useCallback} from "react";
+import React, {useCallback, useEffect} from "react";
 
 import {IAsset, IPoolCard} from "@core/types";
-import {fromGroths, getPoolKind, parseIntToNum} from "@core/appUtils";
+import {fromGroths, getPoolKind, parseIntToNum, setDataRequest} from "@core/appUtils";
 import {ROUTES_PATH} from "@app/shared/constants";
 import {useNavigate} from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import * as mainActions from "@app/containers/Pools/store/actions";
+import {Button} from "@app/shared/components";
+import {styled} from "@linaria/react";
+import {toast} from "react-toastify";
+import {selectErrorMessage} from "@app/containers/Pools/store/selectors";
 
 interface PoolCardType  {
   data: IPoolCard,
   assets: IAsset[]
 }
 
+const ButtonWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+`
 export const PoolCard = ({data, assets}:PoolCardType) => {
+  const error = useSelector(selectErrorMessage());
   const nameToken1 = data.metadata1.N
   const nameToken2 = data.metadata2.N
-  const isCreator = !!data.creator
+  // const isCreator = !!data.creator
   const navigate = useNavigate()
+  const dispatch = useDispatch()
 
 
 
   const addLiquidityNavigation = useCallback(() => {
-    navigate(ROUTES_PATH.POOLS.ADD_LIQUIDITY, {state: data});
+    dispatch(mainActions.setCurrentPool(data))
+    navigate(ROUTES_PATH.POOLS.ADD_LIQUIDITY);
   }, [navigate]);
   const tradePoolNavigation = useCallback(() => {
-    navigate(ROUTES_PATH.POOLS.TRADE_POOL, {state: data});
+    dispatch(mainActions.setCurrentPool(data))
+    navigate(ROUTES_PATH.POOLS.TRADE_POOL );
   }, [navigate]);
+
+  useEffect(() => {
+    if (error) {
+      toast(error);
+    }
+  }, [!error]);
+  const onWithdraw = (data) => {
+    dispatch(mainActions.onWithdraw.request(setDataRequest(data)))
+  }
 
   return (
     <div className="pool-card-wrapper">
@@ -31,7 +55,6 @@ export const PoolCard = ({data, assets}:PoolCardType) => {
         <div className="pool-card-header">
           <div className="pool-card-title">{nameToken1} / {nameToken2}</div>
           <div className="pool-fees">fee: {getPoolKind(data.kind)}</div>
-
           <div className="asset-icon-wrapper">
             <div className="asset-icon main" />
             <div className="asset-icon secondary" />
@@ -43,10 +66,11 @@ export const PoolCard = ({data, assets}:PoolCardType) => {
           <div className="asset-exchange-rate">{`1 ${nameToken1} = ${parseIntToNum(data.k1_2)}  ${nameToken2}`}</div>
           <div className="asset-exchange-rate">{`1 ${nameToken2} = ${parseIntToNum(data.k2_1)}  ${nameToken1}`}</div>
         </div>
-        <div className="pool-control-wrapper">
-          {isCreator && <button onClick={addLiquidityNavigation}>Add Liquidity</button>}
-          <button onClick={tradePoolNavigation}>Trade</button>
-        </div>
+        <ButtonWrapper>
+          <Button onClick={addLiquidityNavigation}>Add Liquidity</Button>
+          <Button onClick={tradePoolNavigation}>Trade</Button>
+          {data.ctl ? <Button onClick={() => onWithdraw(data)}>Withdraw</Button> : null}
+        </ButtonWrapper>
       </div>
     </div>
   );

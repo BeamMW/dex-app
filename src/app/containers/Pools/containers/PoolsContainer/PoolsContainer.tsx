@@ -1,8 +1,7 @@
 import React from 'react';
 import { useRoutes } from "react-router-dom";
 import { ROUTES_PATH } from "@app/shared/constants";
-import {CreatePool, PoolsList, AddLiquidity, TradePool} from "../";
-
+import {CreatePool, PoolsList, AddLiquidity, TradePool, WithdrawPool} from "../";
 
 
 const routes = [
@@ -24,6 +23,11 @@ const routes = [
   {
     path: ROUTES_PATH.POOLS.TRADE_POOL,
     element: <TradePool/>,
+    exact: true,
+  },
+  {
+    path: ROUTES_PATH.POOLS.WITHDRAW_POOL,
+    element: <WithdrawPool/>,
     exact: true,
   },
 

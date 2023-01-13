@@ -7,6 +7,7 @@
 .pnp.js
 
 /.linaria-cache
+/html
 
 # misc
 .DS_Store

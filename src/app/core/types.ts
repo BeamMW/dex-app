@@ -7,6 +7,11 @@ export enum Kind {
     Mid = 1,
     High = 2,
 }
+export enum KindProcent {
+    Low = '0.05%',
+    Mid = '0.03%',
+    High = '1%',
+}
 
 export enum TxStatus {
     Pending  = 0 ,
@@ -63,7 +68,12 @@ export interface IAddLiquidity extends ICreatePool{
 }
 export interface ITrade extends  ICreatePool{
     val1_buy: number,
-    bPredictOnly: number
+    bPredictOnly?: number
+}
+
+export interface IWithdraw extends ICreatePool{
+    ctl: number,
+    bPredictOnly?: number
 }
 
 
@@ -97,6 +107,20 @@ export interface ITxStatus {
 
 export interface ITxId {
     txid: string
+}
+export interface IPredict {
+    buy?: number,
+    fee_dao?: number,
+   fee_pool?: number,
+    pay?: number,
+    pay_raw?: number,
+    ctl?: number,
+    tok1?: number,
+    tok2?: number,
+}
+export interface ITxResult {
+    txid?: string,
+    res?: IPredict
 }
 
 

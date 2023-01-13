@@ -1,5 +1,5 @@
 import Utils from '@core/utils.js';
-import {IAddLiquidity, ICreatePool, IError, ITrade, ITxId} from "@core/types";
+import {IAddLiquidity, ICreatePool, IError, ITrade, ITxId, ITxResult, IWithdraw} from "@core/types";
 
 const CID =  '4e0a28b2b2a83b811ad17ba8228b0645dbce2969fd453a68fbc0b60bc8860e02';
 
@@ -49,7 +49,7 @@ export function CreatePoolApi<T = any>([{aid1,aid2,kind}]:ICreatePool[]): Promis
             });
     });
 }
-export function AddLiquidityApi<T = any>({aid1,aid2,kind, val1, val2, bPredictOnly }:IAddLiquidity,): Promise<T> {
+export function AddLiquidityApi<T = any>({aid1,aid2,kind, val1, val2, bPredictOnly = 1 }:IAddLiquidity,): Promise<T> {
     return new Promise((resolve, reject) => {
         Utils.invokeContract("action=pool_add_liquidity,aid1="+ aid1+ ",aid2="+ aid2 +",kind="+ kind +",val1="+ val1 +",val2="+ val2 +",bPredictOnly="+ bPredictOnly +",cid=" + CID,
             (error, result, full) => {
@@ -57,21 +57,44 @@ export function AddLiquidityApi<T = any>({aid1,aid2,kind, val1, val2, bPredictOn
                     reject(error)
                 }
                 onMakeTx(error, result, full)
-                    .then((res: ITxId)=>{
-                    resolve(res)
-                })
+                    .then((res)=>{
+                        if(res){
+                            resolve(res)
+                        } resolve(result)
+                    })
             });
     });
-}export function TradePoolApi<T = any>({aid1,aid2,kind, val1_buy, bPredictOnly = 1 }:ITrade,): Promise<T> {
+}
+export function TradePoolApi<T = any>({aid1,aid2,kind, val1_buy, bPredictOnly = 1 }:ITrade,): Promise<T> {
     return new Promise((resolve, reject) => {
-        Utils.invokeContract("action=pool_trade,aid1="+ aid1+ ",aid2="+ aid2 +",kind="+ kind +",val1_buy="+ val1_buy +",cid=" + CID,
+        Utils.invokeContract("action=pool_trade,aid1="+ aid1+ ",aid2="+ aid2 +",kind="+ kind +",val1_buy="+ val1_buy +",bPredictOnly="+ bPredictOnly +",cid=" + CID,
             (error, result, full) => {
                 if(error){
                     reject(error)
                 }
-                onMakeTx(error, result, full).then((res: ITxId)=>{
-                    resolve(res)
+                onMakeTx(error, result, full)
+                    .then((res)=>{
+                    if(res){
+                        resolve(res)
+                    } resolve(result)
                 })
+            });
+    });
+}
+
+export function WithdrawApi<T = any>({aid1,aid2,kind, ctl, bPredictOnly = 1 }:IWithdraw,): Promise<T> {
+    return new Promise((resolve, reject) => {
+        Utils.invokeContract("action=pool_withdraw,aid1="+ aid1+ ",aid2="+ aid2 +",kind="+ kind +",ctl="+ ctl +",bPredictOnly="+ bPredictOnly +",cid=" + CID,
+            (error, result, full) => {
+                if(error){
+                    reject(error)
+                }
+                onMakeTx(error, result, full)
+                    .then((res)=>{
+                        if(res){
+                            resolve(res)
+                        } resolve(result)
+                    })
             });
     });
 }

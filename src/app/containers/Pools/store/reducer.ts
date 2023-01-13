@@ -5,13 +5,15 @@ import produce from "immer";
 
 type Action = ActionType<typeof actions>;
 
-
 const initialState: DexStateType = {
     assetsList: [],
     poolsList: [],
     tx_status: null,
-    statusTransaction: null ,
-    errorMessage: ''
+    statusTransaction: null,
+    errorMessage: '',
+    predict: null,
+    currentPool: null,
+    filter: 'all'
 };
 
 
@@ -30,6 +32,15 @@ const reducer = createReducer<DexStateType, Action>(initialState)
     }))
     .handleAction(actions.setErrorMessage, (state, action) => produce(state, (nexState) => {
         nexState.errorMessage = action.payload;
+    }))
+    .handleAction(actions.setPredict, (state, action) => produce(state, (nexState) => {
+        nexState.predict = action.payload;
+    }))
+     .handleAction(actions.setCurrentPool, (state, action) => produce(state, (nexState) => {
+        nexState.currentPool = action.payload;
+    }))
+  .handleAction(actions.setFilter, (state, action) => produce(state, (nexState) => {
+        nexState.filter = action.payload
     }))
 
 

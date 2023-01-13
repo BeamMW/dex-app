@@ -18,7 +18,7 @@ export const CreatePool = () => {
   const [options2pair, setOptions2Pair] = useState([])
   const [currentToken1, setCurrentToken1] = useState(null);
   const [currentToken2, setCurrentToken2] = useState(null);
-  const [currentKind, setCurrentKind] = useState(null);
+  const [currentKind, setCurrentKind] = useState(2);
   const [isValidate, setIsValidate] = useState(false);
 
   const navigate = useNavigate()
@@ -61,6 +61,10 @@ export const CreatePool = () => {
         setOptions2Pair(lists.filter((item) => item.value > value))
     }
     return  lists
+  }
+
+  const getKindValue = () => {
+    return  kindSelect.find((elem) => elem.value === currentKind);
   }
 
   useEffect(()=>{
@@ -138,6 +142,7 @@ export const CreatePool = () => {
             <Select
                 classNamePrefix="custom-select"
                 options={kindSelect} placeholder='Select fee'
+                value={getKindValue()}
                 onChange={onChangeKind}
             />
           </div>

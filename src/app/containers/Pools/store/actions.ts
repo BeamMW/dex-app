@@ -1,5 +1,5 @@
 import {createAction, createAsyncAction} from "typesafe-actions";
-import {IAddLiquidity, IAsset, ICreatePool, IPoolCard, ITrade, ITxStatus} from "@core/types";
+import {IAddLiquidity, IAsset, ICreatePool, IPoolCard, IPredict, ITrade, ITxStatus, IWithdraw} from "@core/types";
 import {MainActionsTypes} from "@app/containers/Pools/store/constants";
 
 export const setAssetsList = createAction(MainActionsTypes.SET_ASSETS_LIST)<IAsset[]>();
@@ -7,6 +7,9 @@ export const setPoolsList = createAction(MainActionsTypes.SET_POOLS_LIST)<IPoolC
 export const setTxStatus = createAction(MainActionsTypes.SET_TX_STATUS)<ITxStatus[]>();
 export const setErrorMessage = createAction(MainActionsTypes.SET_ERROR_MESSAGE)<string | null>();
 export const setTransactionStatus = createAction(MainActionsTypes.SET_TRANSACTIONS_STATUS)<Number>();
+export const setPredict = createAction(MainActionsTypes.SET_PREDICT)<IPredict>();
+export const setCurrentPool = createAction(MainActionsTypes.SET_CURRENT_POOL)<IPoolCard>();
+export const setFilter = createAction(MainActionsTypes.SET_FILTER)<string>();
 
 
 export const loadAppParams = createAsyncAction(
@@ -36,4 +39,9 @@ export const onTradePool = createAsyncAction(
     MainActionsTypes.TRADE_POOL_SUCCESS,
     MainActionsTypes.TRADE_POOL_FAILURE,
 )<ITrade, any>();
+export const onWithdraw = createAsyncAction(
+    MainActionsTypes.WITHDRAW,
+    MainActionsTypes.WITHDRAW_SUCCESS,
+    MainActionsTypes.WITHDRAW_FAILURE,
+)<IWithdraw, any>();
 

@@ -1,15 +1,17 @@
 import {call, delay, put, select, takeLatest} from 'redux-saga/effects';
-import {IAsset, IPoolCard, ITxId, ITxStatus, TxStatus} from "@core/types";
+import {IAsset, IPoolCard, ITxId, ITxResult, ITxStatus, TxStatus} from "@core/types";
 import {actions} from '.';
-import {AddLiquidityApi, CreatePoolApi, LoadAssetsList, LoadPoolsList, TradePoolApi} from "@core/api";
-import {checkTxStatus,  parseMetadata, parsePoolMetadata} from "@core/appUtils";
+import {AddLiquidityApi, CreatePoolApi, LoadAssetsList, LoadPoolsList, TradePoolApi, WithdrawApi} from "@core/api";
+import { checkTxStatus, onFilter, parseMetadata, parsePoolMetadata } from "@core/appUtils";
 import {AppState} from "@app/shared/interface";
 import * as mainActions from "@app/containers/Pools/store/actions";
+import { selectFilter } from "@app/containers/Pools/store/selectors";
 
 export function* loadParamsSaga(
     action: ReturnType<typeof actions.loadAppParams.request>,
 ): Generator {
     try {
+        const filter = yield select(selectFilter())
         const assetsList = (yield call(LoadAssetsList, action.payload ? action.payload : null)) as IAsset[]
         assetsList.forEach((asset) => {
             asset['parsedMetadata'] = parseMetadata(asset.metadata);
@@ -19,7 +21,11 @@ export function* loadParamsSaga(
         const newPoolList = poolsList.map((pool)=>{
            return   parsePoolMetadata(pool,pool.aid1, pool.aid2, assetsList)
         })
-        yield put(mainActions.setPoolsList(newPoolList));
+        const filteredPools =  (yield onFilter(newPoolList, filter, assetsList).map((pool)=>{
+            return   parsePoolMetadata(pool,pool.aid1, pool.aid2, assetsList)
+        })) as IPoolCard[]
+        yield put(mainActions.setPoolsList(filteredPools));
+
     }
     catch (e){
             // @ts-ignore
@@ -67,9 +73,14 @@ export function* addLiquidity(
 ): Generator{
     try {
         // @ts-ignore
-        const  { txid } = (yield call(AddLiquidityApi, action.payload ? action.payload : null)) as ITxId;
-        console.log('saga')
-        yield getStatus(txid)
+        const  {txid, res} = (yield call(AddLiquidityApi, action.payload ? action.payload : null))  as ITxResult
+        if(res){
+            yield put(mainActions.setPredict(res))
+        }
+        if(txid){
+            yield getStatus(txid)
+        }
+
     }
     catch (e) {
         // @ts-ignore
@@ -85,12 +96,39 @@ export function* tradePool(
 ): Generator{
     try {
         // @ts-ignore
-        const  { txid } = (yield call(TradePoolApi, action.payload ? action.payload : null)) as ITxId;
-        yield getStatus(txid)
+        const  {res, txid } = (yield call(TradePoolApi, action.payload ? action.payload : null)) as ITxResult
+        if(res){
+            yield put(mainActions.setPredict(res))
+        }
+        if(txid){
+            yield getStatus(txid)
+        }
+
     }
     catch (e) {
         // @ts-ignore
         yield put(mainActions.onTradePool.failure(e));
+        yield put(mainActions.setErrorMessage(e));
+    }
+}
+export function* withdrawPool(
+    action: ReturnType<typeof mainActions.onWithdraw.request>,
+
+): Generator{
+    try {
+        // @ts-ignore
+        const  {res, txid } = (yield call(WithdrawApi, action.payload ? action.payload : null)) as ITxResult
+        if(res){
+            yield put(mainActions.setPredict(res))
+        }
+        if(txid){
+            yield getStatus(txid)
+        }
+
+    }
+    catch (e) {
+        // @ts-ignore
+        yield put(mainActions.onWithdraw.failure(e));
         yield put(mainActions.setErrorMessage(e));
 
 
@@ -102,6 +140,7 @@ export function* tradePool(
         yield takeLatest(mainActions.onCreatePool.request, createPool);
         yield takeLatest(mainActions.onAddLiquidity.request, addLiquidity);
         yield takeLatest(mainActions.onTradePool.request, tradePool);
+        yield takeLatest(mainActions.onWithdraw.request, withdrawPool);
     }
 
     export default mainSaga;
