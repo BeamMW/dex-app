@@ -6,7 +6,6 @@ export interface DexStateType {
         poolsList: IPoolCard[];
         tx_status: ITxStatus[] | null,
         statusTransaction: number | null,
-        errorMessage: string | null,
         predict: IPredict,
         currentPool: IPoolCard,
         filter: string

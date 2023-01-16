@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useState} from "react";
 import "./index.scss";
 import {Button, Title} from "@app/shared/components";
 import {useDispatch, useSelector} from "react-redux";
-import {selectAssetsList, selectPoolsList, selectTxStatus, selectErrorMessage} from "@app/containers/Pools/store/selectors";
+import {selectAssetsList, selectPoolsList, selectTxStatus} from "@app/containers/Pools/store/selectors";
 import Select from 'react-select'
 import {IAsset, ICreatePool, TxStatus} from "@core/types";
 import {kindSelect, ROUTES_PATH} from "@app/shared/constants";
@@ -13,7 +13,6 @@ export const CreatePool = () => {
   const assetsList = useSelector(selectAssetsList());
   const poolsList = useSelector(selectPoolsList());
   const txStatus = useSelector(selectTxStatus());
-  const error = useSelector(selectErrorMessage());
   const [options, setOptions] = useState([])
   const [options2pair, setOptions2Pair] = useState([])
   const [currentToken1, setCurrentToken1] = useState(null);

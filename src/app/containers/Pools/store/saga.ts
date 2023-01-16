@@ -6,6 +6,7 @@ import { checkTxStatus, onFilter, parseMetadata, parsePoolMetadata } from "@core
 import {AppState} from "@app/shared/interface";
 import * as mainActions from "@app/containers/Pools/store/actions";
 import { selectFilter } from "@app/containers/Pools/store/selectors";
+import { toast } from "react-toastify";
 
 export function* loadParamsSaga(
     action: ReturnType<typeof actions.loadAppParams.request>,
@@ -30,6 +31,7 @@ export function* loadParamsSaga(
     catch (e){
             // @ts-ignore
         yield put(mainActions.loadAppParams.failure(e));
+        toast(e.error)
     }
 }
 
@@ -85,7 +87,8 @@ export function* addLiquidity(
     catch (e) {
         // @ts-ignore
         yield put(mainActions.onAddLiquidity.failure(e));
-        yield put(mainActions.setErrorMessage(e));
+        toast(e.error)
+
 
 
     }
@@ -109,6 +112,7 @@ export function* tradePool(
         // @ts-ignore
         yield put(mainActions.onTradePool.failure(e));
         yield put(mainActions.setErrorMessage(e));
+        toast(e.error)
     }
 }
 export function* withdrawPool(
@@ -129,9 +133,7 @@ export function* withdrawPool(
     catch (e) {
         // @ts-ignore
         yield put(mainActions.onWithdraw.failure(e));
-        yield put(mainActions.setErrorMessage(e));
-
-
+        toast(e.error)
     }
 }
 

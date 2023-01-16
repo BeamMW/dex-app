@@ -13,13 +13,13 @@ import {
   selectErrorMessage,
   selectPredirect,
 } from "@app/containers/Pools/store/selectors";
+import { useError } from "@app/shared/hooks/useError";
 
 export const TradePool = () => {
   const data = useSelector(selectCurrentPool());
   const predictData = useSelector(selectPredirect());
   const [currentToken, setCurrentToken] = useState(data.aid1);
   const [options, setOptions] = useState([]);
-  const error = useSelector(selectErrorMessage());
   const amountInput = useInput(0);
   const [requestData, setRequestData] = useState(null);
   const dispatch = useDispatch();
@@ -50,13 +50,9 @@ export const TradePool = () => {
     if (amountInput.value !== 0) {
       dispatch(mainActions.onTradePool.request(requestData));
     }
-  }, [requestData]);
+  }, [requestData, amountInput.value]);
 
-  useMemo(() => {
-    if (error) {
-      toast(error);
-    }
-  }, [!error]);
+
   const onTrade = (data: ITrade) => {
     dispatch(mainActions.onTradePool.request(setDataRequest(data)));
   };

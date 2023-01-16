@@ -7,15 +7,13 @@ import { useDispatch, useSelector } from "react-redux";
 import * as mainActions from "@app/containers/Pools/store/actions";
 import { toast } from "react-toastify";
 import {
-  selectCurrentPool,
-  selectErrorMessage, selectPredirect,
+  selectCurrentPool, selectPredirect,
 } from "@app/containers/Pools/store/selectors";
 import {useInput} from "@app/shared/hooks";
 
 export const AddLiquidity = () => {
   const data = useSelector(selectCurrentPool());
   const predictData = useSelector(selectPredirect());
-  const error = useSelector(selectErrorMessage());
   const amountInput_aid1 = useInput(0)
   const amountInput_aid2 = useInput(0)
   const [requestData, setRequestData] = useState(null);
@@ -30,11 +28,6 @@ export const AddLiquidity = () => {
     });
   }, [amountInput_aid2.value, amountInput_aid2.value]);
 
-  useMemo(() => {
-    if (error) {
-      toast(error);
-    }
-  }, [!error]);
   useMemo(() => {
     if (amountInput_aid1.value !== 0 && amountInput_aid1.value !== 0) {
       dispatch(mainActions.onAddLiquidity.request(requestData));

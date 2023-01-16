@@ -9,7 +9,6 @@ import * as mainActions from "@app/containers/Pools/store/actions";
 import {Button} from "@app/shared/components";
 import {styled} from "@linaria/react";
 import {toast} from "react-toastify";
-import {selectErrorMessage} from "@app/containers/Pools/store/selectors";
 
 interface PoolCardType  {
   data: IPoolCard,
@@ -22,13 +21,11 @@ const ButtonWrapper = styled.div`
   flex-direction: column;
 `
 export const PoolCard = ({data, assets}:PoolCardType) => {
-  const error = useSelector(selectErrorMessage());
   const nameToken1 = data.metadata1.N
   const nameToken2 = data.metadata2.N
   // const isCreator = !!data.creator
   const navigate = useNavigate()
   const dispatch = useDispatch()
-
 
 
   const addLiquidityNavigation = useCallback(() => {
@@ -40,11 +37,6 @@ export const PoolCard = ({data, assets}:PoolCardType) => {
     navigate(ROUTES_PATH.POOLS.TRADE_POOL );
   }, [navigate]);
 
-  useEffect(() => {
-    if (error) {
-      toast(error);
-    }
-  }, [!error]);
   const onWithdraw = (data) => {
     dispatch(mainActions.onWithdraw.request(setDataRequest(data)))
   }
