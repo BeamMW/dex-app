@@ -7,9 +7,12 @@
 .pnp.js
 
 /.linaria-cache
+/html
 
 # misc
 .DS_Store
+.idea
+.idea/workspace.xml
 .env.local
 .env.development.local
 .env.test.local

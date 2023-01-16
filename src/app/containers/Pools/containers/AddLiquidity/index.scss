@@ -27,7 +27,7 @@
 
     .custom-select {
       &__control{
-      background-color: var(--color-darkest-blue) !important;
+        background-color: var(--color-darkest-blue) !important;
       }
       &__menu{
         background-color: var(--color-darkest-blue) !important;
@@ -55,10 +55,20 @@
         border: 2px solid var(  --color-green);
         padding: 24px;
         .information{
-margin-bottom: 24px;
+          margin-bottom: 24px;
         }
       }
 
     }
   }
+
+    .select-wrapper{
+      .select-content{
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
 }

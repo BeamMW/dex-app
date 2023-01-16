@@ -9,6 +9,13 @@
     display: flex;
     justify-content: space-between;
 
+  .poop-list-sort-wrapper {
+    display: flex;
+    max-width: 500px;
+    width: 100%;
+    justify-content: space-between;
+    }
+
 
     input {
       width: 300px;
@@ -64,10 +71,13 @@
         }
 
         .pool-card-content{
-          margin-top: 16px;
+          margin: 16px 0;
           .asset-count{
             color: var(--color-green);
             font-weight: bold;
+            margin-bottom: 8px;
+          }
+          .asset-exchange-rate:not(:last-child){
             margin-bottom: 8px;
           }
         }

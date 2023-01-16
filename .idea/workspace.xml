@@ -4,16 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e8e799a6-13d1-459a-bbd0-de93e54acc87" name="Changes" comment="feat: poolslist">
-      <change afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/constants.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dex-app.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+    <list default="true" id="e1fc8e27-7a2d-44db-afa9-446b73814ad2" name="Changes" comment="feat: poolslist">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/components/PoolList/PoolCard/PoolCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/components/PoolList/PoolCard/PoolCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/AddLiquidity/AddLiquidity.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/AddLiquidity/AddLiquidity.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/CreatePool.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/CreatePool.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/actions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/TradePool/TradePool.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/TradePool/TradePool.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/interfaces/DexStateType.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/interfaces/DexStateType.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/reducer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/reducer.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/saga.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/saga.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/selectors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/selectors.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,23 +24,16 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="TypeScript JSX File" />
-        <option value="SCSS File" />
-        <option value="TypeScript File" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="dappnet" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
-  <component name="ProjectId" id="2JB8A5Q9djYrXae9Q4Gha2oarFn" />
+  <component name="ProjectId" id="2KAcjO1VfeV8XR0aKiAh4vyAMaA" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
@@ -49,62 +42,60 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "js.linters.configure.manually.selectedeslint": "true",
-    "last_opened_file_path": "D:/develop/beam/dex-app/src",
-    "list.type.of.created.stylesheet": "SCSS",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.standard": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "D:\\develop\\beam\\dex-app\\node_modules\\eslint",
-    "node.js.selected.package.standard": "",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "yarn",
-    "prettierjs.PrettierConfiguration.Package": "D:\\develop\\beam\\dex-app\\src",
-    "settings.editor.selected.configurable": "settings.javascript.linters.eslint",
-    "ts.external.directory.path": "D:\\develop\\beam\\dex-app\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;js.linters.configure.manually.selectedeslint&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/develop/beam/dex-app&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.standard&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;D:\\develop\\beam\\dex-app\\node_modules\\eslint&quot;,
+    &quot;node.js.selected.package.standard&quot;: &quot;&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;D:\\develop\\beam\\dex-app\\node_modules\\prettier&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.linters.eslint&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;D:\\develop\\beam\\dex-app\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\develop\beam\dex-app\src\app\containers\Pools" />
-    </key>
+}</component>
+  <component name="RunManager">
+    <configuration name="start" type="js.build_tools.npm" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="start" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="e8e799a6-13d1-459a-bbd0-de93e54acc87" name="Changes" comment="" />
-      <created>1671539969991</created>
+      <changelist id="e1fc8e27-7a2d-44db-afa9-446b73814ad2" name="Changes" comment="feat: poolslist" />
+      <created>1673420963209</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1671539969991</updated>
-      <workItem from="1671539973901" duration="1915000" />
-      <workItem from="1671560975248" duration="284000" />
-      <workItem from="1671606806872" duration="39628000" />
-      <workItem from="1671879548261" duration="2000" />
-      <workItem from="1672042592247" duration="42000" />
-      <workItem from="1672042649682" duration="87080000" />
+      <updated>1673420963209</updated>
+      <workItem from="1673420968516" duration="4581000" />
+      <workItem from="1673436431821" duration="10314000" />
+      <workItem from="1673446953096" duration="17000" />
+      <workItem from="1673507736497" duration="18518000" />
+      <workItem from="1673594719322" duration="10717000" />
+      <workItem from="1673851467251" duration="7079000" />
     </task>
-    <task id="LOCAL-00001" summary="feat: poolslist">
-      <created>1671878766165</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1671878766165</updated>
-    </task>
-    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: poolslist" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: poolslist" />
   </component>
 </project>
