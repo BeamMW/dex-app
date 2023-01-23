@@ -11,7 +11,7 @@ import {
   Title,
   Window
 } from "@app/shared/components";
-import { emptyPredict, fromGroths, numFormatter, setDataRequest, toGroths } from "@core/appUtils";
+import { emptyPredict, fromGroths, numFormatter, onPredictValue, setDataRequest, toGroths } from "@core/appUtils";
 import { useDispatch, useSelector } from "react-redux";
 import * as mainActions from "@app/containers/Pools/store/actions";
 import { toast } from "react-toastify";
@@ -34,7 +34,7 @@ export const AddLiquidity = () => {
   const dispatch = useDispatch();
 
   useEffect(()=>{
-    setIsEmpty(onCheckEmptyPool(data))
+    setIsEmpty(!(data.tok1 || data.tok2 !== 0))
   },[])
 
   const getValueInput_1 = () => {
@@ -54,6 +54,7 @@ export const AddLiquidity = () => {
   useEffect(()=>{
     setCurrentToken(!isSwap?data.aid1 : data.aid2)
   },[isSwap])
+
   useEffect(() => {
     setRequestData({
       aid1: data.aid1,
@@ -67,7 +68,7 @@ export const AddLiquidity = () => {
 
 
   useEffect(()=>{
-    if(predictData){
+    if(!isEmpty && predictData){
       if(currentToken === data.aid1){
         !emptyPredict(predictData, amountInput_aid1.value) ? amountInput_aid2.onPredict(fromGroths(predictData.tok2)) : amountInput_aid2.onPredict(0);
       } else {
@@ -89,20 +90,11 @@ export const AddLiquidity = () => {
   const onAddLiquidity = (data: IAddLiquidity): void => {
     dispatch(mainActions.onAddLiquidity.request(setDataRequest(data)));
   };
-  function onCheckEmptyPool(pool:IPoolCard){
-    return !(pool.tok1 || pool.tok2 !== 0)
-  }
-  const onPredictValue = (value, swap:boolean, predict: IPredict) => {
-    if(!predict || value.value==0){
-      return 0
-    }
-    if(swap){
-      return fromGroths(predict.tok1)
-    }
-    return  fromGroths(predict.tok2)
-  }
+
   const currentInput = isSwap ? amountInput_aid2 : amountInput_aid1
+
   const calculated = onPredictValue(currentInput, isSwap, predictData)
+
   return (
     <Window >
       <Title variant="heading">Add Liquidity</Title>
@@ -167,6 +159,7 @@ export const AddLiquidity = () => {
             </Section>
           </AssetsContainer>
         )}
+        // Create components for predirect
         <Section>
           <div className="amount-wrapper">
             <div className="amount-title">{data.metadata1.N}:</div>

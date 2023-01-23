@@ -107,6 +107,15 @@ export function numFormatter(num) {
         return parseFloat(num.toFixed(2));
     }
 }
+export const onPredictValue = (value, swap:boolean, predict: IPredict) => {
+    if(!predict || value.value == 0){
+        return 0
+    }
+    if(swap){
+        return fromGroths(predict.tok1)
+    }
+    return  fromGroths(predict.tok2)
+}
 
 
 
