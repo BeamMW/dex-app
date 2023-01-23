@@ -159,7 +159,7 @@ export const AddLiquidity = () => {
             </Section>
           </AssetsContainer>
         )}
-        // Create components for predirect
+        {/*// Create components for predirect*/}
         <Section>
           <div className="amount-wrapper">
             <div className="amount-title">{data.metadata1.N}:</div>
