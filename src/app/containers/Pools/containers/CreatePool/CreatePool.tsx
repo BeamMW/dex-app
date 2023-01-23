@@ -1,13 +1,26 @@
 import React, {useCallback, useEffect, useState} from "react";
 import "./index.scss";
-import {Button, Title} from "@app/shared/components";
+import { AssetsContainer, Button, Section, Title, Window, Container } from "@app/shared/components";
 import {useDispatch, useSelector} from "react-redux";
 import {selectAssetsList, selectPoolsList, selectTxStatus} from "@app/containers/Pools/store/selectors";
 import Select from 'react-select'
 import {IAsset, ICreatePool, TxStatus} from "@core/types";
-import {kindSelect, ROUTES_PATH} from "@app/shared/constants";
+import { kindSelect, ROUTES_PATH, titleSections } from "@app/shared/constants";
 import {useNavigate} from "react-router-dom";
 import * as mainActions from "@app/containers/Pools/store/actions";
+import { styled } from "@linaria/react";
+
+// const Container = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   margin: 50px 0;
+//   width: 100%;
+//   min-height: 600px;
+//   height: 100%;
+//   justify-content: space-between;
+// `;
+
 
 export const CreatePool = () => {
   const assetsList = useSelector(selectAssetsList());
@@ -101,38 +114,25 @@ export const CreatePool = () => {
   }
 
   return (
-    <div className="create-pool-wrapper">
+    <Window>
       <Title variant="heading">Create Pool</Title>
+      <Container>
+        <AssetsContainer>
+          <Section title={titleSections.CREATE_FIRST}>
+            <Select  classNamePrefix="custom-select"
+                     options={options}
+                     onChange={onChangeToken1}
+            />
+          </Section>
+          <Section title={titleSections.CREATE_SECOND}>
+          <Select classNamePrefix="custom-select"
+              options={options2pair}
+              onChange={onChangeToken2}
+      />
+          </Section>
+        </AssetsContainer>
 
-      <div className="create-pool-assets-container">
-        <Title variant="subtitle">Select Pair</Title>
-        <div className="assets-selector-wrapper">
-          <div className="asset-selector">
-            {/*<Input />*/}
-            <div className="select-wrapper">
-              <Select  classNamePrefix="custom-select"
-                       options={options}
-                       onChange={onChangeToken1}
-              />
-            </div>
-          </div>
-          <div className="asset-selector">
-            {/*<Input />*/}
-            <div className="select-wrapper">
-              <Select classNamePrefix="custom-select"
-                      options={options2pair}
-                      onChange={onChangeToken2}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="price-wrapper">
-          <div className="price-title">Price:</div>
-          <div className="price-value">xxxxxx</div>
-        </div>
-
-        <div className="fees-container">
-          <Title variant="subtitle">Choose fee tier</Title>
+        <Section title={titleSections.FEE}>
           <div className="fees-wrapper">
             <div className="information">
               Fee tier indicates the liquidity of the pool assets. It is
@@ -145,12 +145,12 @@ export const CreatePool = () => {
                 onChange={onChangeKind}
             />
           </div>
-        </div>
+        </Section>
 
         <div className="button-wrapper">
           <Button  onClick={()=>onCreatePool(requestData)} disabled={!isValidate}>Create Pool</Button>
         </div>
-      </div>
-    </div>
+      </Container>
+      </Window>
   );
 };

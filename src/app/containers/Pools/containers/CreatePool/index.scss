@@ -1,39 +1,57 @@
-.create-pool-wrapper{
-  width: 600px;
-  margin: 0 auto;
-  h2{
-    text-align: center;
-  }
-
-  .create-pool-assets-container{
-
-    .assets-selector-wrapper{
-      margin: 32px 0;
-      .asset-selector{
-        display: flex;
-        align-items: center;
-        margin-bottom: 24px;
-        justify-content: space-between;
-        .select-wrapper{
-          width: 130px;
-          height: 41px;
-          border: 1px solid;
-        }
-        input{
-          width: 450px;
-        }
-      }
-    }
 
     .custom-select {
+      &_container{
+        max-width: 412px;
+        width: 100%;
+      }
       &__control{
-      background-color: var(--color-darkest-blue) !important;
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        border: none !important;
+        border-radius: 10px;
+        &--menu-is-open{
+          box-shadow:( 0 0 0 1px ) var(--color-green) !important;
+        }
       }
       &__menu{
-        background-color: var(--color-darkest-blue) !important;
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        &-list::-webkit-scrollbar {
+          width: 4px;
+          height: 0px;
+        }
+        &-list::-webkit-scrollbar-track {
+          background-color: rgba(255, 255, 255, 0.2) !important;
+          border-radius: 3px !important;
+        }
+        &-list::-webkit-scrollbar-thumb {
+          background-color: rgba(255, 255, 255, 0.2) !important;
+          border-radius: 3px !important;
+        }
+        &-list::-webkit-scrollbar-thumb:hover {
+          background: var(--color-green) !important;
+          border-radius: 3px !important;
+        }
+      }
+      &__option{
+        &--is-focused, &--is-selected{
+          background-color: var(--color-green) !important;
+          color: black !important;
+        }
       }
       &__single-value{
-        color: white;
+        font-family: 'Proxima Nova' !important;
+        font-style: normal !important;
+        font-weight: 400 !important;
+        font-size: 14px !important;
+        line-height: 14px !important;
+        color: white !important;
+      }
+      &__placeholder{
+        font-family: 'Proxima Nova' !important;
+        font-style: normal !important;
+        font-weight: 400 !important;
+        font-size: 14px !important;
+        line-height: 14px !important;
+        color: white !important;
       }
     }
 
@@ -49,16 +67,6 @@
     }
 
 
-    .fees-container{
-      margin: 32px 0;
-      .fees-wrapper{
-        border: 2px solid var(  --color-green);
-        padding: 24px;
         .information{
-margin-bottom: 24px;
+            margin-bottom: 24px;
         }
-      }
-
-    }
-  }
-}

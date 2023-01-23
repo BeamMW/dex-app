@@ -15,10 +15,13 @@ interface SectionProps {
 
 const SectionStyled = styled.div`
   position: relative;
-  margin: 0 -10px;
-  padding-top: 20px;
+  margin: 0;
+  padding: 20px;
   text-align: left;
-
+  background-color: rgba(255,255,255, 0.05);
+  max-width: 459px;
+  width: 100%;
+  border-radius: 10px;
   > .cancel-button {
     position: absolute;
     top: 68px;

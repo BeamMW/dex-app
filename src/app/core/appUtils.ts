@@ -1,4 +1,4 @@
-import { IAddLiquidity, IAsset, ICreatePool, IPoolCard, ITrade, ITxStatus, Kind } from "@core/types";
+import { IAddLiquidity, IAsset, ICreatePool, IPoolCard, IPredict, ITrade, ITxStatus, Kind } from "@core/types";
 import {ASSET_BEAM, GROTHS_IN_BEAM} from "@app/shared/constants";
 
 export function parseMetadata(metadata) {
@@ -94,4 +94,19 @@ export function onFilter(data: IPoolCard[], filter, assetsList:IAsset[]){
             return data
     }
 }
+
+export const emptyPredict = (data: IPredict, amount: string | number ):boolean => {
+    return !data || !amount || amount === '0'
+}
+export function numFormatter(num) {
+    if (num > 999 && num < 1000000) {
+        return parseFloat((num / 1000).toFixed(2)) + 'K';
+    } else if (num >= 1000000) {
+        return parseFloat((num / 1000000).toFixed(2)) + 'M';
+    } else if (num <= 999){
+        return parseFloat(num.toFixed(2));
+    }
+}
+
+
 

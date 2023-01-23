@@ -6,13 +6,16 @@ export  function useInput(initialState:string | number){
 
     const onChange = (e) => {
         setValue(e.target.value)
-
+    }
+    const onPredict = (e) => {
+        setValue(e)
     }
 
 
     return {
         value,
-        onChange
+        onChange,
+        onPredict
     }
 
 }

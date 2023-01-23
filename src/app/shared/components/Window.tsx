@@ -15,6 +15,7 @@ const Container = styled.div<{ bgColor: string }>`
   min-height: 100%;
   display: flex;
   flex-direction: column;
+  align-items: center;
   padding: 20px;
 `;
 

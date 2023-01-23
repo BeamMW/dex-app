@@ -21,3 +21,13 @@ export const SORT = [
   {  name: 'Liquid' ,value: "liquid"},
   {  name: "Empty", value: "empty" },
 ];
+
+export const titleSections = {
+  ADD_LIQUIDITY: "SELECT DEPOSIT CURRENCY",
+  ADD_LIQUIDITY_SEND: "Send Amount",
+  TRADE_RECEIVE: "Receive Amount",
+  TRADE_SEND: "Send Amount (estimated) ",
+  CREATE_FIRST : 'Select first asset',
+  CREATE_SECOND : 'Select second asset',
+  FEE: 'CHOOSE FEE TIER'
+}

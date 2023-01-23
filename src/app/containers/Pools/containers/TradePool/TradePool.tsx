@@ -1,41 +1,38 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { ITrade } from "@core/types";
-import { setDataRequest, toGroths } from "@core/appUtils";
-import { Button, Input, Title } from "@app/shared/components";
-import Select from "react-select";
+import { emptyPredict, fromGroths, setDataRequest, toGroths } from "@core/appUtils";
+import { AssetsContainer, AssetsSection, Button, Input, Section, Title, Window, Container } from "@app/shared/components";
 import { useInput } from "@app/shared/hooks";
 import * as mainActions from "@app/containers/Pools/store/actions";
 import { useDispatch, useSelector } from "react-redux";
 import "./index.scss";
-import { toast } from "react-toastify";
 import {
   selectCurrentPool,
-  selectErrorMessage,
   selectPredirect,
 } from "@app/containers/Pools/store/selectors";
-import { useError } from "@app/shared/hooks/useError";
+import { IconSwap } from "@app/shared/icons";
+import { titleSections } from "@app/shared/constants";
+
 
 export const TradePool = () => {
   const data = useSelector(selectCurrentPool());
   const predictData = useSelector(selectPredirect());
   const [currentToken, setCurrentToken] = useState(data.aid1);
   const [options, setOptions] = useState([]);
+  // const [optionTwo, setOptionsTwo] = useState([]);
+  const [isSwap, setIsSwap] = useState<boolean>(false);
   const amountInput = useInput(0);
   const [requestData, setRequestData] = useState(null);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    setOptions([
-      { label: data.metadata1.N, value: data.aid1 },
-      { label: data.metadata2.N, value: data.aid2 },
-    ]);
-  }, []);
-  const onChangeToken = (newValue) => {
-    setCurrentToken(newValue.value);
-  };
-  const getValue = () => {
-    return options.find((elem) => elem.value === currentToken);
-  };
+  console.log({ isSwap, currentToken })
+
+  const handleChange =  () => {
+    setIsSwap(!isSwap)
+  }
+  useEffect(()=>{
+    setCurrentToken(!isSwap?data.aid1 : data.aid2)
+  },[isSwap])
 
   useMemo(() => {
     setRequestData({
@@ -45,6 +42,7 @@ export const TradePool = () => {
       val1_buy: toGroths(Number(amountInput.value)),
     });
   }, [amountInput.value, currentToken]);
+  console.log(requestData)
 
   useMemo(() => {
     if (amountInput.value !== 0) {
@@ -52,75 +50,87 @@ export const TradePool = () => {
     }
   }, [requestData, amountInput.value]);
 
-
   const onTrade = (data: ITrade) => {
     dispatch(mainActions.onTradePool.request(setDataRequest(data)));
   };
   return (
-    <div className="create-pool-wrapper">
+   <Window>
       <Title variant="heading">Trade</Title>
-      <div className="create-pool-assets-container">
-        <Title variant="subtitle">Select token</Title>
-        <div className="assets-selector-wrapper">
-          <div className="asset-selector">
+     <Container>
+      <AssetsContainer variant='column'>
+        <Section title={titleSections.TRADE_RECEIVE}>
+          <AssetsSection>
+          <Input
+            type="number"
+            value={amountInput.value}
+            variant='amount'
+            pallete='blue'
+            onChange={(e) => amountInput.onChange(e)}
+          />
+            <h4>{isSwap ? data.metadata2.N : data.metadata1.N}</h4>
+          </AssetsSection>
+        </Section>
+        <Button variant='icon' type='button' icon={IconSwap} onClick={handleChange}> </Button>
+        <Section title={titleSections.TRADE_SEND}>
+          <AssetsSection>
             <Input
               type="number"
-              value={amountInput.value}
-              onChange={(e) => amountInput.onChange(e)}
+              disabled
+              pallete='purple'
+              variant='amount'
+              style={{cursor: 'default', color: '--var(color-purple)', opacity: 1}}
+              value={ emptyPredict(predictData, amountInput.value) ? '0' : fromGroths(predictData.pay) }
             />
-            <div className="select-wrapper">
-              <Select
-                classNamePrefix="custom-select"
-                options={options}
-                value={getValue()}
-                onChange={onChangeToken}
-              />
-              {/*<span className="select-content"> {data.metadata1.N}</span>*/}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="amount-wrapper">
-        <div className="amount-title">{data.metadata1.N}:</div>
-        <div className="amount-value">{data.tok1}</div>
-      </div>
-      <div className="amount-wrapper">
-        <div className="amount-title">{data.metadata2.N}:</div>
-        <div className="amount-value">{data.tok2}</div>
-      </div>
-      <div className="amount-wrapper">
-        <div className="amount-title">Buy:</div>
-        <div className="amount-value">
-          {predictData ? predictData.buy : "0"}
-        </div>
-      </div>
-      <div className="amount-wrapper">
-        <div className="amount-title">Fee-dao:</div>
-        <div className="amount-value">
-          {predictData ? predictData.fee_dao : "0"}
-        </div>
-      </div>
-      <div className="amount-wrapper">
-        <div className="amount-title">Fee-pool:</div>
-        <div className="amount-value">
-          {predictData ? predictData.fee_pool : "0"}
-        </div>
-      </div>
-      <div className="amount-wrapper">
-        <div className="amount-title">Pay:</div>
-        <div className="amount-value">
-          {predictData ? predictData.pay : "0"}
-        </div>
-      </div>
-      <div className="amount-wrapper">
-        <div className="amount-title">Pay-raw:</div>
-        <div className="amount-value">
-          {predictData ? predictData.pay_raw : "0"}
-        </div>
-      </div>
+            <h4>{isSwap ? data.metadata1.N : data.metadata2.N}</h4>
+          </AssetsSection>
+
+        </Section>
+      </AssetsContainer>
+       <Section>
+         <div className="amount-wrapper">
+           <div className="amount-title">{data.metadata1.N}:</div>
+           <div className="amount-value">{data.tok1}</div>
+         </div>
+         <div className="amount-wrapper">
+           <div className="amount-title">{data.metadata2.N}:</div>
+           <div className="amount-value">{data.tok2}</div>
+         </div>
+         <div className="amount-wrapper">
+           <div className="amount-title">Buy:</div>
+           <div className="amount-value">
+             {predictData ? predictData.buy : "0"}
+           </div>
+         </div>
+         <div className="amount-wrapper">
+           <div className="amount-title">Fee-dao:</div>
+           <div className="amount-value">
+             {predictData ? predictData.fee_dao : "0"}
+           </div>
+         </div>
+         <div className="amount-wrapper">
+           <div className="amount-title">Fee-pool:</div>
+           <div className="amount-value">
+             {predictData ? predictData.fee_pool : "0"}
+           </div>
+         </div>
+         <div className="amount-wrapper">
+           <div className="amount-title">Pay:</div>
+           <div className="amount-value">
+             {predictData ? predictData.pay : "0"}
+           </div>
+         </div>
+         <div className="amount-wrapper">
+           <div className="amount-title">Pay-raw:</div>
+           <div className="amount-value">
+             {predictData ? predictData.pay_raw : "0"}
+           </div>
+         </div>
+       </Section>
+
       <div className="button-wrapper">
         <Button onClick={() => onTrade(requestData)}>Trade</Button>
       </div>
-    </div>
+     </Container>
+   </Window>
   );
 };

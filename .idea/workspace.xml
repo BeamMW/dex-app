@@ -5,15 +5,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e1fc8e27-7a2d-44db-afa9-446b73814ad2" name="Changes" comment="feat: poolslist">
+      <change afterPath="$PROJECT_DIR$/src/app/shared/components/AssetsContainer.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/shared/components/AssetsSection.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/shared/components/Container.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/app.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/components/PoolList/PoolCard/PoolCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/components/PoolList/PoolCard/PoolCard.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/AddLiquidity/AddLiquidity.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/AddLiquidity/AddLiquidity.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/AddLiquidity/index.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/AddLiquidity/index.scss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/CreatePool.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/CreatePool.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/index.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/index.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolList/index.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolList/index.scss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/TradePool/TradePool.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/TradePool/TradePool.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/interfaces/DexStateType.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/interfaces/DexStateType.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/reducer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/reducer.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/saga.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/saga.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/selectors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/selectors.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/TradePool/index.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/TradePool/index.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/appUtils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/appUtils.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/Input.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Input.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/Section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Section.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/Window.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Window.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/constants/common.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/constants/common.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/hooks/useInput.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/hooks/useInput.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/icons/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/icons/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -58,7 +70,7 @@
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;yarn&quot;,
     &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;D:\\develop\\beam\\dex-app\\node_modules\\prettier&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;settings.javascript.linters.eslint&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;ts.external.directory.path&quot;: &quot;D:\\develop\\beam\\dex-app\\node_modules\\typescript\\lib&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -92,6 +104,10 @@
       <workItem from="1673507736497" duration="18518000" />
       <workItem from="1673594719322" duration="10717000" />
       <workItem from="1673851467251" duration="7079000" />
+      <workItem from="1674023339668" duration="13506000" />
+      <workItem from="1674108996137" duration="20567000" />
+      <workItem from="1674377279990" duration="27000" />
+      <workItem from="1674457725116" duration="2955000" />
     </task>
     <servers />
   </component>

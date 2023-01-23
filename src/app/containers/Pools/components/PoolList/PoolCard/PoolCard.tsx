@@ -6,7 +6,7 @@ import {ROUTES_PATH} from "@app/shared/constants";
 import {useNavigate} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import * as mainActions from "@app/containers/Pools/store/actions";
-import {Button} from "@app/shared/components";
+import { Button, Section } from "@app/shared/components";
 import {styled} from "@linaria/react";
 import {toast} from "react-toastify";
 
@@ -43,7 +43,7 @@ export const PoolCard = ({data, assets}:PoolCardType) => {
 
   return (
     <div className="pool-card-wrapper">
-      <div className="pool-card">
+      <Section>
         <div className="pool-card-header">
           <div className="pool-card-title">{nameToken1} / {nameToken2}</div>
           <div className="pool-fees">fee: {getPoolKind(data.kind)}</div>
@@ -63,7 +63,7 @@ export const PoolCard = ({data, assets}:PoolCardType) => {
           <Button onClick={tradePoolNavigation}>Trade</Button>
           {data.ctl ? <Button onClick={() => onWithdraw(data)}>Withdraw</Button> : null}
         </ButtonWrapper>
-      </div>
+      </Section>
     </div>
   );
 };
