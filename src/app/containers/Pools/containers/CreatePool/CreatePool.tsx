@@ -42,8 +42,9 @@ export const CreatePool = () => {
     kind: currentKind
   }]
 
-  const addLiquidityNavigation = useCallback((state) => {
-    navigate(ROUTES_PATH.POOLS.ADD_LIQUIDITY, {state});
+  const addLiquidityNavigation = useCallback((data) => {
+    dispatch(mainActions.setCurrentPool(data))
+    navigate(ROUTES_PATH.POOLS.ADD_LIQUIDITY);
   }, [navigate]);
 
   useEffect(()=>{

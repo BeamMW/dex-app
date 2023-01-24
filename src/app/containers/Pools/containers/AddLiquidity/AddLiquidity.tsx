@@ -14,7 +14,6 @@ import {
 import { emptyPredict, fromGroths, numFormatter, onPredictValue, setDataRequest, toGroths } from "@core/appUtils";
 import { useDispatch, useSelector } from "react-redux";
 import * as mainActions from "@app/containers/Pools/store/actions";
-import { toast } from "react-toastify";
 import {
   selectCurrentPool, selectPredirect,
 } from "@app/containers/Pools/store/selectors";
