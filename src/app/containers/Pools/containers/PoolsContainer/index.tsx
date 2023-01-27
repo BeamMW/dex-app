@@ -1,1 +1,1 @@
-export * from './PoolsContainer'
+export * from './PoolsContainer';

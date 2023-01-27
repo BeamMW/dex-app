@@ -1,17 +1,16 @@
-import React, { useRef } from "react";
-import { styled } from "@linaria/react";
-import Utils from "@core/utils.js";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { css } from "@linaria/core";
+import React, { useRef } from 'react';
+import { styled } from '@linaria/react';
+import Utils from '@core/utils.js';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { css } from '@linaria/core';
 
 interface WindowProps {
   onPrevious?: React.MouseEventHandler | undefined;
 }
 
 const Container = styled.div<{ bgColor: string }>`
-  background-color: ${({ bgColor }) =>
-    Utils.isWeb() ? bgColor : "transparent"};
+  background-color: ${({ bgColor }) => (Utils.isWeb() ? bgColor : 'transparent')};
   min-height: 100%;
   display: flex;
   flex-direction: column;

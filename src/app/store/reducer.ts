@@ -1,13 +1,12 @@
 import { AnyAction, combineReducers } from 'redux';
 import { AppState } from '@app/shared/interface';
 import { SharedReducer } from '@app/shared/store/reducer';
-import {MainReducer} from "@app/containers/Pools/store/reducer";
-
+import { MainReducer } from '@app/containers/Pools/store/reducer';
 
 export default () => {
   const appReducer = combineReducers({
     shared: SharedReducer,
-    main: MainReducer
+    main: MainReducer,
   });
 
   return (state: AppState | undefined, action: AnyAction) => appReducer(state, action);

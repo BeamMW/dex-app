@@ -6,10 +6,18 @@
   "author": "",
   "license": "",
   "scripts": {
+    "commit-hook": "git add .",
+    "lint": "eslint './src/**/*.ts{,x}' --fix",
+    "prettier": "prettier --write \"**/*.+(ts|tsx)\"",
     "build": "webpack --config webpack.common.js",
     "start": "webpack serve --config webpack.common.js",
     "prod": "webpack serve --config webpack.prod.js"
   },
+  "pre-commit": [
+    "prettier",
+    "lint",
+    "commit-hook"
+  ],
   "devDependencies": {
     "@babel/cli": "^7.14.8",
     "@babel/core": "^7.14.8",
@@ -33,11 +41,17 @@
     "cross-env": "7.0.3",
     "css-loader": "^6.2.0",
     "eslint": "^7.11.0",
-    "eslint-config-prettier": "6.10.1",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-config-airbnb-typescript": "^14.0.0",
+    "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-react-hooks": "^4.2.0",
     "mini-css-extract-plugin": "^2.2.0",
     "node-sass": "^8.0.0",
-    "prettier": "2.0.1",
+    "prettier": "2.1.1",
     "sass-loader": "^13.2.0",
     "style-loader": "^3.3.1",
     "svgo-loader": "^3.0.0",

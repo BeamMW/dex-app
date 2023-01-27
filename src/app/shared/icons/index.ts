@@ -120,4 +120,4 @@ export {
   WalletIcon,
   ErrorSvg,
   TxSentOfflineMPOwnIcon,
-}
+};
