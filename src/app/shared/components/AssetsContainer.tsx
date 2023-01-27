@@ -1,20 +1,22 @@
 import React from "react";
 import { styled } from "@linaria/react";
 interface SectionProps {
-  variant?: 'column'
+  variant?: 'center' | 'space-between'
 
 }
 const SectionStyled = styled.div<SectionProps>`
   display: flex;
-  justify-content: space-between;
+  justify-content: ${({variant}) => variant};
   max-width: 954px;
   width: 100%;
 `
+
 const AssetsContainer: React.FC<SectionProps> = ({
-  children
+  children,
+  variant= 'space-between'
 }) => {
   return (
-    <SectionStyled>
+    <SectionStyled variant={variant}>
       {children}
     </SectionStyled>
   );

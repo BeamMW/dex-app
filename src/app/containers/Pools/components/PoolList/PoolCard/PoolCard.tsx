@@ -21,8 +21,8 @@ const ButtonWrapper = styled.div`
   flex-direction: column;
 `
 export const PoolCard = ({data, assets}:PoolCardType) => {
-  const nameToken1 = data.metadata1.N
-  const nameToken2 = data.metadata2.N
+  const nameToken1 = `${data.aid1} ${data.metadata1.N}`
+  const nameToken2 = `${data.aid2} ${data.metadata2.N}`
   // const isCreator = !!data.creator
   const navigate = useNavigate()
   const dispatch = useDispatch()
@@ -32,9 +32,15 @@ export const PoolCard = ({data, assets}:PoolCardType) => {
     dispatch(mainActions.setCurrentPool(data))
     navigate(ROUTES_PATH.POOLS.ADD_LIQUIDITY);
   }, [navigate]);
+
   const tradePoolNavigation = useCallback(() => {
     dispatch(mainActions.setCurrentPool(data))
     navigate(ROUTES_PATH.POOLS.TRADE_POOL );
+  }, [navigate]);
+
+  const withdrawPoolNavigation = useCallback(() => {
+    dispatch(mainActions.setCurrentPool(data))
+    navigate(ROUTES_PATH.POOLS.WITHDRAW_POOL);
   }, [navigate]);
 
   const onWithdraw = (data) => {
@@ -42,8 +48,7 @@ export const PoolCard = ({data, assets}:PoolCardType) => {
   }
 
   return (
-    <div className="pool-card-wrapper">
-      <Section>
+      <Section title={`${nameToken1} / ${nameToken2}`}>
         <div className="pool-card-header">
           <div className="pool-card-title">{nameToken1} / {nameToken2}</div>
           <div className="pool-fees">fee: {getPoolKind(data.kind)}</div>
@@ -53,17 +58,16 @@ export const PoolCard = ({data, assets}:PoolCardType) => {
           </div>
         </div>
         <div className="pool-card-content">
-          <div className="asset-count">{`${fromGroths(data.tok1)} ${nameToken1}`}</div>
-          <div className="asset-count">{`${fromGroths(data.tok2)} ${nameToken2}`}</div>
+          <div className="asset-count">{`${fromGroths(data.tok1)} ${data.metadata1.N}`}</div>
+          <div className="asset-count">{`${fromGroths(data.tok2)} ${data.metadata2.N}`}</div>
           <div className="asset-exchange-rate">{`1 ${nameToken1} = ${parseIntToNum(data.k1_2)}  ${nameToken2}`}</div>
           <div className="asset-exchange-rate">{`1 ${nameToken2} = ${parseIntToNum(data.k2_1)}  ${nameToken1}`}</div>
         </div>
         <ButtonWrapper>
           <Button onClick={addLiquidityNavigation}>Add Liquidity</Button>
           <Button onClick={tradePoolNavigation}>Trade</Button>
-          {data.ctl ? <Button onClick={() => onWithdraw(data)}>Withdraw</Button> : null}
+          {data.ctl ? <Button onClick={withdrawPoolNavigation}>Withdraw</Button> : null}
         </ButtonWrapper>
       </Section>
-    </div>
   );
 };

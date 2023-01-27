@@ -1,6 +1,6 @@
 export type Pallete = 'green' | 'ghost' | 'purple' | 'blue' | 'red' | 'white' | 'vote-red';
 
-export type ButtonVariant = 'regular' | 'ghost' | 'ghostBordered' | 'block' | 'link' | 'icon';
+export type ButtonVariant = 'regular' | 'ghost' | 'ghostBordered' | 'block' | 'link' | 'icon' | 'control';
 
 export enum Kind {
     Low = 0,
@@ -122,8 +122,6 @@ export interface ITxResult {
     txid?: string,
     res?: IPredict
 }
-
-
 export interface IError {
     answer: {
         id: string,
@@ -135,4 +133,9 @@ export interface IError {
     }
         error: string;
 
+}
+
+export interface IOptions {
+    value: number,
+    label: string
 }

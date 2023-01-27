@@ -2,7 +2,7 @@ import {call, delay, put, select, takeLatest} from 'redux-saga/effects';
 import {IAsset, IPoolCard, ITxId, ITxResult, ITxStatus, TxStatus} from "@core/types";
 import {actions} from '.';
 import {AddLiquidityApi, CreatePoolApi, LoadAssetsList, LoadPoolsList, TradePoolApi, WithdrawApi} from "@core/api";
-import { checkTxStatus, onFilter, parseMetadata, parsePoolMetadata } from "@core/appUtils";
+import { checkTxStatus, getOptions, onFilter, parseMetadata, parsePoolMetadata } from "@core/appUtils";
 import {AppState} from "@app/shared/interface";
 import * as mainActions from "@app/containers/Pools/store/actions";
 import { selectFilter } from "@app/containers/Pools/store/selectors";
@@ -14,10 +14,12 @@ export function* loadParamsSaga(
     try {
         const filter = yield select(selectFilter())
         const assetsList = (yield call(LoadAssetsList, action.payload ? action.payload : null)) as IAsset[]
-        assetsList.forEach((asset) => {
+            assetsList.forEach((asset) => {
             asset['parsedMetadata'] = parseMetadata(asset.metadata);
         });
         yield put(mainActions.setAssetsList(assetsList));
+        const options = getOptions(assetsList)
+        yield put(mainActions.setOptions(options))
         const poolsList = (yield call(LoadPoolsList, action.payload? action.payload : null)) as IPoolCard[];
         const newPoolList = poolsList.map((pool)=>{
            return   parsePoolMetadata(pool,pool.aid1, pool.aid2, assetsList)

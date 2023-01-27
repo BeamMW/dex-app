@@ -1,12 +1,19 @@
-import React, { useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import { styled } from "@linaria/react";
 import Utils from "@core/utils.js";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { css } from "@linaria/core";
+import Title from "@app/shared/components/Title";
+import { BackButton, Button } from "@app/shared/components/index";
+import { ROUTES, ROUTES_PATH } from "@app/shared/constants";
+import { IconPlus } from "@app/shared/icons";
 
 interface WindowProps {
   onPrevious?: React.MouseEventHandler | undefined;
+  title?: string,
+  backButton?: boolean
+  createPool?: boolean
 }
 
 const Container = styled.div<{ bgColor: string }>`
@@ -16,8 +23,13 @@ const Container = styled.div<{ bgColor: string }>`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
 `;
+
+const HeaderWrapper = styled.div`
+display: flex;
+width: 100%;
+justify-content: center;
+`
 
 const StyledTitle = styled.div`
   font-weight: 500;
@@ -74,13 +86,44 @@ const NewButtonClass = css`
   margin-bottom: 0 !important;
   margin-right: 30px !important;
 `;
+const ButtonWrapper = styled.div`
+{
+  width: 100%;
+  display:flex;
+  justify-content: flex-end;
+}`
+const ButtonStyled = styled.div`{
+  max-width: 166px;
+  width: 100%;
+ margin-bottom: 16px;
+}`
 
-const Window: React.FC<WindowProps> = ({ children, onPrevious }) => {
+const Window: React.FC<WindowProps> = ({ children, onPrevious ,
+                                       title,
+                                       backButton,
+                                         createPool}) => {
   const rootRef = useRef();
-
+  const navigate = useNavigate()
+  const onPreviousClick = () => {
+    navigate(ROUTES.POOLS.BASE);
+  };
+  const createPoolNavigation = useCallback(() => {
+    navigate(ROUTES_PATH.POOLS.CREATE_POOL);
+  }, [navigate]);
   return (
     <>
       <Container bgColor={Utils.getStyles().background_main} ref={rootRef}>
+        {createPool && <ButtonWrapper>
+          <ButtonStyled>
+            <Button onClick={createPoolNavigation} variant="ghost" icon={IconPlus}>Create Pool</Button>
+          </ButtonStyled>
+        </ButtonWrapper>}
+        <HeaderWrapper>
+          {backButton && <BackButton title="back" onClick={onPreviousClick
+          }
+          ></BackButton>}
+          {title && <Title variant="heading">{title}</Title>}
+        </HeaderWrapper>
         {children}
       </Container>
     </>

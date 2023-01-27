@@ -2,9 +2,14 @@ import React, {useCallback, useEffect, useState} from "react";
 import "./index.scss";
 import { AssetsContainer, Button, Section, Title, Window, Container } from "@app/shared/components";
 import {useDispatch, useSelector} from "react-redux";
-import {selectAssetsList, selectPoolsList, selectTxStatus} from "@app/containers/Pools/store/selectors";
+import {
+  selectAssetsList,
+  selectOptions,
+  selectPoolsList,
+  selectTxStatus
+} from "@app/containers/Pools/store/selectors";
 import Select from 'react-select'
-import {IAsset, ICreatePool, TxStatus} from "@core/types";
+import { ICreatePool, TxStatus} from "@core/types";
 import { kindSelect, ROUTES_PATH, titleSections } from "@app/shared/constants";
 import {useNavigate} from "react-router-dom";
 import * as mainActions from "@app/containers/Pools/store/actions";
@@ -26,7 +31,7 @@ export const CreatePool = () => {
   const assetsList = useSelector(selectAssetsList());
   const poolsList = useSelector(selectPoolsList());
   const txStatus = useSelector(selectTxStatus());
-  const [options, setOptions] = useState([])
+ const options = useSelector(selectOptions())
   const [options2pair, setOptions2Pair] = useState([])
   const [currentToken1, setCurrentToken1] = useState(null);
   const [currentToken2, setCurrentToken2] = useState(null);
@@ -58,17 +63,6 @@ export const CreatePool = () => {
       addLiquidityNavigation(newPool)
     }
   },[txStatus])
-
-  const  getOptions =  (list: IAsset[]) => {
-    let options = [{
-      value: 0,
-      label: 'BEAM'
-    }]
-    list.map(item => {
-      options = [...options,  { value: item.aid, label: item.parsedMetadata.N}]
-    })
-    return options
-  }
   const getOptionsSecondPare = (lists, value: number) =>{
     if(lists && value || value === 0){
         setOptions2Pair(lists.filter((item) => item.value > value))
@@ -79,10 +73,6 @@ export const CreatePool = () => {
   const getKindValue = () => {
     return  kindSelect.find((elem) => elem.value === currentKind);
   }
-
-  useEffect(()=>{
-      setOptions(getOptions(assetsList))
-  },[assetsList])
 
   useEffect(()=>{
     getOptionsSecondPare(options, currentToken1)
@@ -115,13 +105,13 @@ export const CreatePool = () => {
   }
 
   return (
-    <Window>
-      <Title variant="heading">Create Pool</Title>
+    <Window title='Create pool' backButton>
       <Container>
         <AssetsContainer>
           <Section title={titleSections.CREATE_FIRST}>
             <Select  classNamePrefix="custom-select"
                      options={options}
+                     isSearchable
                      onChange={onChangeToken1}
             />
           </Section>

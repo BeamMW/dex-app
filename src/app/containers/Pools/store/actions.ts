@@ -1,5 +1,15 @@
 import {createAction, createAsyncAction} from "typesafe-actions";
-import {IAddLiquidity, IAsset, ICreatePool, IPoolCard, IPredict, ITrade, ITxStatus, IWithdraw} from "@core/types";
+import {
+  IAddLiquidity,
+  IAsset,
+  ICreatePool,
+  IOptions,
+  IPoolCard,
+  IPredict,
+  ITrade,
+  ITxStatus,
+  IWithdraw
+} from "@core/types";
 import {MainActionsTypes} from "@app/containers/Pools/store/constants";
 
 export const setAssetsList = createAction(MainActionsTypes.SET_ASSETS_LIST)<IAsset[]>();
@@ -10,8 +20,7 @@ export const setTransactionStatus = createAction(MainActionsTypes.SET_TRANSACTIO
 export const setPredict = createAction(MainActionsTypes.SET_PREDICT)<IPredict>();
 export const setCurrentPool = createAction(MainActionsTypes.SET_CURRENT_POOL)<IPoolCard>();
 export const setFilter = createAction(MainActionsTypes.SET_FILTER)<string>();
-
-
+export const setOptions = createAction(MainActionsTypes.SET_OPTIONS)<IOptions[]>();
 export const loadAppParams = createAsyncAction(
     MainActionsTypes.LOAD_PARAMS,
     MainActionsTypes.LOAD_PARAMS_SUCCESS,

@@ -16,3 +16,4 @@ export { default as Loader } from "./Loader";
 export  { default as AssetsSection } from './AssetsSection'
 export  { default as AssetsContainer } from './AssetsContainer'
 export  { default as Container } from './Container'
+export  { default as ReactSelect } from './ReactSelect'

@@ -5,9 +5,36 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e1fc8e27-7a2d-44db-afa9-446b73814ad2" name="Changes" comment="feat: poolslist">
+      <change afterPath="$PROJECT_DIR$/src/app/shared/components/ReactSelect.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/app.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/components/PoolList/PoolCard/PoolCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/components/PoolList/PoolCard/PoolCard.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/AddLiquidity/AddLiquidity.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/AddLiquidity/AddLiquidity.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/CreatePool.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/CreatePool.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/index.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/index.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolList/PoolsList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolList/PoolsList.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolList/index.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolList/index.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/TradePool/TradePool.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/TradePool/TradePool.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/WithdrawPool/WithdrawPool.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/WithdrawPool/WithdrawPool.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/interfaces/DexStateType.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/interfaces/DexStateType.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/actions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/constants.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/constants.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/reducer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/reducer.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/saga.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/saga.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/selectors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/selectors.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/appUtils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/appUtils.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/AssetsContainer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/AssetsContainer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/BackButton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/BackButton.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/Button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Button.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/Container.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Container.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/Section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Section.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/Title.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Title.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/Window.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Window.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/icons/icon-arrow-left.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/icons/icon-arrow-left.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/icons/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/icons/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/styles.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/styles.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,6 +45,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="TypeScript JSX File" />
+        <option value="TypeScript File" />
       </list>
     </option>
   </component>
@@ -90,7 +118,7 @@
       <workItem from="1674108996137" duration="20567000" />
       <workItem from="1674377279990" duration="27000" />
       <workItem from="1674457725116" duration="9507000" />
-      <workItem from="1674549487799" duration="2130000" />
+      <workItem from="1674549487799" duration="55500000" />
     </task>
     <servers />
   </component>

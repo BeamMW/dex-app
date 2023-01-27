@@ -22,6 +22,61 @@ css`
       box-sizing: border-box;
       outline: none;
     }
+    @font-face {
+      font-family: 'ProximaNova';
+      src: url('/shared/fonts/ProximaNova-Regular.otf');
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'ProximaNova';
+      src: url('/shared/fonts/ProximaNova-Regular.otf');
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    @font-face {
+      font-family: 'ProximaNova';
+      src: url('/shared/fonts/ProximaNova-Font.otf');
+      font-weight: 600;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'ProximaNova';
+      src: url('/shared/fonts/ProximaNova-Bold.otf');
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'SFProDisplay';
+      src: url('/shared/fonts/SFProDisplay-Regular.ttf');
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'SFProDisplay';
+      src: url('/shared/fonts/SFProDisplay-RegularItalic.ttf');
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    @font-face {
+      font-family: 'SFProDisplay';
+      src: url('/shared/fonts/SFUIDisplay-Medium.otf');
+      font-weight: 600;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'SFProDisplay';
+      src: url('/shared/fonts/SFProDisplay-Bold.ttf');
+      font-weight: 700;
+      font-style: normal;
+    }
 
     html,
     body {
@@ -29,6 +84,7 @@ css`
       padding: 0;
       height: 100%;
       min-width: 860px;
+      font-family: 'Proxima Nova';
     }
 
     #root {

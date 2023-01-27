@@ -9,6 +9,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const BaseButtonStyled = styled.button<ButtonProps>`
+  font-family: SFProDisplay;
   &[disabled] {
     opacity: 0.5;
 
@@ -23,16 +24,13 @@ const BaseButtonStyled = styled.button<ButtonProps>`
 const ButtonStyled = styled(BaseButtonStyled)`
   display: block;
   width: 100%;
-  max-width: 254px;
-  margin: 0 auto;
-  margin-bottom: 10px;
-  padding: 12px 24px;
+  height: 37px;
   border: none;
-  border-radius: 22px;
+  border-radius: 19px;
   background-color: ${({ pallete }) => `var(--color-${pallete})`};
   text-align: center;
-  font-weight: bold;
-  font-size: 16px;
+  font-weight: 700;
+  font-size: 14px;
   color: var(--color-dark-blue);
 
   &:hover,
@@ -99,6 +97,17 @@ const LinkButtonStyled = styled(IconButtonStyled)`
   font-weight: 700;
   color: ${({ pallete }) => `var(--color-${pallete})`};
 `;
+const ControlButton = styled(IconButtonStyled)`
+  font-style: normal;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 17px;
+  text-transform: lowercase;
+  svg{
+    margin-right: 16px;
+    vertical-align: middle;
+  }
+`
 
 const VARIANTS = {
   regular: ButtonStyled,
@@ -106,6 +115,8 @@ const VARIANTS = {
   link: LinkButtonStyled,
   icon: IconButtonStyled,
   block: BlockButtonStyled,
+  control: ControlButton
+
 };
 
 const Button: React.FC<ButtonProps> = ({

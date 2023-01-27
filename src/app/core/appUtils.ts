@@ -1,4 +1,14 @@
-import { IAddLiquidity, IAsset, ICreatePool, IPoolCard, IPredict, ITrade, ITxStatus, Kind } from "@core/types";
+import {
+    IAddLiquidity,
+    IAsset,
+    ICreatePool,
+    IOptions,
+    IPoolCard,
+    IPredict,
+    ITrade,
+    ITxStatus,
+    Kind
+} from "@core/types";
 import {ASSET_BEAM, GROTHS_IN_BEAM} from "@app/shared/constants";
 
 export function parseMetadata(metadata) {
@@ -9,6 +19,17 @@ export function parseMetadata(metadata) {
         return {...accumulator, [data[0]]: data[1]};
     }, {});
     return obj;
+}
+
+export function getOptions(assets: IAsset[]) {
+    let options = [{
+        value: 0,
+        label: `0 BEAM`
+    }]
+    assets.map(item => {
+        options = [...options,  { value: item.aid, label:`${item.aid} ${item.parsedMetadata.N}`}]
+    })
+    return options
 }
 
 export const getPoolKind = (kind: number) => {
@@ -91,7 +112,7 @@ export function onFilter(data: IPoolCard[], filter, assetsList:IAsset[]){
             return data.filter(el=>!el.ctl)
         }
         default:
-            return data
+            return data.filter(el=>el.ctl)
     }
 }
 
@@ -116,6 +137,22 @@ export const onPredictValue = (value, swap:boolean, predict: IPredict) => {
     }
     return  fromGroths(predict.tok2)
 }
+
+export const getFilterPools = (filtered: IOptions[], data:IPoolCard[]):IPoolCard[] => {
+    if (filtered.length !== 0) {
+        let newList = []
+        filtered.map(el => {
+            data.map(item => {
+                if (item.aid1 == el.value || item.aid2 === el.value) {
+                    return newList = [...newList, item]
+                }
+            })
+            console.log(newList)
+            return newList
+        })
+        return newList
+    }else  return data
+ }
 
 
 

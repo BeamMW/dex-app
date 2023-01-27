@@ -1,22 +1,89 @@
 
     .custom-select {
-      &_container{
-        max-width: 412px;
-        width: 100%;
-      }
       &__control{
         background-color: rgba(255, 255, 255, 0.05) !important;
         border: none !important;
         border-radius: 10px;
+        max-width: 412px !important;
+        width: 100% !important;
+        min-width: 300px !important;
         &--menu-is-open{
           box-shadow:( 0 0 0 1px ) var(--color-green) !important;
         }
       }
       &__menu{
-        background-color: rgba(255, 255, 255, 0.05) !important;
+        background-color: rgba(0, 0, 0, 0.9) !important;
+        box-shadow:( 0 0 0 1px ) var(--color-green) !important;
         &-list::-webkit-scrollbar {
           width: 4px;
           height: 0px;
+        }
+        &-list::-webkit-scrollbar-track {
+          background-color: rgba(255, 255, 255, 0.2) !important;
+          border-radius: 3px !important;
+        }
+        &-list::-webkit-scrollbar-thumb {
+          background-color: rgba(255, 255, 255, 0.2) !important;
+          border-radius: 3px !important;
+        }
+        &-list::-webkit-scrollbar-thumb:hover {
+          background: var(--color-green) !important;
+          border-radius: 3px !important;
+        }
+      }
+      &__option{
+        &--is-focused, &--is-selected{
+          background-color: var(--color-green) !important;
+          color: black !important;
+        }
+      }
+      &__single-value{
+        font-family: 'Proxima Nova' !important;
+        font-style: normal !important;
+        font-weight: 400 !important;
+        font-size: 14px !important;
+        line-height: 14px !important;
+        color: white !important;
+      }
+      &__placeholder{
+        font-family: 'Proxima Nova' !important;
+        font-style: normal !important;
+        font-weight: 400 !important;
+        font-size: 14px !important;
+        line-height: 14px !important;
+        color: white !important;
+      }
+    }
+    .custom-filter{
+      &__control{
+        background-color: rgba(255, 255, 255, 0.05) !important;
+        border: none !important;
+        border-radius: 10px;
+        max-width: 400px !important;
+        width: 100% !important;
+        min-width: 300px !important;
+        &--menu-is-open, &--is-focused{
+          box-shadow:( 0 0 0 1px ) var(--color-green) !important;
+        }
+      }
+      &__indicator-separator{
+        display: none;
+      }
+      &__multi-value{
+          background-color: rgba(255, 255, 255, 0.05) !important;
+      }
+      &__value-container{
+          flex-wrap: nowrap !important;
+      }
+      &__multi-value__label{
+        color: white !important;
+      }
+      &__menu{
+        background-color: rgba(0, 0, 0, 0.9) !important;
+        box-shadow:( 0 0 0 1px ) var(--color-green) !important;
+        &-list::-webkit-scrollbar {
+          width: 4px !important;
+          height: 0px !important; ;
         }
         &-list::-webkit-scrollbar-track {
           background-color: rgba(255, 255, 255, 0.2) !important;

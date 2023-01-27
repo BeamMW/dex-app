@@ -10,3 +10,4 @@ export const selectTxStatus = () => createSelector(selectMain, (state) => state.
 export const selectPredirect = () => createSelector(selectMain, (state) => state.predict);
 export const selectCurrentPool = () => createSelector(selectMain, (state) => state.currentPool);
 export const selectFilter= () => createSelector(selectMain, (state) => state.filter);
+export const selectOptions= () => createSelector(selectMain, (state) => state.options);

@@ -1,4 +1,4 @@
-import {IAsset, IPoolCard, IPredict, ITxStatus} from "@core/types";
+import { IAsset, IOptions, IPoolCard, IPredict, ITxStatus } from "@core/types";
 
 
 export interface DexStateType {
@@ -8,5 +8,7 @@ export interface DexStateType {
         statusTransaction: number | null,
         predict: IPredict,
         currentPool: IPoolCard,
-        filter: string
+        filter: string,
+
+        options: IOptions[];
 }

@@ -1,7 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { ITrade } from "@core/types";
 import { emptyPredict, fromGroths, setDataRequest, toGroths } from "@core/appUtils";
-import { AssetsContainer, AssetsSection, Button, Input, Section, Title, Window, Container } from "@app/shared/components";
+import {
+  AssetsContainer,
+  AssetsSection,
+  Button,
+  Input,
+  Section,
+  Title,
+  Window,
+  Container,
+  BackButton
+} from "@app/shared/components";
 import { useInput } from "@app/shared/hooks";
 import * as mainActions from "@app/containers/Pools/store/actions";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,7 +21,8 @@ import {
   selectPredirect,
 } from "@app/containers/Pools/store/selectors";
 import { IconSwap } from "@app/shared/icons";
-import { titleSections } from "@app/shared/constants";
+import { ROUTES, titleSections } from "@app/shared/constants";
+import { useNavigate } from "react-router-dom";
 
 
 export const TradePool = () => {
@@ -24,6 +35,10 @@ export const TradePool = () => {
   const amountInput = useInput(0);
   const [requestData, setRequestData] = useState(null);
   const dispatch = useDispatch();
+  const navigate = useNavigate()
+
+  const tokenName_1 = `${data.aid1} ${data.metadata1.N}`;
+  const tokenName_2 = `${data.aid2} ${data.metadata2.N}`;
 
   console.log({ isSwap, currentToken })
 
@@ -53,11 +68,13 @@ export const TradePool = () => {
   const onTrade = (data: ITrade) => {
     dispatch(mainActions.onTradePool.request(setDataRequest(data)));
   };
+  const onPreviousClick = () => {
+    navigate(ROUTES.POOLS.BASE);
+  };
   return (
-   <Window>
-      <Title variant="heading">Trade</Title>
+   <Window title='trade' backButton>
      <Container>
-      <AssetsContainer variant='column'>
+      <AssetsContainer>
         <Section title={titleSections.TRADE_RECEIVE}>
           <AssetsSection>
           <Input
@@ -67,7 +84,7 @@ export const TradePool = () => {
             pallete='blue'
             onChange={(e) => amountInput.onChange(e)}
           />
-            <h4>{isSwap ? data.metadata2.N : data.metadata1.N}</h4>
+            <h4>{isSwap ? tokenName_2 :tokenName_1}</h4>
           </AssetsSection>
         </Section>
         <Button variant='icon' type='button' icon={IconSwap} onClick={handleChange}> </Button>
@@ -81,7 +98,7 @@ export const TradePool = () => {
               style={{cursor: 'default', color: '--var(color-purple)', opacity: 1}}
               value={ emptyPredict(predictData, amountInput.value) ? '0' : fromGroths(predictData.pay) }
             />
-            <h4>{isSwap ? data.metadata1.N : data.metadata2.N}</h4>
+            <h4>{isSwap ? tokenName_1 :tokenName_2}</h4>
           </AssetsSection>
 
         </Section>

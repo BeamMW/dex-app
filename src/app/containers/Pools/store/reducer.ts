@@ -12,7 +12,8 @@ const initialState: DexStateType = {
     statusTransaction: null,
     predict: null,
     currentPool: null,
-    filter: 'all'
+    filter: 'liquid',
+    options: [],
 };
 
 
@@ -37,6 +38,9 @@ const reducer = createReducer<DexStateType, Action>(initialState)
     }))
   .handleAction(actions.setFilter, (state, action) => produce(state, (nexState) => {
         nexState.filter = action.payload
+    }))
+  .handleAction(actions.setOptions, (state, action) => produce(state, (nexState) => {
+        nexState.options = action.payload
     }))
 
 

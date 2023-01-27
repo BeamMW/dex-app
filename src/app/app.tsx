@@ -14,7 +14,7 @@ import { ToastContainer } from "react-toastify";
 import { Scrollbars } from "react-custom-scrollbars";
 
 import "./styles";
-import {PoolsContainer, CreatePool, AddLiquidity, TradePool} from "@app/containers";
+import { PoolsContainer, CreatePool, AddLiquidity, TradePool, WithdrawPool } from "@app/containers";
 import { ROUTES } from "@app/shared/constants";
 const trackStyle = css`
   z-index: 999;
@@ -39,10 +39,10 @@ const routes = [
     path: ROUTES.POOLS.TRADE_POOL,
     element: <TradePool />,
   },
-  // {
-  //   path: ROUTES.POOLS.WITHDRAW_POOL,
-  //   element: <WithdrawPool />,
-  // },
+  {
+    path: ROUTES.POOLS.WITHDRAW_POOL,
+    element: <WithdrawPool />,
+  },
 ];
 
 const App = () => {

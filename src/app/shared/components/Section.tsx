@@ -8,7 +8,7 @@ interface SectionProps {
   title?: string;
   subtitle?: string;
   collapse?: boolean;
-  variant?: 'regular' | 'gray';
+  variant?: 'regular' | 'gray' | 'card';
   showAllAction?: () => void;
   defaultCollapseState?: boolean;
 }
@@ -62,6 +62,12 @@ const SectionGrayStyled = styled.div`
   }
 `;
 
+const SectionCardStyled = styled(SectionGrayStyled)`{
+  max-width: 298px;
+  width: 100%;
+  height: 382px;
+}`
+
 const ButtonStyled = styled.button`
   position: absolute;
   top: 20px;
@@ -110,6 +116,7 @@ const Section: React.FC<SectionProps> = ({
   const SectionComponent = {
     regular: SectionStyled,
     gray: SectionGrayStyled,
+    card: SectionCardStyled
   }[variant];
 
   return (

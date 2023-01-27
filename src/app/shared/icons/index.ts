@@ -63,6 +63,7 @@ import WalletIcon from './ic-wallet.svg';
 import ErrorSvg from './error-svg.svg';
 import TxSentOfflineMPOwnIcon from './icon-sent-own-offline.svg';
 import IconSwap from './icon-swap.svg'
+import IconPlus from './icon-plus.svg'
 
 export {
   IconReceive,
@@ -121,5 +122,6 @@ export {
   WalletIcon,
   ErrorSvg,
   TxSentOfflineMPOwnIcon,
-  IconSwap
+  IconSwap,
+  IconPlus
 }

@@ -31,6 +31,8 @@ export const AddLiquidity = () => {
   const [isSwap, setIsSwap] = useState<boolean>(false);
   const [isEmpty, setIsEmpty] = useState(true)
   const dispatch = useDispatch();
+  const tokenName_1 = `${data.aid1} ${data.metadata1.N}`;
+  const tokenName_2 = `${data.aid2} ${data.metadata2.N}`;
 
   useEffect(()=>{
     setIsEmpty(!(data.tok1 || data.tok2 !== 0))
@@ -95,8 +97,7 @@ export const AddLiquidity = () => {
   const calculated = onPredictValue(currentInput, isSwap, predictData)
 
   return (
-    <Window >
-      <Title variant="heading">Add Liquidity</Title>
+    <Window title='Add liquidity' backButton>
       <Container>
         {isEmpty ?(<AssetsContainer>
           {/*<Title variant="subtitle">Select Pair</Title>*/}
@@ -110,7 +111,7 @@ export const AddLiquidity = () => {
                 onChange={(e) => amountInput_aid1.onChange(e)}
               />
               <div className="select-wrapper">
-                <span className="select-content"> {data.metadata1.N}</span>
+                <span className="select-content"> {tokenName_1}</span>
               </div>
             </AssetsSection>
           </Section>
@@ -124,7 +125,7 @@ export const AddLiquidity = () => {
                 onChange={(e) => amountInput_aid2.onChange(e)}
               />
               <div className="select-wrapper">
-                <span className="select-content"> {data.metadata2.N}</span>
+                <span className="select-content"> {tokenName_2}</span>
               </div>
             </AssetsSection>
           </Section>
@@ -139,7 +140,7 @@ export const AddLiquidity = () => {
                   pallete='blue'
                   onChange={(e) => currentInput.onChange(e)}
                 />
-                <h4>{isSwap ? data.metadata2.N : data.metadata1.N}</h4>
+                <h4>{isSwap ? tokenName_2 : tokenName_1}</h4>
               </AssetsSection>
             </Section>
             <Button variant='icon' type='button' icon={IconSwap} onClick={handleChange}> </Button>
@@ -152,7 +153,7 @@ export const AddLiquidity = () => {
                   style={{cursor: 'default', color: '--var(color-purple)', opacity: 1}}
                   value={numFormatter(calculated)}
                 />
-                <h4>{isSwap ? data.metadata1.N : data.metadata2.N}</h4>
+                <h4>{isSwap ? tokenName_1 : tokenName_2}</h4>
               </AssetsSection>
 
             </Section>
@@ -161,13 +162,13 @@ export const AddLiquidity = () => {
         {/*// Create components for predirect*/}
         <Section>
           <div className="amount-wrapper">
-            <div className="amount-title">{data.metadata1.N}:</div>
+            <div className="amount-title">{tokenName_1}:</div>
             <div className="amount-value">
               {!predictData || currentInput.value == 0 ? 0 : fromGroths(predictData.tok1)}
             </div>
           </div>
           <div className="amount-wrapper">
-            <div className="amount-title">{data.metadata2.N}:</div>
+            <div className="amount-title">{tokenName_2}:</div>
             <div className="amount-value">
               {!predictData || currentInput.value == 0 ? 0 : fromGroths(predictData.tok2)}
             </div>
