@@ -1,1 +1,1 @@
-export * from './WithdrawPool'
+export * from './WithdrawPool';

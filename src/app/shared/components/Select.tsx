@@ -1,8 +1,10 @@
-import React, { ReactElement, useEffect, useRef, useState } from "react";
-import { styled } from "@linaria/react";
+import React, {
+  ReactElement, useEffect, useRef, useState,
+} from 'react';
+import { styled } from '@linaria/react';
 
-import { css } from "@linaria/core";
-import Angle from "./Angle";
+import { css } from '@linaria/core';
+import Angle from './Angle';
 
 const ContainerStyled = styled.div`
   display: inline-block;
@@ -43,7 +45,7 @@ const OptionActiveStyled = styled(OptionStyled)`
 
 const ButtonStyled = styled.button`
   line-height: 26px;
-  cursor: ${({ disabled }) => (disabled ? "default" : "pointer")};
+  cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
   padding: 0;
   border: none;
   background-color: transparent;
@@ -70,11 +72,7 @@ interface OptionProps {
   onClick?: React.MouseEventHandler;
 }
 
-export const Option: React.FC<OptionProps> = ({
-  active,
-  children,
-  onClick,
-}) => {
+export const Option: React.FC<OptionProps> = ({ active, children, onClick }) => {
   if (active) {
     return <OptionActiveStyled>{children}</OptionActiveStyled>;
   }
@@ -89,10 +87,7 @@ interface SelectProps<T = any> {
 }
 
 export const Select: React.FC<SelectProps> = ({
-  value,
-  className,
-  children,
-  onSelect,
+  value, className, children, onSelect,
 }) => {
   const [opened, setOpened] = useState(false);
   const selectRef = useRef<HTMLDivElement>();
@@ -146,19 +141,9 @@ export const Select: React.FC<SelectProps> = ({
 
   return (
     <ContainerStyled className={className}>
-      <ButtonStyled
-        type="button"
-        onMouseDown={handleMouseDown}
-        disabled={disabled}
-      >
+      <ButtonStyled type="button" onMouseDown={handleMouseDown} disabled={disabled}>
         {(selected as ReactElement).props.children}
-        {options.length > 1 && (
-          <Angle
-            className={angleStyle}
-            value={opened ? 0 : 180}
-            margin={opened ? 3 : 1}
-          />
-        )}
+        {options.length > 1 && <Angle className={angleStyle} value={opened ? 0 : 180} margin={opened ? 3 : 1} />}
       </ButtonStyled>
       {opened && (
         <SelectStyled ref={selectRef} tabIndex={-1} onBlur={handleBlur}>

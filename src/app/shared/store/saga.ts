@@ -1,40 +1,39 @@
-import {
-  call, take,
-} from 'redux-saga/effects';
+import { call, take } from 'redux-saga/effects';
 
 import { eventChannel, END } from 'redux-saga';
-import {  setSystemState } from '@app/shared/store/actions';
+import { setSystemState } from '@app/shared/store/actions';
 import { actions as mainActions } from '@app/containers/Pools/store/index';
-import store from '../../../index';
 
 import Utils from '@core/utils.js';
-import { setTxStatus} from "@app/containers/Pools/store/actions";
+import { setTxStatus } from '@app/containers/Pools/store/actions';
+import store from '../../../index';
 
 export function remoteEventChannel() {
   return eventChannel((emitter) => {
-    Utils.initialize({
-      "appname": "BEAM Faucet",
-      "min_api_version": "6.2",
-      "headless": false,
-      "apiResultHandler": (error, result, full) => {
-        console.log('api result data: ', result, full);
-        if (!result.error) {
-          emitter(full);
-        }
-      }
-    }, (err) => {
-        Utils.download("./amm.wasm", (err, bytes) => {
-            Utils.callApi("ev_subunsub", {ev_txs_changed: true, ev_system_state: true},
-              (error, result, full) => {
-                if (result) {
-                  console.log("Object")
-                 store.dispatch(mainActions.loadAppParams.request(bytes));
-                 // store.dispatch(mainActions.loadPoolsList.request(bytes));
-                 }
-                }
-            );
-        })
-    });
+    Utils.initialize(
+      {
+        appname: 'BEAM Faucet',
+        min_api_version: '6.2',
+        headless: false,
+        apiResultHandler: (error, result, full) => {
+          console.log('api result data: ', result, full);
+          if (!result.error) {
+            emitter(full);
+          }
+        },
+      },
+      (err) => {
+        Utils.download('./amm.wasm', (err, bytes) => {
+          Utils.callApi('ev_subunsub', { ev_txs_changed: true, ev_system_state: true }, (error, result, full) => {
+            if (result) {
+              console.log('Object');
+              store.dispatch(mainActions.loadAppParams.request(bytes));
+              // store.dispatch(mainActions.loadPoolsList.request(bytes));
+            }
+          });
+        });
+      },
+    );
 
     const unsubscribe = () => {
       emitter(END);
@@ -50,16 +49,16 @@ function* sharedSaga() {
   while (true) {
     try {
       const payload: any = yield take(remoteChannel);
-      console.log(payload)
+      console.log(payload);
       switch (payload.id) {
         case 'ev_system_state':
           store.dispatch(setSystemState(payload.result));
           store.dispatch(mainActions.loadAppParams.request(null));
           break;
-          case 'ev_txs_changed':
+        case 'ev_txs_changed':
           store.dispatch(setTxStatus(payload.result));
           break;
-          default:
+        default:
           break;
       }
     } catch (err) {

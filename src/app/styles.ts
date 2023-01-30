@@ -94,13 +94,14 @@ css`
     body {
       font-size: 14px;
       color: white;
-    }    
+    }
 
     p {
       margin: 0;
     }
 
-    h1,h2 {
+    h1,
+    h2 {
       margin: 0;
     }
 
@@ -110,7 +111,9 @@ css`
       padding: 0;
     }
 
-    tr, th, table {
+    tr,
+    th,
+    table {
       border: none;
       border-spacing: 0;
       padding: 0;
@@ -119,8 +122,3 @@ css`
     }
   }
 `;
-
-
-
-
-
