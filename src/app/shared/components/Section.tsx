@@ -66,7 +66,7 @@ const SectionCardStyled = styled(SectionGrayStyled)`{
   max-width: 298px;
   width: 100%;
   height: 382px;
-}`
+}`;
 
 const ButtonStyled = styled.button`
   position: absolute;
@@ -116,7 +116,7 @@ const Section: React.FC<SectionProps> = ({
   const SectionComponent = {
     regular: SectionStyled,
     gray: SectionGrayStyled,
-    card: SectionCardStyled
+    card: SectionCardStyled,
   }[variant];
 
   return (

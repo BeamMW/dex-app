@@ -66,6 +66,9 @@
           box-shadow:( 0 0 0 1px ) var(--color-green) !important;
         }
       }
+      &__input-container{
+        color: white !important;
+      }
       &__indicator-separator{
         display: none;
       }

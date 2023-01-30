@@ -1,5 +1,5 @@
-import React from "react";
-import { styled } from "@linaria/react";
+import React from 'react';
+import { styled } from '@linaria/react';
 
 const SectionStyled = styled.div`
   display: flex;
@@ -13,15 +13,13 @@ const SectionStyled = styled.div`
   border-radius: 10px;
   padding-right: 15px;
   background-color: rgba(255,255,255,0.05);
-`
+`;
 const AssetsSection: React.FC = ({
- children,
- }) => {
-  return (
-    <SectionStyled>
-      {children}
-    </SectionStyled>
-  );
-};
+  children,
+}) => (
+  <SectionStyled>
+    {children}
+  </SectionStyled>
+);
 
 export default AssetsSection;

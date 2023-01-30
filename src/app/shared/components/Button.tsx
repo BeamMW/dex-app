@@ -107,7 +107,7 @@ const ControlButton = styled(IconButtonStyled)`
     margin-right: 16px;
     vertical-align: middle;
   }
-`
+`;
 
 const VARIANTS = {
   regular: ButtonStyled,
@@ -115,7 +115,7 @@ const VARIANTS = {
   link: LinkButtonStyled,
   icon: IconButtonStyled,
   block: BlockButtonStyled,
-  control: ControlButton
+  control: ControlButton,
 
 };
 

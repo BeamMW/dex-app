@@ -1,5 +1,5 @@
-import React from "react";
-import { styled } from "@linaria/react";
+import React from 'react';
+import { styled } from '@linaria/react';
 
 const ContainerStyled = styled.div`
   display: flex;
@@ -14,13 +14,11 @@ const ContainerStyled = styled.div`
 `;
 
 const Container: React.FC = ({
-  children
-  }) => {
-  return (
-    <ContainerStyled>
-      {children}
-    </ContainerStyled>
-  );
-};
+  children,
+}) => (
+  <ContainerStyled>
+    {children}
+  </ContainerStyled>
+);
 
 export default Container;

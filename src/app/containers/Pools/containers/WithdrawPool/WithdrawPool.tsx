@@ -1,17 +1,20 @@
-import React, { useMemo, useState } from "react";
-import { ITrade } from "@core/types";
-import { emptyPredict, fromGroths, setDataRequest, toGroths } from "@core/appUtils";
-import { AssetsContainer, AssetsSection, Button, Input, Section, Title, Window, Container } from "@app/shared/components";
-import { useInput } from "@app/shared/hooks";
-import * as mainActions from "@app/containers/Pools/store/actions";
-import { useDispatch, useSelector } from "react-redux";
-import "./index.scss";
+import React, { useMemo, useState } from 'react';
+import { ITrade } from '@core/types';
+import {
+  emptyPredict, fromGroths, setDataRequest, toGroths,
+} from '@core/appUtils';
+import {
+  AssetsContainer, AssetsSection, Button, Input, Section, Title, Window, Container,
+} from '@app/shared/components';
+import { useInput } from '@app/shared/hooks';
+import * as mainActions from '@app/containers/Pools/store/actions';
+import { useDispatch, useSelector } from 'react-redux';
+import './index.scss';
 import {
   selectCurrentPool,
   selectPredirect,
-} from "@app/containers/Pools/store/selectors";
-import { titleSections } from "@app/shared/constants";
-
+} from '@app/containers/Pools/store/selectors';
+import { titleSections } from '@app/shared/constants';
 
 export const WithdrawPool = () => {
   const data = useSelector(selectCurrentPool());
@@ -19,7 +22,6 @@ export const WithdrawPool = () => {
   const amountInput = useInput(0);
   const [requestData, setRequestData] = useState(null);
   const dispatch = useDispatch();
-
 
   useMemo(() => {
     setRequestData({
@@ -40,19 +42,19 @@ export const WithdrawPool = () => {
     dispatch(mainActions.onWithdraw.request(setDataRequest(data)));
   };
   return (
-    <Window title='Withdraw' backButton>
+    <Window title="Withdraw" backButton>
       <Container>
-        <AssetsContainer variant='center'>
+        <AssetsContainer variant="center">
           <Section title={titleSections.ADD_LIQUIDITY_SEND}>
             <AssetsSection>
               <Input
                 type="number"
                 value={amountInput.value}
-                variant='amount'
-                pallete='blue'
+                variant="amount"
+                pallete="blue"
                 onChange={(e) => amountInput.onChange(e)}
               />
-              <h4>{"AMML"}</h4>
+              <h4>AMML</h4>
             </AssetsSection>
           </Section>
         </AssetsContainer>
@@ -61,10 +63,10 @@ export const WithdrawPool = () => {
             <Input
               type="number"
               disabled
-              pallete='purple'
-              variant='amount'
-              style={{cursor: 'default', color: '--var(color-purple)', opacity: 1}}
-              value={ emptyPredict(predictData, amountInput.value) ? '0' : fromGroths(predictData.tok1) }
+              pallete="purple"
+              variant="amount"
+              style={{ cursor: 'default', color: '--var(color-purple)', opacity: 1 }}
+              value={emptyPredict(predictData, amountInput.value) ? '0' : fromGroths(predictData.tok1)}
             />
             <h4>{data.metadata1.N}</h4>
           </AssetsSection>
@@ -72,10 +74,10 @@ export const WithdrawPool = () => {
             <Input
               type="number"
               disabled
-              pallete='purple'
-              variant='amount'
-              style={{cursor: 'default', color: '--var(color-purple)', opacity: 1}}
-              value={ emptyPredict(predictData, amountInput.value) ? '0' : fromGroths(predictData.tok2) }
+              pallete="purple"
+              variant="amount"
+              style={{ cursor: 'default', color: '--var(color-purple)', opacity: 1 }}
+              value={emptyPredict(predictData, amountInput.value) ? '0' : fromGroths(predictData.tok2)}
             />
             <h4>{data.metadata2.N}</h4>
           </AssetsSection>

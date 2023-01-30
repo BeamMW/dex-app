@@ -4,37 +4,89 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e1fc8e27-7a2d-44db-afa9-446b73814ad2" name="Changes" comment="feat: poolslist">
-      <change afterPath="$PROJECT_DIR$/src/app/shared/components/ReactSelect.tsx" afterDir="false" />
+    <list default="true" id="e1fc8e27-7a2d-44db-afa9-446b73814ad2" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/app/shared/components/AssetLabel.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/app/shared/components/AssetsIcon.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.eslintrc" beforeDir="false" afterPath="$PROJECT_DIR$/.eslintrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/app.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/app.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/components/PoolList/PoolCard/PoolCard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/components/PoolList/PoolCard/PoolCard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/components/PoolList/PoolCard/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/components/PoolList/PoolCard/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/components/PoolList/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/components/PoolList/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/AddLiquidity/AddLiquidity.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/AddLiquidity/AddLiquidity.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/AddLiquidity/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/AddLiquidity/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/CreatePool.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/CreatePool.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/index.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/index.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/CreatePool/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolList/PoolsList.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolList/PoolsList.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolList/index.scss" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolList/index.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolList/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolList/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolsContainer/PoolsContainer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolsContainer/PoolsContainer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolsContainer/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/PoolsContainer/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/TradePool/TradePool.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/TradePool/TradePool.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/TradePool/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/TradePool/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/WithdrawPool/WithdrawPool.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/WithdrawPool/WithdrawPool.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/WithdrawPool/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/WithdrawPool/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/containers/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/containers/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/index.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/interfaces/DexStateType.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/interfaces/DexStateType.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/actions.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/constants.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/constants.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/reducer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/reducer.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/saga.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/saga.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/containers/Pools/store/selectors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/Pools/store/selectors.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/containers/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/containers/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/api.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/api.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/core/appUtils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/appUtils.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/core/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/core/utils.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/core/utils.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/Angle.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Angle.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/shared/components/AssetsContainer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/AssetsContainer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/AssetsSection.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/AssetsSection.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/shared/components/BackButton.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/BackButton.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/Backdrop.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Backdrop.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/shared/components/Button.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Button.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/shared/components/Container.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Container.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/ErrorBoundary.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/ErrorBoundary.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/Footer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Footer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/Input.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Input.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/LabeledToggle.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/LabeledToggle.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/Loader.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Loader.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/Logo.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Logo.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/ProgressBar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/ProgressBar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/ReactSelect.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/ReactSelect.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/shared/components/Section.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Section.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/Select.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Select.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/Table.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Table.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/shared/components/Title.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Title.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/components/Toggle.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Toggle.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/shared/components/Window.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/Window.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/shared/components/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/components/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app/shared/icons/icon-arrow-left.svg" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/icons/icon-arrow-left.svg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/constants/common.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/constants/common.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/constants/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/constants/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/constants/pallete_assets.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/constants/pallete_assets.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/constants/routes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/constants/routes.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/hooks/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/hooks/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/hooks/useInput.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/hooks/useInput.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/hooks/useValidation.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/hooks/useValidation.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/shared/icons/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/icons/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/interface/SharedStateType.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/interface/SharedStateType.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/interface/State.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/interface/State.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/interface/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/interface/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/store/actions.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/store/actions.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/store/constants.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/store/constants.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/store/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/store/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/store/reducer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/store/reducer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/store/saga.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/store/saga.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/shared/store/selectors.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/shared/store/selectors.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/store/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/store/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/store/reducer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/store/reducer.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/store/saga.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/store/saga.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app/store/store.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/store/store.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app/styles.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app/styles.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,16 +96,24 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="TypeScript JSX File" />
         <option value="TypeScript File" />
+        <option value="TypeScript JSX File" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="from-scratch" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectId" id="2KAcjO1VfeV8XR0aKiAh4vyAMaA" />
   <component name="ProjectLevelVcsManager">

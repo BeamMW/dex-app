@@ -1,6 +1,5 @@
 import { createSelector } from 'reselect';
-import {AppState} from "@app/shared/interface";
-
+import { AppState } from '@app/shared/interface';
 
 const selectMain = (state: AppState) => state.main;
 
@@ -9,5 +8,5 @@ export const selectPoolsList = () => createSelector(selectMain, (state) => state
 export const selectTxStatus = () => createSelector(selectMain, (state) => state.statusTransaction);
 export const selectPredirect = () => createSelector(selectMain, (state) => state.predict);
 export const selectCurrentPool = () => createSelector(selectMain, (state) => state.currentPool);
-export const selectFilter= () => createSelector(selectMain, (state) => state.filter);
-export const selectOptions= () => createSelector(selectMain, (state) => state.options);
+export const selectFilter = () => createSelector(selectMain, (state) => state.filter);
+export const selectOptions = () => createSelector(selectMain, (state) => state.options);

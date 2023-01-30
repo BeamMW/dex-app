@@ -1,7 +1,7 @@
 import React from 'react';
 import { css, cx } from '@linaria/core';
 
-import { AngleBackIcon, ArrowLeftIcon } from "@app/shared/icons";
+import { AngleBackIcon, ArrowLeftIcon } from '@app/shared/icons';
 
 import Button from './Button';
 
@@ -19,11 +19,16 @@ const backStyle = css`
 const title = css`
   color:white;
   margin-left: 10px;
-`
+`;
 
 const BackButton: React.FC<BackButtonProps> = ({ className, onClick, title }) => (
-  <Button variant="control" icon={ArrowLeftIcon}
-          pallete='white' className={cx(backStyle, className)} onClick={onClick}>
+  <Button
+    variant="control"
+    icon={ArrowLeftIcon}
+    pallete="white"
+    className={cx(backStyle, className)}
+    onClick={onClick}
+  >
     {title}
   </Button>
 );
