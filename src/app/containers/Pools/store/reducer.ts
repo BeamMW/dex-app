@@ -12,7 +12,7 @@ const initialState: DexStateType = {
   statusTransaction: null,
   predict: null,
   currentPool: null,
-  filter: 'liquid',
+  filter: 'all',
   options: [],
 };
 

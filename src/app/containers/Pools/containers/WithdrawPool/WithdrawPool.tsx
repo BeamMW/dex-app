@@ -14,7 +14,24 @@ import {
   selectCurrentPool,
   selectPredirect,
 } from '@app/containers/Pools/store/selectors';
-import { titleSections } from '@app/shared/constants';
+import { ROUTES, titleSections } from '@app/shared/constants';
+import AssetLabel from '@app/shared/components/AssetLabel';
+import { ArrowDownIcon, CancelIcon, DoneIcon } from '@app/shared/icons';
+import { styled } from '@linaria/react';
+import { useNavigate } from 'react-router-dom';
+
+const ButtonBlock = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top:40px;
+`;
+const ButtonWrapper = styled.div`
+  display: flex;
+  max-width: 363px;
+  width: 100%;
+  justify-content: space-evenly; 
+`;
 
 export const WithdrawPool = () => {
   const data = useSelector(selectCurrentPool());
@@ -22,6 +39,7 @@ export const WithdrawPool = () => {
   const amountInput = useInput(0);
   const [requestData, setRequestData] = useState(null);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useMemo(() => {
     setRequestData({
@@ -38,9 +56,13 @@ export const WithdrawPool = () => {
     }
   }, [requestData, amountInput.value]);
 
-  const onWithdraw = (data: ITrade) => {
-    dispatch(mainActions.onWithdraw.request(setDataRequest(data)));
+  const onWithdraw = (dataReq: ITrade) => {
+    dispatch(mainActions.onWithdraw.request(setDataRequest(dataReq)));
   };
+  const onPreviousClick = () => {
+    navigate(ROUTES.POOLS.BASE);
+  };
+
   return (
     <Window title="Withdraw" backButton>
       <Container>
@@ -57,35 +79,40 @@ export const WithdrawPool = () => {
               <h4>AMML</h4>
             </AssetsSection>
           </Section>
+          <Section title={titleSections.TRADE_RECEIVE}>
+            <AssetsSection>
+              <Input
+                type="number"
+                disabled
+                pallete="purple"
+                variant="amount"
+                style={{ cursor: 'default', color: '--var(color-purple)', opacity: 1 }}
+                value={emptyPredict(predictData, amountInput.value) ? '0' : fromGroths(predictData.tok1)}
+              />
+              <AssetLabel title={data.metadata1.UN} assets_id={data.aid1} />
+            </AssetsSection>
+            <AssetsSection>
+              <Input
+                type="number"
+                disabled
+                pallete="purple"
+                variant="amount"
+                style={{ cursor: 'default', color: '--var(color-purple)', opacity: 1 }}
+                value={emptyPredict(predictData, amountInput.value) ? '0' : fromGroths(predictData.tok2)}
+              />
+              <AssetLabel title={data.metadata2.UN} assets_id={data.aid2} />
+            </AssetsSection>
+          </Section>
         </AssetsContainer>
-        <Section title={titleSections.TRADE_RECEIVE}>
-          <AssetsSection>
-            <Input
-              type="number"
-              disabled
-              pallete="purple"
-              variant="amount"
-              style={{ cursor: 'default', color: '--var(color-purple)', opacity: 1 }}
-              value={emptyPredict(predictData, amountInput.value) ? '0' : fromGroths(predictData.tok1)}
-            />
-            <h4>{data.metadata1.N}</h4>
-          </AssetsSection>
-          <AssetsSection>
-            <Input
-              type="number"
-              disabled
-              pallete="purple"
-              variant="amount"
-              style={{ cursor: 'default', color: '--var(color-purple)', opacity: 1 }}
-              value={emptyPredict(predictData, amountInput.value) ? '0' : fromGroths(predictData.tok2)}
-            />
-            <h4>{data.metadata2.N}</h4>
-          </AssetsSection>
-        </Section>
 
-        <div className="button-wrapper">
-          <Button onClick={() => onWithdraw(requestData)}>Withdraw</Button>
-        </div>
+        <ButtonBlock>
+          <ButtonWrapper>
+            <Button icon={CancelIcon} variant="cancel" onClick={onPreviousClick}>
+              Cancel
+            </Button>
+            <Button icon={ArrowDownIcon} variant="withdraw" onClick={() => onWithdraw(requestData)}>Withdraw</Button>
+          </ButtonWrapper>
+        </ButtonBlock>
       </Container>
     </Window>
   );

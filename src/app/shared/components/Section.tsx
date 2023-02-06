@@ -8,7 +8,7 @@ interface SectionProps {
   title?: string;
   subtitle?: string;
   collapse?: boolean;
-  variant?: 'regular' | 'gray' | 'card';
+  variant?: 'regular' | 'gray' | 'card' | 'exchange';
   showAllAction?: () => void;
   defaultCollapseState?: boolean;
 }
@@ -19,7 +19,7 @@ const SectionStyled = styled.div`
   padding: 20px;
   text-align: left;
   background-color: rgba(255,255,255, 0.05);
-  max-width: 459px;
+  max-width: 452px;
   width: 100%;
   border-radius: 10px;
   > .cancel-button {
@@ -62,11 +62,20 @@ const SectionGrayStyled = styled.div`
   }
 `;
 
-const SectionCardStyled = styled(SectionGrayStyled)`{
+const SectionCardStyled = styled(SectionStyled)`
+ 
   max-width: 298px;
   width: 100%;
-  height: 382px;
-}`;
+  height: 301px;
+  justify-self: center;
+`;
+
+const SectionExchangeStyled = styled(SectionStyled)`
+  display: flex;
+  justify-content: center;
+  height: 54px;
+  align-items: center;
+`;
 
 const ButtonStyled = styled.button`
   position: absolute;
@@ -117,6 +126,7 @@ const Section: React.FC<SectionProps> = ({
     regular: SectionStyled,
     gray: SectionGrayStyled,
     card: SectionCardStyled,
+    exchange: SectionExchangeStyled,
   }[variant];
 
   return (

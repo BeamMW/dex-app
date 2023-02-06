@@ -1,22 +1,34 @@
 import React from 'react';
 import { styled } from '@linaria/react';
 
-const ContainerStyled = styled.div`
+interface ContainerProps {
+  variant?: 'center' | 'space-between',
+  jystify?: 'center' | 'space-between',
+  main?: boolean
+
+}
+const ContainerStyled = styled.div<ContainerProps>`
   display: flex;
   flex-direction: column;
-  align-items: center;
+  //align-items: center;
   margin: 30px 0;
   width: 100%;
   min-height: 600px;
   height: 100%;
-  justify-content: space-between;
-  margin-left: 5px;
+  //justify-content: space-between;
+  align-items: ${({ variant }) => variant};
+  justify-content:${({ jystify }) => jystify} ;
+  width: ${({ main }) => (main ? '100%' : '914px')};
+  //min-width: 914px;
 `;
 
-const Container: React.FC = ({
+const Container: React.FC<ContainerProps> = ({
   children,
+  variant,
+  main,
+  jystify,
 }) => (
-  <ContainerStyled>
+  <ContainerStyled variant={variant} jystify={jystify} main={main}>
     {children}
   </ContainerStyled>
 );

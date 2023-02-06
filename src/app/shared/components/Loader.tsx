@@ -1,38 +1,44 @@
 import React from 'react';
-import Logo from '@app/shared/components/Logo';
+import { Container, Window } from '@app/shared/components/index';
+import { IconLoader, IconSearchResult } from '@app/shared/icons';
 import { styled } from '@linaria/react';
 
-const LoaderWrapper = styled.div`
-  position: absolute;
-  background: black;
-  opacity: 0.5;
-  width: 100%;
-  height: 100%;
-  left: 0;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  top: 0;
+interface ILoader {
+  isSearchable? :boolean,
+}
 
-  svg {
-    animation: rotation 2s infinite linear;
-  }
-
-  @keyframes rotation {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(359deg);
-    }
-  }
+const Description = styled.div<ILoader>`
+  font-style: italic;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+  text-align: center;
+  color: rgba(255,255,255, 0.5);
+  width: ${({ isSearchable }) => (isSearchable ? '256px' : '281px')} 256px;
+  margin-top: ${({ isSearchable }) => (isSearchable ? '40px' : '54px')};
 `;
 
-const Loader = () => (
-  <LoaderWrapper>
-    <Logo />
-  </LoaderWrapper>
+const Loader = ({ isSearchable }:ILoader) => (
+  <Window>
+    <Container variant="center" jystify="center">
+      { isSearchable ? (
+        <>
+          <IconSearchResult />
+          <Description isSearchable={isSearchable}>
+            No pools were found.
+            Please check the asset or create the pool.
+          </Description>
+        </>
+      ) : (
+        <>
+          <IconLoader />
+          <Description isSearchable={isSearchable}>
+            Please wait, BeamX DEX DApp is loading...
+          </Description>
+        </>
+      )}
+    </Container>
+  </Window>
 );
 
 export default Loader;

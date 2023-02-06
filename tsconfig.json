@@ -20,6 +20,7 @@
       "@uikit/*": ["app/uikit/*"],
       "@pages/*": ["app/pages/*"],
       "@state/*": ["app/state/*"],
+      "@assets/*": ["assets/*"]
     }
   },
   "include": ["**/*"],

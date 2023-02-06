@@ -1,10 +1,5 @@
 import {
-  IAsset,
-  IOptions,
-  IPoolCard,
-  IPredict,
-  ITxStatus,
-  Kind,
+  IAsset, IOptions, IPoolCard, IPredict, ITxStatus, Kind,
 } from '@core/types';
 import { ASSET_BEAM, GROTHS_IN_BEAM } from '@app/shared/constants';
 
@@ -19,13 +14,15 @@ export function parseMetadata(metadata) {
 }
 
 export function getOptions(assets: IAsset[]) {
-  let options = [{
-    value: 0,
-    label: '0 BEAM',
-  }];
+  let options = [
+    {
+      value: 0,
+      label: 'BEAM',
+    },
+  ];
 
   assets.map((item) => {
-    options = [...options, { value: item.aid, label: `${item.aid} ${item.parsedMetadata.UN}` }];
+    options = [...options, { value: item.aid, label: `${item.parsedMetadata.UN}` }];
     return options;
   });
   return options;
@@ -34,11 +31,17 @@ export function getOptions(assets: IAsset[]) {
 export const getPoolKind = (kind: number) => {
   let kindDesc = null;
 
-  if (kind === Kind.Low) { kindDesc = '0.05%'; }
+  if (kind === Kind.Low) {
+    kindDesc = '0.05%';
+  }
 
-  if (kind === Kind.Mid) { kindDesc = '0.3%'; }
+  if (kind === Kind.Mid) {
+    kindDesc = '0.3%';
+  }
 
-  if (kind === Kind.High) { kindDesc = '1%'; }
+  if (kind === Kind.High) {
+    kindDesc = '1%';
+  }
 
   return kindDesc;
 };
@@ -77,12 +80,12 @@ export function toGroths(value: number): number {
   return value > 0 ? Math.floor(val) : 0;
 }
 
-export function parseIntToNum(value:string):number {
+export function parseIntToNum(value: string): number {
   const val = parseInt(value);
   return parseInt(value) > 0 ? Math.floor(val) : 0;
 }
 
-export function checkTxStatus(txId:string, txList:ITxStatus[]) {
+export function checkTxStatus(txId: string, txList: ITxStatus[]) {
   let status;
   // TODO: type rr
   // @ts-ignore
@@ -101,7 +104,7 @@ export function setDataRequest(data) {
 export function onFilter(data: IPoolCard[], filter) {
   switch (filter) {
     case 'all': {
-      return data;
+      return data.sort((a, b) => b.ctl - a.ctl);
     }
     case 'my': {
       return data.filter((el) => el.creator);
@@ -113,22 +116,23 @@ export function onFilter(data: IPoolCard[], filter) {
       return data.filter((el) => !el.ctl);
     }
     default:
-      return data.filter((el) => el.ctl);
+      return data.sort((a, b) => b.ctl - a.ctl);
   }
 }
 
-export const emptyPredict = (data: IPredict, amount: string | number):boolean => !data || !amount || amount === '0';
+export const emptyPredict = (data: IPredict, amount: string | number): boolean => !data || !amount || amount === '0';
 export function numFormatter(num) {
   if (num > 999 && num < 1000000) {
     return `${parseFloat((num / 1000).toFixed(2))}K`;
-  } if (num >= 1000000) {
+  }
+  if (num >= 1000000) {
     return `${parseFloat((num / 1000000).toFixed(2))}M`;
-  } if (num <= 999) {
+  }
+  if (num <= 999) {
     return parseFloat(num.toFixed(2));
   }
-  return num;
 }
-export const onPredictValue = (value, swap:boolean, predict: IPredict) => {
+export const onPredictValue = (value, swap: boolean, predict: IPredict) => {
   if (!predict || value.value === 0) {
     return 0;
   }
@@ -138,19 +142,29 @@ export const onPredictValue = (value, swap:boolean, predict: IPredict) => {
   return fromGroths(predict.tok2);
 };
 
-export const getFilterPools = (filtered: IOptions[], data:IPoolCard[]):IPoolCard[] => {
-  if (filtered.length !== 0) {
-    let newList = [];
-    filtered.map((el) => {
-      data.map((item) => {
-        if (item.aid1 === el.value || item.aid2 === el.value) {
-          newList = [...newList, item];
-        }
-        return newList;
-      });
-      console.log(newList);
-      return newList;
-    });
-    return newList;
+// export const getFilterPools = (filtered: IOptions[], data:IPoolCard[]):IPoolCard[] => {
+//   if (filtered.length !== 0) {
+//     let newList = [];
+//     filtered.map((el) => {
+//       data.map((item) => {
+//         if (item.aid1 === el.value || item.aid2 === el.value) {
+//           newList = [...newList, item];
+//         }
+//         return newList;
+//       });
+//       console.log(newList);
+//       return newList;
+//     });
+//     return newList;
+//   } return data;
+// };
+export const getFilterPools = (value: IOptions,
+  data: IPoolCard[]): IPoolCard[] => {
+  let newList = [];
+  if (value !== null || undefined) {
+    newList = data.filter((el) => el.aid1 === value.value || el.aid2 === value.value);
+    return newList.length === 0 ? null : newList;
   } return data;
 };
+
+export const getTotalFee = (daoFee: number, poolFee: number) => daoFee + poolFee;

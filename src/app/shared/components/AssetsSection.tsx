@@ -4,7 +4,7 @@ import { styled } from '@linaria/react';
 const SectionStyled = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 10px;
   justify-content: space-between;
   width: 100%;
   height: 56px;

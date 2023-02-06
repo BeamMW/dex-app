@@ -39,7 +39,6 @@ export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.
 
 function* getStatus(txid: string) {
   const listStatus = yield select((state: AppState) => state.main.tx_status);
-  console.log({ txid, listStatus });
   const status = yield checkTxStatus(txid, listStatus as ITxStatus[]);
   if (status === TxStatus.Completed) {
     yield put(mainActions.setTransactionStatus(status));
@@ -48,7 +47,6 @@ function* getStatus(txid: string) {
   } else if (status === TxStatus.Canceled) {
     yield put(mainActions.setTransactionStatus(status));
   } else if (status === TxStatus.InProgress || TxStatus.Registering) {
-    console.log('in_prog');
     yield put(mainActions.setTransactionStatus(status));
     yield delay(2000);
     yield getStatus(txid);
@@ -58,11 +56,12 @@ export function* createPool(action: ReturnType<typeof mainActions.onCreatePool.r
   try {
     // @ts-ignore
     const { txid } = (yield call(CreatePoolApi, action.payload ? action.payload : null)) as ITxId;
-    yield getStatus(txid);
+    if (txid) {
+      yield getStatus(txid);
+    }
   } catch (e) {
     // @ts-ignore
     yield put(mainActions.onCreatePool.failure(e));
-    yield put(mainActions.setErrorMessage(e));
   }
 }
 

@@ -1,6 +1,6 @@
 export type Pallete = 'green' | 'ghost' | 'purple' | 'blue' | 'red' | 'white' | 'vote-red';
 
-export type ButtonVariant = 'regular' | 'ghost' | 'ghostBordered' | 'block' | 'link' | 'icon' | 'control';
+export type ButtonVariant = 'regular' | 'ghost' | 'ghostBordered' | 'block' | 'link' | 'icon' | 'control' | 'trade' | 'approve' |'cancel' | 'withdraw';
 
 export enum Kind {
   Low = 0,

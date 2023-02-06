@@ -22,12 +22,11 @@ const Container = styled.div<{ bgColor: string }>`
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 0 20px 0 0;
 `;
 
 const HeaderWrapper = styled.div`
-display: flex;
-width: 100%;
-justify-content: center;
+//
 `;
 
 const StyledTitle = styled.div`
@@ -90,6 +89,7 @@ const ButtonWrapper = styled.div`
   width: 100%;
   display:flex;
   justify-content: flex-end;
+  min-width: 914px;
 }`;
 const ButtonStyled = styled.div`{
   max-width: 166px;

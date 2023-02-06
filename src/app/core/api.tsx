@@ -39,7 +39,7 @@ export function LoadPoolsList<T = any>(payload?): Promise<T> {
     );
   });
 }
-export function CreatePoolApi<T = any>([{ aid1, aid2, kind }]: ICreatePool[]): Promise<T> | any {
+export function CreatePoolApi<T = any>([{ aid1 = 180, aid2 = 210, kind = 1 }]: ICreatePool[]): Promise<T> | any {
   return new Promise((resolve, reject) => {
     Utils.invokeContract(
       `action=pool_create,aid1=${aid1},aid2=${aid2},kind=${kind},cid=${CID}`,

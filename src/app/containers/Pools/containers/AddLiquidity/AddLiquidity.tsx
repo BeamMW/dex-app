@@ -7,7 +7,7 @@ import {
   Button,
   Container,
   Input,
-  Section,
+  Section, Title,
   Window,
 } from '@app/shared/components';
 import {
@@ -19,9 +19,81 @@ import {
   selectCurrentPool, selectPredirect,
 } from '@app/containers/Pools/store/selectors';
 import { useInput } from '@app/shared/hooks';
-import { titleSections } from '@app/shared/constants';
-import { IconSwap } from '@app/shared/icons';
+import { ROUTES, titleSections } from '@app/shared/constants';
+import { CancelIcon, DoneIcon, IconExchange } from '@app/shared/icons';
 import AssetLabel from '@app/shared/components/AssetLabel';
+import { styled } from '@linaria/react';
+import { useNavigate } from 'react-router-dom';
+
+const ExchangeWrapper = styled.div`
+  position: absolute;
+  top: 71px;
+  left: 435px;
+`;
+const SectionWrapper = styled.div`
+  margin: 10px 0 40px 0;
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+`;
+const SectionContainer = styled.div`
+  display: flex;
+  width: 100%;
+`;
+const SideLeftWrap = styled.div`
+  width: 225px;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  height: 110px;
+`;
+const SideRightWrap = styled.div`
+  width: 225px;
+  margin-left: 20px;
+`;
+const LeftBlockPredict = styled.div`
+display: flex;
+  width: 100%;
+`;
+const TitleBlock = styled.div`
+display: flex;
+  flex-direction: column;
+width: 100%;
+`;
+const AmountBlock = styled.div`
+display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+const TitleSummary = styled.div`
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 14px;
+  color: rgba(255, 255, 255, 0.5);
+  //text-transform: uppercase;
+  margin-bottom: 14px;
+`;
+
+const ButtonBlock = styled.div`
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  `;
+const ButtonWrapper = styled.div`
+    display: flex;
+    max-width: 363px;
+    width: 100%;
+    justify-content: space-between;
+  `;
+const AmountSummary = styled(TitleSummary)`
+  color: rgba(255, 255, 255, 1);
+`;
+
+const initialState = {
+  asset_1: 0,
+  asset_2: 0,
+  liquid_3: 0,
+};
 
 export const AddLiquidity = () => {
   const data = useSelector(selectCurrentPool());
@@ -32,12 +104,16 @@ export const AddLiquidity = () => {
   const [requestData, setRequestData] = useState(null);
   const [isSwap, setIsSwap] = useState<boolean>(false);
   const [isEmpty, setIsEmpty] = useState(true);
+  const [percent, setPercent] = useState(initialState);
   const dispatch = useDispatch();
-  const tokenName_1 = `${data.aid1} ${data.metadata1.UN}`;
-  const tokenName_2 = `${data.aid2} ${data.metadata2.UN}`;
-
+  const navigate = useNavigate();
+  const tokenName_1 = `${data.metadata1.UN}`;
+  const tokenName_2 = `${data.metadata2.UN}`;
   useEffect(() => {
-    setIsEmpty(!(data.tok1 || data.tok2 !== 0));
+    setIsEmpty(
+      !!(!data.tok1 || !data.tok2),
+
+    );
   }, []);
 
   const getValueInput_1 = () => {
@@ -66,7 +142,6 @@ export const AddLiquidity = () => {
       val2: getValueInput_2(),
     });
   }, [amountInput_aid1.value, amountInput_aid2.value, isSwap]);
-  console.log(requestData, isSwap);
 
   useEffect(() => {
     if (!isEmpty && predictData) {
@@ -95,6 +170,10 @@ export const AddLiquidity = () => {
   const currentInput = isSwap ? amountInput_aid2 : amountInput_aid1;
 
   const calculated = onPredictValue(currentInput, isSwap, predictData);
+
+  const onPreviousClick = () => {
+    navigate(ROUTES.POOLS.BASE);
+  };
 
   return (
     <Window title="Add liquidity" backButton>
@@ -129,7 +208,7 @@ export const AddLiquidity = () => {
           </AssetsContainer>
         ) : (
           <AssetsContainer>
-            <Section title={titleSections.ADD_LIQUIDITY_SEND}>
+            <Section title={titleSections.ADD_LIQUIDITY}>
               <AssetsSection>
                 <Input
                   type="number"
@@ -141,8 +220,10 @@ export const AddLiquidity = () => {
                 <AssetLabel title={isSwap ? tokenName_2 : tokenName_1} assets_id={isSwap ? data.aid2 : data.aid1} />
               </AssetsSection>
             </Section>
-            <Button variant="icon" type="button" icon={IconSwap} onClick={handleChange}> </Button>
-            <Section title={titleSections.TRADE_SEND}>
+            <ExchangeWrapper>
+              <Button icon={IconExchange} variant="icon" onClick={() => handleChange()} />
+            </ExchangeWrapper>
+            <Section title={titleSections.ADD_LIQUIDITY}>
               <AssetsSection>
                 <Input
                   disabled
@@ -158,36 +239,47 @@ export const AddLiquidity = () => {
           </AssetsContainer>
         )}
         {/* // Create components for predirect */}
-        <Section>
-          <div className="amount-wrapper">
-            <div className="amount-title">
-              {tokenName_1}
-              :
-            </div>
-            {/* TODO: Create components */}
-            <div className="amount-value">
-              {!predictData || currentInput.value == 0 ? 0 : fromGroths(predictData.tok1)}
-            </div>
-          </div>
-          <div className="amount-wrapper">
-            <div className="amount-title">
-              {tokenName_2}
-              :
-            </div>
-            <div className="amount-value">
-              {!predictData || currentInput.value == 0 ? 0 : fromGroths(predictData.tok2)}
-            </div>
-          </div>
-          <div className="amount-wrapper">
-            <div className="amount-title">Ctl:</div>
-            <div className="amount-value">
-              {!predictData || currentInput.value == 0 ? 0 : fromGroths(predictData.ctl)}
-            </div>
-          </div>
-        </Section>
-        <Button onClick={() => onAddLiquidity(requestData)}>
-          Add Liquidity
-        </Button>
+        <SectionWrapper>
+          <Section>
+            <SectionContainer>
+              <SideLeftWrap>
+                <Title>pool summary</Title>
+                <LeftBlockPredict>
+                  <TitleBlock>
+                    <TitleSummary>{data.metadata1.UN}</TitleSummary>
+                    <TitleSummary>{data.metadata2.UN}</TitleSummary>
+                    <TitleSummary>Liquidity</TitleSummary>
+                  </TitleBlock>
+                  <AmountBlock>
+                    <AmountSummary>{predictData ? fromGroths(predictData.tok1) : 0}</AmountSummary>
+                    <AmountSummary>{predictData ? fromGroths(predictData.tok2) : 0}</AmountSummary>
+                    <AmountSummary>{predictData ? fromGroths(predictData.ctl) : 0}</AmountSummary>
+                  </AmountBlock>
+                </LeftBlockPredict>
+              </SideLeftWrap>
+              <SideRightWrap>
+                <Title>pool changes</Title>
+                <LeftBlockPredict>
+                  {/* <AmountBlock> */}
+                  {/*  <AmountSummary>{predictData ? percent.asset_1 : 0}</AmountSummary> */}
+                  {/*  <AmountSummary>{predictData ? percent.asset_2 : 0}</AmountSummary> */}
+                  {/*  <AmountSummary>{predictData ? percent.liquid_3 : 0}</AmountSummary> */}
+                  {/* </AmountBlock> */}
+                </LeftBlockPredict>
+              </SideRightWrap>
+            </SectionContainer>
+          </Section>
+        </SectionWrapper>
+        <ButtonBlock>
+          <ButtonWrapper>
+            <Button icon={CancelIcon} variant="cancel" onClick={() => onPreviousClick()}>
+              Cancel
+            </Button>
+            <Button icon={DoneIcon} variant="approve" onClick={() => onAddLiquidity(requestData)}>
+              Add liquidity
+            </Button>
+          </ButtonWrapper>
+        </ButtonBlock>
       </Container>
     </Window>
   );

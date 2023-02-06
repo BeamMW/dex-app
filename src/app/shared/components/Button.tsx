@@ -9,7 +9,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const BaseButtonStyled = styled.button<ButtonProps>`
-  font-family: SFProDisplay;
+  font-family: SFProDisplay,sans-serif;
   &[disabled] {
     opacity: 0.5;
 
@@ -77,9 +77,14 @@ const BlockButtonStyled = styled(GhostButtonStyled)`
 
 const IconButtonStyled = styled(BaseButtonStyled)`
   display: inline-block;
+  font-family: "ProximaNova", SFProDisplay ,sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 17px;
   vertical-align: sub;
-  line-height: 0;
-  margin: 0 10px;
+  //margin: 0 10px;
+  margin: 0 0 0 10px;
   padding: 0;
   background-color: transparent;
   border: none;
@@ -88,6 +93,7 @@ const IconButtonStyled = styled(BaseButtonStyled)`
 
   > svg {
     vertical-align: sub;
+    margin-right: 15px;
   }
 `;
 
@@ -97,7 +103,8 @@ const LinkButtonStyled = styled(IconButtonStyled)`
   font-weight: 700;
   color: ${({ pallete }) => `var(--color-${pallete})`};
 `;
-const ControlButton = styled(IconButtonStyled)`
+const ControlButtonStyled = styled(IconButtonStyled)`
+  font-family: "ProximaNova", SFProDisplay ,sans-serif;
   font-style: normal;
   font-weight: 700;
   font-size: 14px;
@@ -108,6 +115,37 @@ const ControlButton = styled(IconButtonStyled)`
     vertical-align: middle;
   }
 `;
+const TradeButtonStyled = styled(ButtonStyled)`
+  font-style: normal;
+  font-weight: 700;
+  font-size: 14px;
+  height: 33px;
+  line-height: 17px;
+  background: rgba(0, 246, 210, 0.1);
+  color: ${({ pallete }) => `var(--color-${pallete})`};
+  border-radius: 20px;
+  border:  ${({ pallete }) => `1px solid var(--color-${pallete})`} ;
+`;
+
+const ApproveButtonStyled = styled(ButtonStyled)`
+    width: 182px;
+    background-color: rgba(0,246,210, 1);
+  color: var(--color-dark-blue);
+    text-transform: lowercase;
+  &:disabled{
+    //color: var(--color-dark-blue);
+    background-color: rgba(0,246,210, 0.3);
+  }
+`;
+const WithdrawButtonStyled = styled(ApproveButtonStyled)`
+    width: 151px;
+    background: var(--color-blue);
+  
+`;const CancelButtonStyled = styled(ApproveButtonStyled)`
+    width: 151px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-white);
+`;
 
 const VARIANTS = {
   regular: ButtonStyled,
@@ -115,7 +153,11 @@ const VARIANTS = {
   link: LinkButtonStyled,
   icon: IconButtonStyled,
   block: BlockButtonStyled,
-  control: ControlButton,
+  control: ControlButtonStyled,
+  trade: TradeButtonStyled,
+  approve: ApproveButtonStyled,
+  cancel: CancelButtonStyled,
+  withdraw: WithdrawButtonStyled,
 
 };
 

@@ -1,22 +1,25 @@
-import React, { useMemo, useState } from 'react';
+import React, {
+  useCallback, useMemo, useState,
+} from 'react';
 import './index.scss';
 import {
-  Button, Container, ReactSelect, Window,
+  Container, Loader, ReactSelect, Window,
 } from '@app/shared/components';
 import { PoolCard } from '@app/containers/Pools/components/PoolList';
-import { SORT } from '@app/shared/constants';
+import { placeHolder, SORT } from '@app/shared/constants';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectOptions, selectPoolsList } from '@app/containers/Pools/store/selectors';
+import { selectFilter, selectOptions, selectPoolsList } from '@app/containers/Pools/store/selectors';
 import { setFilter } from '@app/containers/Pools/store/actions';
 import * as mainActions from '@app/containers/Pools/store/actions';
 import { getFilterPools } from '@core/appUtils';
 import { styled } from '@linaria/react';
 
-const Sort = styled.div`
+const Sort = styled.ul`
+  position: relative;
   max-width: 450px;
   width: 100%;
   display: flex;
-  justify-content: space-evenly;
+  justify-content: flex-start;
 `;
 
 const HeaderContainer = styled.div`
@@ -26,28 +29,56 @@ const HeaderContainer = styled.div`
 `;
 
 const PoolList = styled.div`
-   {
-    margin: 16px 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    //grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: repeat(5, 1fr);
-    grid-column-gap: 10px;
-    grid-row-gap: 10px;
-    min-width: 954px;
-    width: 100%;
+  margin: 16px 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(298px, 298px));
+  grid-gap: 10px;
+  grid-auto-flow: row;
+  width: 100%;
+  justify-content: center;
+  flex-grow: 1;
+  @media (max-width: 934px) {
+    grid-template-columns: repeat(3, 1fr);
+    overflow: hidden;
   }
 `;
 
 const HeaderWrapperSort = styled.div`
   display: flex;
   justify-content: space-between;
+  width: 100%;
+  align-items: center;
 `;
+
+const SortItem = styled.li`
+  list-style: none;
+`;
+const SortItemLink = styled.button<{ active: boolean }>`
+  background: transparent;
+  border: none;
+  float: left;
+  display: block;
+  color: ${({ active }) => (active ? 'white' : 'rgba(255,255,255, 0.3)')};
+  font-family: SFProDisplay, sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 14px;
+  padding: 4px 16px;
+  cursor: pointer;
+  text-transform: uppercase;
+  border-bottom: ${({ active }) => (active ? '2px solid var(--color-green)' : 'transparent')};
+  //TODO: BOX_SHADOW
+  &:hover {
+    border-bottom: 2px solid var(--color-green);
+  }
+`;
+
 export const PoolsList = () => {
   const data = useSelector(selectPoolsList());
   const options = useSelector(selectOptions());
+  const currentFilter = useSelector(selectFilter());
   const [poolsList, setPoolList] = useState(data);
-  const [filtered, setFiltered] = useState([]);
+  const [filtered, setFiltered] = useState(null);
 
   const dispatch = useDispatch();
 
@@ -56,38 +87,54 @@ export const PoolsList = () => {
     dispatch(mainActions.loadAppParams.request(null));
   };
 
-  const onFilter = (value) => {
-    setFiltered(value);
-  };
+  const onFilter = useCallback(
+    (value) => {
+      setFiltered(value);
+    },
+    [data, poolsList],
+  );
+
   useMemo(() => {
     setPoolList(getFilterPools(filtered, data));
   }, [data, filtered]);
-
   return (
     <Window title="Pools" createPool>
-      <Container>
+      <Container main jystify="center">
         <HeaderContainer>
           <HeaderWrapperSort>
-            <ReactSelect options={options} onChange={onFilter} isIcon isFilter isSearchable />
             <Sort>
               {SORT.map((el) => (
-                <Button variant="link" onClick={() => handleSort(el.value)}>
-                  {el.name}
-                </Button>
+                <SortItem key={el.value}>
+                  <SortItemLink key={el.value} active={currentFilter === el.value} onClick={() => handleSort(el.value)}>
+                    {el.name}
+                  </SortItemLink>
+                </SortItem>
               ))}
             </Sort>
+            <div style={{ marginRight: '1px' }}>
+              <ReactSelect
+                options={options}
+                isClearable
+                onChange={(e) => onFilter(e)}
+                isIcon
+                placeholder={placeHolder.SEARCH}
+                customPrefix="custom-filter"
+              />
+            </div>
           </HeaderWrapperSort>
         </HeaderContainer>
 
-        <PoolList>
-          {poolsList.length > 0 ? (
-            poolsList.map((item, idx) => <PoolCard data={item} key={idx} />)
-          ) : (
-            <Container>
-              <div>Empty</div>
-            </Container>
-          )}
-        </PoolList>
+        {poolsList === null ? (
+          <Loader isSearchable />
+        ) : poolsList.length > 0 ? (
+          <PoolList>
+            {poolsList.map((item) => (
+              <PoolCard data={item} key={`${item.aid1}_${item.aid2}_${item.kind}`} />
+            ))}
+          </PoolList>
+        ) : (
+          <Loader />
+        )}
       </Container>
     </Window>
   );

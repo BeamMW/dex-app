@@ -92,13 +92,11 @@ export default class Utils {
 
     client.subscribe((response) => {
       const err = `Unexpected wasm wallet client response call: ${response}`;
-      console.log(err);
       throw err;
     });
 
     client.setApproveContractInfoHandler((info) => {
       const err = `Unexpected wasm wallet client transaction in headless wallet: ${info}`;
-      console.log(err);
       throw err;
     });
 
