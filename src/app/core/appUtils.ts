@@ -3,6 +3,8 @@ import {
 } from '@core/types';
 import { ASSET_BEAM, GROTHS_IN_BEAM } from '@app/shared/constants';
 
+const LENGTH_MAX = 4;
+
 export function parseMetadata(metadata) {
   const splittedMetadata = metadata.split(';');
   splittedMetadata.shift();
@@ -168,3 +170,55 @@ export const getFilterPools = (value: IOptions,
 };
 
 export const getTotalFee = (daoFee: number, poolFee: number) => daoFee + poolFee;
+export function convertLowAmount(explicitNum) {
+  if (explicitNum !== undefined) {
+    const data = explicitNum.split(/[eE]/);
+    if (data.length === 1) {
+      return data[0];
+    }
+    let z = '';
+    const sign = explicitNum.slice(0, 1) === '-' ? '-' : '';
+    const str = data[0].replace('.', '');
+    let mag = Number(data[1]) + 1;
+    if (mag <= 0) {
+      z = `${sign}0.`;
+      while (!(mag >= 0)) {
+        z += '0';
+        ++mag;
+      }
+      const num = z + str.replace(/^\-/, '');
+      if (explicitNum) {
+        return parseFloat(num);
+      }
+      return num;
+    }
+    if (str.length <= mag) {
+      mag -= str.length;
+      while (!(mag <= 0)) {
+        z += 0;
+        --mag;
+      }
+      const num = str + z;
+      if (explicitNum) {
+        return parseFloat(num);
+      }
+      return num;
+    }
+    const leader = parseFloat(data[0]);
+    const multiplier = Math.pow(10, parseInt(data[1]));
+    return leader * multiplier;
+  }
+  return 0
+}
+
+export function truncate(value: string): string {
+  if (!value) {
+    return '';
+  }
+
+  if (value.length <= LENGTH_MAX) {
+    return value;
+  }
+
+  return `${value.slice(0, LENGTH_MAX)}…`;
+}

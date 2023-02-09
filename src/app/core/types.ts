@@ -9,7 +9,7 @@ export enum Kind {
 }
 export enum KindProcent {
   Low = '0.05%',
-  Mid = '0.03%',
+  Mid = '0.3%',
   High = '1%',
 }
 

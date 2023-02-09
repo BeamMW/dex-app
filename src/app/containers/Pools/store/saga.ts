@@ -62,6 +62,7 @@ export function* createPool(action: ReturnType<typeof mainActions.onCreatePool.r
   } catch (e) {
     // @ts-ignore
     yield put(mainActions.onCreatePool.failure(e));
+    toast(e.error === 'pool already exists' ? 'This pool already exists' : e.error);
   }
 }
 

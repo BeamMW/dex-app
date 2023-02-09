@@ -16,10 +16,10 @@ import { styled } from '@linaria/react';
 
 const Sort = styled.ul`
   position: relative;
-  max-width: 450px;
   width: 100%;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
+  align-items: center;
 `;
 
 const HeaderContainer = styled.div`
@@ -72,6 +72,8 @@ const SortItemLink = styled.button<{ active: boolean }>`
     border-bottom: 2px solid var(--color-green);
   }
 `;
+const WrapperSelect = styled.div`
+width: 350px`;
 
 export const PoolsList = () => {
   const data = useSelector(selectPoolsList());
@@ -101,8 +103,21 @@ export const PoolsList = () => {
     <Window title="Pools" createPool>
       <Container main jystify="center">
         <HeaderContainer>
+
           <HeaderWrapperSort>
             <Sort>
+              <WrapperSelect>
+                <ReactSelect
+                  options={options}
+                  isClearable
+                  onChange={(e) => onFilter(e)}
+                  isIcon
+                  placeholder={placeHolder.SEARCH}
+                  customPrefix="custom-filter"
+                />
+
+              </WrapperSelect>
+
               {SORT.map((el) => (
                 <SortItem key={el.value}>
                   <SortItemLink key={el.value} active={currentFilter === el.value} onClick={() => handleSort(el.value)}>
@@ -111,16 +126,6 @@ export const PoolsList = () => {
                 </SortItem>
               ))}
             </Sort>
-            <div style={{ marginRight: '1px' }}>
-              <ReactSelect
-                options={options}
-                isClearable
-                onChange={(e) => onFilter(e)}
-                isIcon
-                placeholder={placeHolder.SEARCH}
-                customPrefix="custom-filter"
-              />
-            </div>
           </HeaderWrapperSort>
         </HeaderContainer>
 

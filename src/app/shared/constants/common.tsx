@@ -11,7 +11,7 @@ export const ASSET_BEAM = {
 
 export const kindSelect = [
   { value: Kind.Low, label: '0.05%' },
-  { value: Kind.Mid, label: '0.03%' },
+  { value: Kind.Mid, label: '0.3%' },
   { value: Kind.High, label: '1%' },
 ];
 

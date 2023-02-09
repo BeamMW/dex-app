@@ -16,7 +16,8 @@ css`
       --color-gray: #8196a4;
       //--color-white: white;
       --color-disabled: #8da1ad;
-      --color-select-list: rgba(0,0,0, .8 )
+      --color-select-list: rgba(0, 0, 0, 0.8);
+      --color-opasity-0-1: rgba(255, 255, 255, 0.1);
     }
 
     * {

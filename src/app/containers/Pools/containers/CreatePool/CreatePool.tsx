@@ -9,7 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   selectOptions,
 } from '@app/containers/Pools/store/selectors';
-import { ICreatePool, IOptions } from '@core/types';
+import { ICreatePool, IOptions, Kind } from '@core/types';
 import {
   kindSelect, placeHolder, ROUTES, titleSections,
 } from '@app/shared/constants';
@@ -17,6 +17,7 @@ import * as mainActions from '@app/containers/Pools/store/actions';
 import { styled } from '@linaria/react';
 import { CancelIcon, DoneIcon } from '@app/shared/icons';
 import { useNavigate } from 'react-router-dom';
+import { element } from 'prop-types';
 
 const SectionWrapper = styled.div`
  margin: 10px 0 40px 0;
@@ -42,7 +43,7 @@ export const CreatePool = () => {
   const [requestData, setRequestData] = useState(null);
   const [currentToken1, setCurrentToken1] = useState<IOptions>(null);
   const [currentToken2, setCurrentToken2] = useState<IOptions>(null);
-  const [currentKind, setCurrentKind] = useState<number>(2);
+  const [currentKind, setCurrentKind] = useState<IOptions>({ value: Kind.High, label: '1%' });
   const [isValidate, setIsValidate] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -50,7 +51,7 @@ export const CreatePool = () => {
     setRequestData([{
       aid1: currentToken1 && currentToken1.value,
       aid2: currentToken2 && currentToken2.value,
-      kind: currentKind,
+      kind: currentKind && currentKind.value,
     }]);
   }, [currentToken1, currentToken2, currentKind]);
   // useEffect(() => {
@@ -86,7 +87,9 @@ export const CreatePool = () => {
     } else setIsValidate(true);
   }, [currentToken1, currentToken2, currentKind]);
 
-  const getKindValue = () => kindSelect.find((elem) => elem.value === currentKind);
+  // const getKindValue = () => {
+  //   kindSelect.find((el) => el === currentKind);
+  // };
 
   useMemo(() => {
     getOptionsSecondPare(options, currentToken1);
@@ -98,9 +101,9 @@ export const CreatePool = () => {
   // const onChangeToken2 = (newValue) => {
   //   setCurrentToken2(newValue);
   // };
-  const onChangeKind = (newValue) => {
-    setCurrentKind(newValue);
-  };
+  // const onChangeKind = (newValue) => {
+  //   setCurrentKind(newValue);
+  // };
   const onPreviousClick = () => {
     navigate(ROUTES.POOLS.BASE);
   };
@@ -135,8 +138,8 @@ export const CreatePool = () => {
             <div className="fees-wrapper">
               <ReactSelect
                 options={kindSelect}
-                onChange={(e) => onChangeKind(e)}
-                value={getKindValue()}
+                onChange={(e) => setCurrentKind(e)}
+                defaultValue={{ value: Kind.High, label: '1%' }}
                 placeholder={placeHolder.FEE}
                 customPrefix="custom-kind"
               />

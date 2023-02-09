@@ -16,7 +16,7 @@ const BaseButtonStyled = styled.button<ButtonProps>`
     &:hover,
     &:active {
       box-shadow: none !important;
-      cursor: not-allowed !important;
+      cursor: default !important;
     }
   }
 `;

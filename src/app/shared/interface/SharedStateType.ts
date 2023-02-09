@@ -4,3 +4,19 @@ export interface SharedStateType {
   systemState: any;
   isLoaded: boolean;
 }
+
+export interface IValidations {
+  isEmpty?: boolean;
+  minLength?: number;
+  isEmail?: boolean;
+}
+
+export interface IUseValidation {
+  value: number;
+  validations?: IValidations;
+}
+export interface IUseInput {
+  initialValue: number;
+  validations?: IValidations;
+}
+

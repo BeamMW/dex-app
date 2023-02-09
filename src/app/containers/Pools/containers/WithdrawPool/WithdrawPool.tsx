@@ -1,24 +1,26 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ITrade } from '@core/types';
 import {
   emptyPredict, fromGroths, setDataRequest, toGroths,
 } from '@core/appUtils';
 import {
-  AssetsContainer, AssetsSection, Button, Input, Section, Title, Window, Container,
+  AssetsContainer, AssetsSection, Button, Input, Section, Window, Container,
 } from '@app/shared/components';
 import { useInput } from '@app/shared/hooks';
 import * as mainActions from '@app/containers/Pools/store/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import './index.scss';
 import {
+  selectAssetsList,
   selectCurrentPool,
   selectPredirect,
 } from '@app/containers/Pools/store/selectors';
 import { ROUTES, titleSections } from '@app/shared/constants';
 import AssetLabel from '@app/shared/components/AssetLabel';
-import { ArrowDownIcon, CancelIcon, DoneIcon } from '@app/shared/icons';
+import { ArrowDownIcon, CancelIcon } from '@app/shared/icons';
 import { styled } from '@linaria/react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const ButtonBlock = styled.div`
   display: flex;
@@ -35,12 +37,21 @@ const ButtonWrapper = styled.div`
 
 export const WithdrawPool = () => {
   const data = useSelector(selectCurrentPool());
+  const assets = useSelector(selectAssetsList());
   const predictData = useSelector(selectPredirect());
-  const amountInput = useInput(0);
+  const [currentLPToken, setCurrentLPToken] = useState(null);
+  const [currentAmountCtl, setCurrentAmount] = useState(data.ctl);
+  const amountInput = useInput({
+    initialValue: 0, validations: { isEmpty: true, isMax: fromGroths(currentAmountCtl) },
+  });
   const [requestData, setRequestData] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  useEffect(() => {
+    if (data && assets) {
+      setCurrentLPToken(assets.find((el) => el.aid === data['lp-token']));
+    }
+  }, [data, assets]);
   useMemo(() => {
     setRequestData({
       aid1: data.aid1,
@@ -49,12 +60,21 @@ export const WithdrawPool = () => {
       ctl: toGroths(Number(amountInput.value)),
     });
   }, [amountInput.value]);
+  console.log(data);
+  useMemo(() => {
+    setCurrentAmount(data.ctl);
+  }, [data.ctl]);
 
   useMemo(() => {
-    if (amountInput.value !== 0) {
+    if (amountInput.isMax) {
+      toast('Amount assets > MAX');
+    } else if (amountInput.isValid) {
       dispatch(mainActions.onWithdraw.request(requestData));
     }
-  }, [requestData, amountInput.value]);
+  }, [requestData, amountInput.value, amountInput.isValid, amountInput.isMax]);
+
+  const assetLabel = currentLPToken ? currentLPToken.parsedMetadata.UN : 'AMML';
+  const assetId = currentLPToken ? currentLPToken.aid : data['lp-token'];
 
   const onWithdraw = (dataReq: ITrade) => {
     dispatch(mainActions.onWithdraw.request(setDataRequest(dataReq)));
@@ -62,7 +82,7 @@ export const WithdrawPool = () => {
   const onPreviousClick = () => {
     navigate(ROUTES.POOLS.BASE);
   };
-
+  // console.log(currentLPToken);
   return (
     <Window title="Withdraw" backButton>
       <Container>
@@ -76,7 +96,7 @@ export const WithdrawPool = () => {
                 pallete="blue"
                 onChange={(e) => amountInput.onChange(e)}
               />
-              <h4>AMML</h4>
+              <AssetLabel title={assetLabel} assets_id={assetId} />
             </AssetsSection>
           </Section>
           <Section title={titleSections.TRADE_RECEIVE}>
@@ -110,7 +130,7 @@ export const WithdrawPool = () => {
             <Button icon={CancelIcon} variant="cancel" onClick={onPreviousClick}>
               Cancel
             </Button>
-            <Button icon={ArrowDownIcon} variant="withdraw" onClick={() => onWithdraw(requestData)}>Withdraw</Button>
+            <Button disabled={!amountInput.isValid} icon={ArrowDownIcon} variant="withdraw" onClick={() => onWithdraw(requestData)}>Withdraw</Button>
           </ButtonWrapper>
         </ButtonBlock>
       </Container>

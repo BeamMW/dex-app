@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ITrade } from '@core/types';
 import {
+  convertLowAmount,
   emptyPredict, fromGroths, getTotalFee, setDataRequest, toGroths,
 } from '@core/appUtils';
 import {
@@ -16,6 +17,8 @@ import { ROUTES, titleSections } from '@app/shared/constants';
 import AssetLabel from '@app/shared/components/AssetLabel';
 import { styled } from '@linaria/react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { isValid } from 'js-base64';
 
 const ExchangeWrapper = styled.div`
   position: absolute;
@@ -86,8 +89,11 @@ export const TradePool = () => {
   const data = useSelector(selectCurrentPool());
   const predictData = useSelector(selectPredirect());
   const [currentToken, setCurrentToken] = useState(data.aid1);
+  const [currentTokAmount, setCurrentTokenAmount] = useState<number>(data.tok1);
   const [isSwap, setIsSwap] = useState<boolean>(false);
-  const amountInput = useInput(0);
+  const amountInput = useInput({
+    initialValue: 0, validations: { isEmpty: true, isMax: fromGroths(currentTokAmount) },
+  });
   const [requestData, setRequestData] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -100,6 +106,7 @@ export const TradePool = () => {
   };
   useEffect(() => {
     setCurrentToken(!isSwap ? data.aid1 : data.aid2);
+    setCurrentTokenAmount(!isSwap ? data.tok1 : data.tok2);
   }, [isSwap]);
 
   useMemo(() => {
@@ -112,10 +119,12 @@ export const TradePool = () => {
   }, [amountInput.value, currentToken]);
 
   useMemo(() => {
-    if (amountInput.value !== 0) {
+    if (amountInput.isMax) {
+      toast('Amount assets > MAX');
+    } else if (amountInput.isValid) {
       dispatch(mainActions.onTradePool.request(requestData));
     }
-  }, [requestData, amountInput.value]);
+  }, [requestData, amountInput.value, amountInput.isValid]);
 
   const onTrade = (dataTrade: ITrade) => {
     dispatch(mainActions.onTradePool.request(setDataRequest(dataTrade)));
@@ -234,7 +243,7 @@ export const TradePool = () => {
             <Button icon={CancelIcon} variant="cancel" onClick={onPreviousClick}>
               Cancel
             </Button>
-            <Button icon={DoneIcon} variant="approve" onClick={() => onTrade(requestData)}>
+            <Button disabled={!amountInput.isValid} icon={DoneIcon} variant="approve" onClick={() => onTrade(requestData)}>
               Trade
             </Button>
           </ButtonWrapper>
