@@ -21,6 +21,8 @@ export const setPredict = createAction(MainActionsTypes.SET_PREDICT)<IPredict>()
 export const setCurrentPool = createAction(MainActionsTypes.SET_CURRENT_POOL)<IPoolCard>();
 export const setFilter = createAction(MainActionsTypes.SET_FILTER)<string>();
 export const setOptions = createAction(MainActionsTypes.SET_OPTIONS)<IOptions[]>();
+export const setFavorites = createAction(MainActionsTypes.SET_FAVORITES)<IPoolCard[]>();
+
 export const loadAppParams = createAsyncAction(
   MainActionsTypes.LOAD_PARAMS,
   MainActionsTypes.LOAD_PARAMS_SUCCESS,
@@ -52,4 +54,9 @@ export const onWithdraw = createAsyncAction(
   MainActionsTypes.WITHDRAW,
   MainActionsTypes.WITHDRAW_SUCCESS,
   MainActionsTypes.WITHDRAW_FAILURE,
+)<IWithdraw, any>();
+export const onFavorites = createAsyncAction(
+  MainActionsTypes.FAVORITES,
+  MainActionsTypes.FAVORITES_SUCCESS,
+  MainActionsTypes.FAVORITES_FAILURE,
 )<IWithdraw, any>();

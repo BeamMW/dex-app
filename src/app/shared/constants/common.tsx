@@ -20,6 +20,7 @@ export const SORT = [
   { name: 'My', value: 'my' },
   { name: 'Liquid', value: 'liquid' },
   { name: 'Empty', value: 'empty' },
+  { name: 'Favorites', value: 'fav' },
 ];
 
 export const titleSections = {

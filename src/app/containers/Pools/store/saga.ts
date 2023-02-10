@@ -8,7 +8,7 @@ import {
   AddLiquidityApi, CreatePoolApi, LoadAssetsList, LoadPoolsList, TradePoolApi, WithdrawApi,
 } from '@core/api';
 import {
-  checkTxStatus, getOptions, onFilter, parseMetadata, parsePoolMetadata,
+  checkTxStatus, getOptions, isInArray, onFilter, parseMetadata, parsePoolMetadata,
 } from '@core/appUtils';
 import { AppState } from '@app/shared/interface';
 import * as mainActions from '@app/containers/Pools/store/actions';
@@ -23,12 +23,14 @@ export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.
     assetsList.forEach((asset) => {
       asset.parsedMetadata = parseMetadata(asset.metadata);
     });
+    const favoritesLocal = JSON.parse(localStorage.getItem('favorites'));
+    yield put(mainActions.setFavorites(favoritesLocal));
     yield put(mainActions.setAssetsList(assetsList));
     const options = getOptions(assetsList);
     yield put(mainActions.setOptions(options));
     const poolsList = (yield call(LoadPoolsList, action.payload ? action.payload : null)) as IPoolCard[];
     const newPoolList = poolsList.map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList));
-    const filteredPools = (yield onFilter(newPoolList, filter).map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList))) as IPoolCard[];
+    const filteredPools = (yield onFilter(newPoolList, filter, favoritesLocal).map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList))) as IPoolCard[];
     yield put(mainActions.setPoolsList(filteredPools));
   } catch (e) {
     // @ts-ignore
@@ -115,6 +117,31 @@ export function* withdrawPool(action: ReturnType<typeof mainActions.onWithdraw.r
     toast(e.error);
   }
 }
+export function* favorites(action: ReturnType<typeof mainActions.onFavorites.request>): Generator {
+  try {
+    const favoritesList = yield select((state: AppState) => state.main.favorites);
+    const pool = action.payload as IPoolCard;
+    let storage = (favoritesList as IPoolCard[] || []);
+    if (storage) {
+      const isFav = isInArray(pool, storage);
+      if (isFav) {
+        const filtered = storage.filter((e: IPoolCard) => JSON.stringify(e) !== JSON.stringify(pool));
+        yield localStorage.setItem('favorites', JSON.stringify(filtered));
+        yield put(mainActions.setFavorites(filtered as IPoolCard[]));
+        return;
+      }
+      storage = [...storage, pool];
+    } else {
+      storage.push(pool);
+    }
+    yield localStorage.setItem('favorites', JSON.stringify(storage));
+    yield put(mainActions.setFavorites(storage as IPoolCard[]));
+  } catch (e) {
+    // @ts-ignore
+    // yield put(mainActions.onWithdraw.failure(e));
+    toast(e.error);
+  }
+}
 
 function* mainSaga() {
   yield takeLatest(mainActions.loadAppParams.request, loadParamsSaga);
@@ -122,6 +149,7 @@ function* mainSaga() {
   yield takeLatest(mainActions.onAddLiquidity.request, addLiquidity);
   yield takeLatest(mainActions.onTradePool.request, tradePool);
   yield takeLatest(mainActions.onWithdraw.request, withdrawPool);
+  yield takeLatest(mainActions.onFavorites.request, favorites);
 }
 
 export default mainSaga;

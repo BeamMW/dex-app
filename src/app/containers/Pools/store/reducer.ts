@@ -1,6 +1,7 @@
 import { DexStateType } from '@app/containers/Pools/interfaces/DexStateType';
 import { ActionType, createReducer } from 'typesafe-actions';
 import produce from 'immer';
+import { IPoolCard } from '@core/types';
 import * as actions from './actions';
 
 type Action = ActionType<typeof actions>;
@@ -14,6 +15,7 @@ const initialState: DexStateType = {
   currentPool: null,
   filter: 'all',
   options: [],
+  favorites: null,
 };
 
 const reducer = createReducer<DexStateType, Action>(initialState)
@@ -40,6 +42,9 @@ const reducer = createReducer<DexStateType, Action>(initialState)
   }))
   .handleAction(actions.setOptions, (state, action) => produce(state, (nexState) => {
     nexState.options = action.payload;
+  }))
+  .handleAction(actions.setFavorites, (state, action) => produce(state, (nexState) => {
+    nexState.favorites = action.payload;
   }));
 
 export { reducer as MainReducer };

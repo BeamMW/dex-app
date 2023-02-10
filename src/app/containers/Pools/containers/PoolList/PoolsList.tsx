@@ -8,11 +8,14 @@ import {
 import { PoolCard } from '@app/containers/Pools/components/PoolList';
 import { placeHolder, SORT } from '@app/shared/constants';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectFilter, selectOptions, selectPoolsList } from '@app/containers/Pools/store/selectors';
+import {
+  selectFavorites, selectFilter, selectOptions, selectPoolsList,
+} from '@app/containers/Pools/store/selectors';
 import { setFilter } from '@app/containers/Pools/store/actions';
 import * as mainActions from '@app/containers/Pools/store/actions';
-import { getFilterPools } from '@core/appUtils';
+import { getFilterPools, isInArray } from '@core/appUtils';
 import { styled } from '@linaria/react';
+import { IPoolCard } from '@core/types';
 
 const Sort = styled.ul`
   position: relative;
@@ -81,7 +84,7 @@ export const PoolsList = () => {
   const currentFilter = useSelector(selectFilter());
   const [poolsList, setPoolList] = useState(data);
   const [filtered, setFiltered] = useState(null);
-
+  const storage = useSelector(selectFavorites());
   const dispatch = useDispatch();
 
   const handleSort = (filter) => {
@@ -99,6 +102,8 @@ export const PoolsList = () => {
   useMemo(() => {
     setPoolList(getFilterPools(filtered, data));
   }, [data, filtered]);
+  const checkFavorite = (poolCard:IPoolCard) => isInArray(poolCard, storage);
+
   return (
     <Window title="Pools" createPool>
       <Container main jystify="center">
@@ -120,7 +125,11 @@ export const PoolsList = () => {
 
               {SORT.map((el) => (
                 <SortItem key={el.value}>
-                  <SortItemLink key={el.value} active={currentFilter === el.value} onClick={() => handleSort(el.value)}>
+                  <SortItemLink
+                    key={el.value}
+                    active={currentFilter === el.value}
+                    onClick={() => handleSort(el.value)}
+                  >
                     {el.name}
                   </SortItemLink>
                 </SortItem>
@@ -134,7 +143,7 @@ export const PoolsList = () => {
         ) : poolsList.length > 0 ? (
           <PoolList>
             {poolsList.map((item) => (
-              <PoolCard data={item} key={`${item.aid1}_${item.aid2}_${item.kind}`} />
+              <PoolCard isFavorite={checkFavorite(item)} data={item} key={`${item.aid1}_${item.aid2}_${item.kind}`} />
             ))}
           </PoolList>
         ) : (

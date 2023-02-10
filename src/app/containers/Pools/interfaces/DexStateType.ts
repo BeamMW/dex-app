@@ -10,6 +10,6 @@ export interface DexStateType {
   predict: IPredict,
   currentPool: IPoolCard,
   filter: string,
-
   options: IOptions[];
+  favorites: IPoolCard[];
 }

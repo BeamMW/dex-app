@@ -3,23 +3,22 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { IPoolCard } from '@core/types';
 import {
   convertLowAmount,
-  fromGroths, getPoolKind, parseIntToNum, truncate,
+  fromGroths, getPoolKind
 } from '@core/appUtils';
 import { ROUTES_PATH } from '@app/shared/constants';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import * as mainActions from '@app/containers/Pools/store/actions';
 import { Button, Section } from '@app/shared/components';
 import { styled } from '@linaria/react';
-import AssetIcon from '@app/shared/components/AssetsIcon';
-import { css } from '@linaria/core';
 import {
-  IconExchange, IconExchangeTrade, IconReceive, IconShieldChecked,
+  IconExchange, IconExchangeTrade, IconFavorite, IconFavoriteFilled, IconReceive, IconShieldChecked,
 } from '@app/shared/icons';
 import AssetLabel from '@app/shared/components/AssetLabel';
 
 interface PoolCardType {
   data: IPoolCard;
+  isFavorite?: boolean;
 }
 
 const HeaderCardWrapper = styled.div`
@@ -53,11 +52,18 @@ const Title = styled.div`
   color: white;
   
 `;
-const Kind = styled.div`
+const Fav = styled.div`
+ 
   position: absolute;
+  align-items: center;
   top: -3px;
   right: -10px;
   height: 22px;
+  display: flex;
+  justify-content: space-between;
+`;
+const Kind = styled.div`
+  margin-right: 3px;
   background: rgba(255, 255, 255, 0.05);
   padding: 4px 8px;
   border-radius: 20px;
@@ -65,7 +71,6 @@ const Kind = styled.div`
   font-size: 14px;
   line-height: 14px;
 `;
-
 const AmountWrapper = styled.div`
   display: flex;
   width: 100%;
@@ -78,7 +83,6 @@ const AssetAmount = styled.div`
   font-size: 14px;
   line-height: 17px;
   color:white`;
-
 const ControlWrapper = styled.div`
 
   display: flex;
@@ -91,7 +95,6 @@ width: 100%;
   height: 1px;
   border-radius: 2px;
 `;
-
 const SideLeftWrap = styled.div`
   display: flex;
   flex-direction: column;
@@ -107,7 +110,7 @@ const SideRightWrap = styled.div`
   width: 100%;
 `;
 
-export const PoolCard = ({ data }: PoolCardType) => {
+export const PoolCard = ({ data, isFavorite }: PoolCardType) => {
   const nameToken1 = `${data.metadata1.UN}`;
   const nameToken2 = `${data.metadata2.UN}`;
   const navigate = useNavigate();
@@ -118,6 +121,7 @@ export const PoolCard = ({ data }: PoolCardType) => {
   const currentCourseSecond = `
   1 ${data.metadata1.UN} = ${convertLowAmount(data.k2_1).toString().substr(0, 5)} ${data.metadata2.UN}`;
   const [exchange, setExchange] = useState(currentCourseMain);
+
   useEffect(() => {
     setPoolIsEmpty(
       !!(!data.tok1 || !data.tok2),
@@ -145,6 +149,10 @@ export const PoolCard = ({ data }: PoolCardType) => {
   const changeCourse = () => {
     setExchange(exchange !== currentCourseMain ? currentCourseMain : currentCourseSecond);
   };
+
+  const handleFavorite = (card:IPoolCard) => {
+    dispatch(mainActions.onFavorites.request(card));
+  };
   // TODO: break down into components
   return (
     <Section variant="card">
@@ -162,7 +170,10 @@ export const PoolCard = ({ data }: PoolCardType) => {
             {nameToken2}
           </Title>
         </TitleWrapper>
-        <Kind>{`${getPoolKind(data.kind)}`}</Kind>
+        <Fav>
+          <Kind>{`${getPoolKind(data.kind)}`}</Kind>
+          {isFavorite ? <IconFavoriteFilled onClick={() => handleFavorite(data)} /> : <IconFavorite onClick={() => handleFavorite(data)} />}
+        </Fav>
       </HeaderCardWrapper>
       <AmountWrapper>
         {/* <AssetIcon asset_id={data.aid1} /> */}

@@ -10,3 +10,4 @@ export const selectPredirect = () => createSelector(selectMain, (state) => state
 export const selectCurrentPool = () => createSelector(selectMain, (state) => state.currentPool);
 export const selectFilter = () => createSelector(selectMain, (state) => state.filter);
 export const selectOptions = () => createSelector(selectMain, (state) => state.options);
+export const selectFavorites = () => createSelector(selectMain, (state) => state.favorites);

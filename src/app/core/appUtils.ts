@@ -103,7 +103,7 @@ export function checkTxStatus(txId: string, txList: ITxStatus[]) {
 export function setDataRequest(data) {
   return { ...data, bPredictOnly: 0 };
 }
-export function onFilter(data: IPoolCard[], filter) {
+export function onFilter(data: IPoolCard[], filter, favorite: IPoolCard[]) {
   switch (filter) {
     case 'all': {
       return data.sort((a, b) => b.ctl - a.ctl);
@@ -116,6 +116,9 @@ export function onFilter(data: IPoolCard[], filter) {
     }
     case 'empty': {
       return data.filter((el) => !el.ctl);
+    }
+    case 'fav': {
+      return favorite;
     }
     default:
       return data.sort((a, b) => b.ctl - a.ctl);
@@ -143,23 +146,6 @@ export const onPredictValue = (value, swap: boolean, predict: IPredict) => {
   }
   return fromGroths(predict.tok2);
 };
-
-// export const getFilterPools = (filtered: IOptions[], data:IPoolCard[]):IPoolCard[] => {
-//   if (filtered.length !== 0) {
-//     let newList = [];
-//     filtered.map((el) => {
-//       data.map((item) => {
-//         if (item.aid1 === el.value || item.aid2 === el.value) {
-//           newList = [...newList, item];
-//         }
-//         return newList;
-//       });
-//       console.log(newList);
-//       return newList;
-//     });
-//     return newList;
-//   } return data;
-// };
 export const getFilterPools = (value: IOptions,
   data: IPoolCard[]): IPoolCard[] => {
   let newList = [];
@@ -208,7 +194,7 @@ export function convertLowAmount(explicitNum) {
     const multiplier = Math.pow(10, parseInt(data[1]));
     return leader * multiplier;
   }
-  return 0
+  return 0;
 }
 
 export function truncate(value: string): string {
@@ -221,4 +207,18 @@ export function truncate(value: string): string {
   }
 
   return `${value.slice(0, LENGTH_MAX)}…`;
+}
+export function isInArray(card, arr: IPoolCard[]) {
+  if (card && arr) {
+    if (card.isArray) {
+      card.map((item:IPoolCard) => item.aid1 === card.aid1 && item.aid2 === card.aid2 && item.kind === card.kind);
+    } else {
+      if (arr.some((e) => e.aid1 === card.aid1 && e.aid2 === card.aid2 && e.kind === card.kind)) {
+        return true;
+      }
+      return false;
+    }
+    return false;
+  }
+  return false;
 }

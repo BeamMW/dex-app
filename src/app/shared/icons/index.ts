@@ -71,6 +71,9 @@ import IconDropdownDown from './icon-arrow-dropdown-down.svg';
 import IconSearchResult from './icon-search-result.svg';
 import IconLoader from './icon-loader.svg';
 
+import IconFavorite from './icon-favorite.svg';
+import IconFavoriteFilled from './icon-favorite-filled.svg';
+
 export {
   IconReceive,
   IconWithdrawBlue,
@@ -136,4 +139,6 @@ export {
   IconDropdownDown,
   IconSearchResult,
   IconLoader,
+  IconFavorite,
+  IconFavoriteFilled,
 };
