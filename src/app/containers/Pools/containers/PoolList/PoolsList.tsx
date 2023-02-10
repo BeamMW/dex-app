@@ -59,7 +59,7 @@ const SortItemLink = styled.button<{ active: boolean }>`
   float: left;
   display: block;
   color: ${({ active }) => (active ? 'white' : 'rgba(255,255,255, 0.3)')};
-  font-family: SFProDisplay, sans-serif;
+  font-family: 'SFProDisplay', sans-serif;
   font-weight: 700;
   font-size: 12px;
   line-height: 14px;
