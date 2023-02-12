@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ITrade } from '@core/types';
 import {
-  emptyPredict, fromGroths, setDataRequest, toGroths,
+  emptyPredict, fromGroths, setDataRequest, toGroths, truncate,
 } from '@core/appUtils';
 import {
   AssetsContainer, AssetsSection, Button, Input, Section, Window, Container,
@@ -41,6 +41,8 @@ export const WithdrawPool = () => {
   const predictData = useSelector(selectPredirect());
   const [currentLPToken, setCurrentLPToken] = useState(null);
   const [currentAmountCtl, setCurrentAmount] = useState(data.ctl);
+  const nameToken1 = truncate(data.metadata1.UN);
+  const nameToken2 = truncate(data.metadata2.UN);
   const amountInput = useInput({
     initialValue: 0, validations: { isEmpty: true, isMax: fromGroths(currentAmountCtl) },
   });
@@ -73,7 +75,7 @@ export const WithdrawPool = () => {
     }
   }, [requestData, amountInput.value, amountInput.isValid, amountInput.isMax]);
 
-  const assetLabel = currentLPToken ? currentLPToken.parsedMetadata.UN : 'AMML';
+  const assetLabel = currentLPToken ? truncate(currentLPToken.parsedMetadata.UN) : 'AMML';
   const assetId = currentLPToken ? currentLPToken.aid : data['lp-token'];
 
   const onWithdraw = (dataReq: ITrade) => {
@@ -109,7 +111,7 @@ export const WithdrawPool = () => {
                 style={{ cursor: 'default', color: '--var(color-purple)', opacity: 1 }}
                 value={emptyPredict(predictData, amountInput.value) ? '0' : fromGroths(predictData.tok1)}
               />
-              <AssetLabel title={data.metadata1.UN} assets_id={data.aid1} />
+              <AssetLabel title={nameToken1} assets_id={data.aid1} />
             </AssetsSection>
             <AssetsSection>
               <Input
@@ -120,7 +122,7 @@ export const WithdrawPool = () => {
                 style={{ cursor: 'default', color: '--var(color-purple)', opacity: 1 }}
                 value={emptyPredict(predictData, amountInput.value) ? '0' : fromGroths(predictData.tok2)}
               />
-              <AssetLabel title={data.metadata2.UN} assets_id={data.aid2} />
+              <AssetLabel title={nameToken2} assets_id={data.aid2} />
             </AssetsSection>
           </Section>
         </AssetsContainer>

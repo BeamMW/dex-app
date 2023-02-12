@@ -11,7 +11,7 @@ import {
   Window,
 } from '@app/shared/components';
 import {
-  emptyPredict, fromGroths, onPredictValue, setDataRequest, toGroths,
+  emptyPredict, fromGroths, onPredictValue, setDataRequest, toGroths, truncate,
 } from '@core/appUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import * as mainActions from '@app/containers/Pools/store/actions';
@@ -114,8 +114,8 @@ export const AddLiquidity = () => {
   const [percent, setPercent] = useState(initialState);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const tokenName_1 = `${data.metadata1.UN}`;
-  const tokenName_2 = `${data.metadata2.UN}`;
+  const tokenName_1 = truncate(data.metadata1.UN);
+  const tokenName_2 = truncate(data.metadata2.UN);
   useEffect(() => {
     setPoolIsEmpty(
       !!(!data.tok1 || !data.tok2),
@@ -256,8 +256,8 @@ export const AddLiquidity = () => {
                 <Title>pool summary</Title>
                 <LeftBlockPredict>
                   <TitleBlock>
-                    <TitleSummary>{data.metadata1.UN}</TitleSummary>
-                    <TitleSummary>{data.metadata2.UN}</TitleSummary>
+                    <TitleSummary>{truncate(data.metadata1.UN)}</TitleSummary>
+                    <TitleSummary>{truncate(data.metadata2.UN)}</TitleSummary>
                     <TitleSummary>Liquidity</TitleSummary>
                   </TitleBlock>
                   <AmountBlock>

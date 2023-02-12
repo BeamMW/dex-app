@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { IPoolCard } from '@core/types';
 import {
   convertLowAmount,
-  fromGroths, getPoolKind
+  fromGroths, getPoolKind, truncate,
 } from '@core/appUtils';
 import { ROUTES_PATH } from '@app/shared/constants';
 import { useNavigate } from 'react-router-dom';
@@ -111,15 +111,15 @@ const SideRightWrap = styled.div`
 `;
 
 export const PoolCard = ({ data, isFavorite }: PoolCardType) => {
-  const nameToken1 = `${data.metadata1.UN}`;
-  const nameToken2 = `${data.metadata2.UN}`;
+  const nameToken1 = truncate(data.metadata1.UN);
+  const nameToken2 = truncate(data.metadata2.UN);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [poolIsEmpty, setPoolIsEmpty] = useState(true);
   const currentCourseMain = `
-  1 ${data.metadata2.UN} = ${convertLowAmount(data.k1_2).toString().substr(0, 5)} ${data.metadata1.UN}`;
+  1 ${nameToken2} = ${convertLowAmount(data.k1_2).toString().substr(0, 5)} ${nameToken1}`;
   const currentCourseSecond = `
-  1 ${data.metadata1.UN} = ${convertLowAmount(data.k2_1).toString().substr(0, 5)} ${data.metadata2.UN}`;
+  1 ${nameToken1} = ${truncate(convertLowAmount(data.k2_1).toString(), 5)} ${nameToken2}`;
   const [exchange, setExchange] = useState(currentCourseMain);
 
   useEffect(() => {

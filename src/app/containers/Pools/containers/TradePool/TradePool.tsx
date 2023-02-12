@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { ITrade } from '@core/types';
 import {
   convertLowAmount,
-  emptyPredict, fromGroths, getTotalFee, setDataRequest, toGroths,
+  emptyPredict, fromGroths, getTotalFee, setDataRequest, toGroths, truncate,
 } from '@core/appUtils';
 import {
   AssetsContainer, AssetsSection, Button, Input, Section, Window, Container,
@@ -98,8 +98,8 @@ export const TradePool = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const tokenName_1 = `${data.metadata1.UN}`;
-  const tokenName_2 = `${data.metadata2.UN}`;
+  const tokenName_1 = truncate(data.metadata1.UN);
+  const tokenName_2 = truncate(data.metadata2.UN);
 
   const handleChange = () => {
     setIsSwap(!isSwap);

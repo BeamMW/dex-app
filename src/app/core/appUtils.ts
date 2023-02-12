@@ -3,7 +3,7 @@ import {
 } from '@core/types';
 import { ASSET_BEAM, GROTHS_IN_BEAM } from '@app/shared/constants';
 
-const LENGTH_MAX = 4;
+const LENGTH_MAX = 6;
 
 export function parseMetadata(metadata) {
   const splittedMetadata = metadata.split(';');
@@ -13,6 +13,17 @@ export function parseMetadata(metadata) {
     return { ...accumulator, [data[0]]: data[1] };
   }, {});
   return obj;
+}
+export function truncate(value: string, len = LENGTH_MAX): string {
+  if (!value) {
+    return '';
+  }
+
+  if (value.length <= len) {
+    return value;
+  }
+
+  return `${value.slice(0, len)}…`;
 }
 
 export function getOptions(assets: IAsset[]) {
@@ -24,10 +35,21 @@ export function getOptions(assets: IAsset[]) {
   ];
 
   assets.map((item) => {
-    options = [...options, { value: item.aid, label: `${item.parsedMetadata.UN}` }];
+    options = [...options, { value: item.aid, label: `${truncate(item.parsedMetadata.UN)}` }];
     return options;
   });
   return options;
+}
+export function numFormatter(num) {
+  if (num > 999 && num < 1000000) {
+    return `${parseFloat((num / 1000).toFixed(2))}K`;
+  }
+  if (num >= 1000000) {
+    return `${parseFloat((num / 1000000).toFixed(2))}M`;
+  }
+  if (num <= 999) {
+    return parseFloat(num.toFixed(2));
+  }
 }
 
 export const getPoolKind = (kind: number) => {
@@ -73,7 +95,10 @@ export const parsePoolMetadata = (poolCard, aid1, aid2, assetList: IAsset[]) => 
   return data;
 };
 
-export function fromGroths(value: number): number {
+export function fromGroths(value: number): string | number {
+  if (value < GROTHS_IN_BEAM) {
+    return value;
+  }
   return value && value !== 0 ? value / GROTHS_IN_BEAM : 0;
 }
 
@@ -126,17 +151,7 @@ export function onFilter(data: IPoolCard[], filter, favorite: IPoolCard[]) {
 }
 
 export const emptyPredict = (data: IPredict, amount: string | number): boolean => !data || !amount || amount === '0';
-export function numFormatter(num) {
-  if (num > 999 && num < 1000000) {
-    return `${parseFloat((num / 1000).toFixed(2))}K`;
-  }
-  if (num >= 1000000) {
-    return `${parseFloat((num / 1000000).toFixed(2))}M`;
-  }
-  if (num <= 999) {
-    return parseFloat(num.toFixed(2));
-  }
-}
+
 export const onPredictValue = (value, swap: boolean, predict: IPredict) => {
   if (!predict || value.value === 0) {
     return 0;
@@ -197,17 +212,6 @@ export function convertLowAmount(explicitNum) {
   return 0;
 }
 
-export function truncate(value: string): string {
-  if (!value) {
-    return '';
-  }
-
-  if (value.length <= LENGTH_MAX) {
-    return value;
-  }
-
-  return `${value.slice(0, LENGTH_MAX)}…`;
-}
 export function isInArray(card, arr: IPoolCard[]) {
   if (card && arr) {
     if (card.isArray) {

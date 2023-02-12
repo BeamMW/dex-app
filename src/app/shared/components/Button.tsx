@@ -93,7 +93,7 @@ const IconButtonStyled = styled(BaseButtonStyled)`
 
   > svg {
     vertical-align: sub;
-    margin-right: 15px;
+    //margin-right: 15px; 
   }
 `;
 
