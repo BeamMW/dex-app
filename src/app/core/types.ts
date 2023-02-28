@@ -1,6 +1,17 @@
 export type Pallete = 'green' | 'ghost' | 'purple' | 'blue' | 'red' | 'white' | 'vote-red';
 
-export type ButtonVariant = 'regular' | 'ghost' | 'ghostBordered' | 'block' | 'link' | 'icon' | 'control' | 'trade' | 'approve' |'cancel' | 'withdraw';
+export type ButtonVariant =
+  | 'regular'
+  | 'ghost'
+  | 'ghostBordered'
+  | 'block'
+  | 'link'
+  | 'icon'
+  | 'control'
+  | 'trade'
+  | 'approve'
+  | 'cancel'
+  | 'withdraw';
 
 export enum Kind {
   Low = 0,
@@ -30,50 +41,49 @@ export interface IMetadataPairs {
   OPT_COLOR?: string;
 }
 export interface IAsset {
-  aid: number,
-  metadata: string,
-  mintedHi: number,
-  mintedLo: number,
-  owner_pk: string,
-  parsedMetadata: IMetadataPairs,
-  limitHi?: number,
-  limitLo?: number,
+  aid: number;
+  metadata: string;
+  mintedHi: number;
+  mintedLo: number;
+  owner_pk: string;
+  parsedMetadata: IMetadataPairs;
+  limitHi?: number;
+  limitLo?: number;
 }
 export interface IPoolCard {
-  aid1: number,
-  aid2: number,
-  ctl: number,
-  k1_2: string,
-  k1_ctl: string,
-  k2_1: string,
-  k2_ctl: string,
-  kind: number,
-  lp_token: number,
-  tok1: number,
-  tok2: number,
-  metadata1?: IMetadataPairs,
-  metadata2?: IMetadataPairs,
+  aid1: number;
+  aid2: number;
+  ctl: number;
+  k1_2: string;
+  k1_ctl: string;
+  k2_1: string;
+  k2_ctl: string;
+  kind: number;
+  lp_token: number;
+  tok1: number;
+  tok2: number;
+  metadata1?: IMetadataPairs;
+  metadata2?: IMetadataPairs;
   creator?: number;
 }
-export interface ICreatePool{
-  aid1: number,
-  aid2: number,
-  kind:number,
+export interface ICreatePool {
+  aid1: number;
+  aid2: number;
+  kind: number;
+}
+export interface IAddLiquidity extends ICreatePool {
+  val1: number;
+  val2: number;
+  bPredictOnly: number;
+}
+export interface ITrade extends ICreatePool {
+  val1_buy: number;
+  bPredictOnly?: number;
+}
 
-}
-export interface IAddLiquidity extends ICreatePool{
-  val1:number,
-  val2:number,
-  bPredictOnly: number
-}
-export interface ITrade extends ICreatePool{
-  val1_buy: number,
-  bPredictOnly?: number
-}
-
-export interface IWithdraw extends ICreatePool{
-  ctl: number,
-  bPredictOnly?: number
+export interface IWithdraw extends ICreatePool {
+  ctl: number;
+  bPredictOnly?: number;
 }
 
 export interface ITsx {
@@ -105,36 +115,35 @@ export interface ITxStatus {
 }
 
 export interface ITxId {
-  txid: string
+  txid: string;
 }
 export interface IPredict {
-  buy?: number,
-  fee_dao?: number,
-  fee_pool?: number,
-  pay?: number,
-  pay_raw?: number,
-  ctl?: number,
-  tok1?: number,
-  tok2?: number,
+  buy?: number;
+  fee_dao?: number;
+  fee_pool?: number;
+  pay?: number;
+  pay_raw?: number;
+  ctl?: number;
+  tok1?: number;
+  tok2?: number;
 }
 export interface ITxResult {
-  txid?: string,
-  res?: IPredict
+  txid?: string;
+  res?: IPredict;
 }
 export interface IError {
   answer: {
-    id: string,
-    jsonrpc: string
+    id: string;
+    jsonrpc: string;
     result: {
-      output: any
-      txid: string
-    }
-  }
+      output: any;
+      txid: string;
+    };
+  };
   error: string;
-
 }
 
 export interface IOptions {
-  value: number,
-  label: string,
+  value: number;
+  label: string;
 }

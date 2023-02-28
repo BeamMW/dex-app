@@ -1,6 +1,7 @@
 import { Kind } from '@core/types';
 
 export const GROTHS_IN_BEAM = 100000000;
+export const REG_AMOUNT = /^(?!0\d)(\d+)(\.)?(\d{0,8})?$/;
 
 export const ASSET_BEAM = {
   N: 'Beam Coin',

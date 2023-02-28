@@ -11,17 +11,17 @@ let InitParams;
 export default class Utils {
   static isMobile() {
     const ua = navigator.userAgent;
-    return (/android/i.test(ua) || /iPad|iPhone|iPod/.test(ua));
+    return /android/i.test(ua) || /iPad|iPhone|iPod/.test(ua);
   }
 
   static isAndroid() {
     const ua = navigator.userAgent;
-    return (/android/i.test(ua));
+    return /android/i.test(ua);
   }
 
   static isDesktop() {
     const ua = navigator.userAgent;
-    return (/QtWebEngine/i.test(ua));
+    return /QtWebEngine/i.test(ua);
   }
 
   static isWeb() {
@@ -68,17 +68,27 @@ export default class Utils {
 
   static async createWebAPI(apiver, apivermin, appname, apirescback) {
     return new Promise((resolve) => {
-      window.addEventListener('message', async (ev) => {
-        if (ev.data === 'apiInjected') {
-          await window.BeamApi.callWalletApiResult(apirescback);
-          resolve({
-            api: window.BeamApi,
-          });
-        }
-      }, false);
-      window.postMessage({
-        type: 'create_beam_api', apiver, apivermin, appname,
-      }, window.origin);
+      window.addEventListener(
+        'message',
+        async (ev) => {
+          if (ev.data === 'apiInjected') {
+            await window.BeamApi.callWalletApiResult(apirescback);
+            resolve({
+              api: window.BeamApi,
+            });
+          }
+        },
+        false,
+      );
+      window.postMessage(
+        {
+          type: 'create_beam_api',
+          apiver,
+          apivermin,
+          appname,
+        },
+        window.origin,
+      );
     });
   }
 
@@ -166,20 +176,38 @@ export default class Utils {
           Utils.hideLoading();
           window.removeEventListener('message', listener);
           // TODO: add cancel handling in wallet
-          window.postMessage({
-            type: 'cancel_beam_api', apiver, apivermin, appname,
-          }, window.origin);
+          window.postMessage(
+            {
+              type: 'cancel_beam_api',
+              apiver,
+              apivermin,
+              appname,
+            },
+            window.origin,
+          );
           resolve(res);
         },
         onReconnect: () => {
-          window.postMessage({
-            type: 'retry_beam_api', apiver, apivermin, appname,
-          }, window.origin);
+          window.postMessage(
+            {
+              type: 'retry_beam_api',
+              apiver,
+              apivermin,
+              appname,
+            },
+            window.origin,
+          );
         },
       });
-      window.postMessage({
-        type: 'create_beam_api', apiver, apivermin, appname,
-      }, window.origin);
+      window.postMessage(
+        {
+          type: 'create_beam_api',
+          apiver,
+          apivermin,
+          appname,
+        },
+        window.origin,
+      );
     });
 
     if (newAPI) {
@@ -310,19 +338,13 @@ export default class Utils {
             headless: true,
             connecting: false,
           });
-          BEAM = await Utils.createHeadlessAPI(
-            apiver, apivermin, appname,
-            (...args) => Utils.handleApiResult(...args),
-          );
+          BEAM = await Utils.createHeadlessAPI(apiver, apivermin, appname, (...args) => Utils.handleApiResult(...args));
         } else {
           Utils.showLoading({
             headless: false,
             connecting: true,
           });
-          BEAM = await Utils.createWebAPI(
-            apiver, apivermin, appname,
-            (...args) => Utils.handleApiResult(...args),
-          );
+          BEAM = await Utils.createWebAPI(apiver, apivermin, appname, (...args) => Utils.handleApiResult(...args));
         }
       }
 
@@ -447,13 +469,15 @@ export default class Utils {
     const regex = new RegExp(/^-?\d+(\.\d*)?$/g);
     const floatValue = parseFloat(next);
     const afterDot = next.indexOf('.') > 0 ? next.substring(next.indexOf('.') + 1) : '0';
-    if ((next && !String(next).match(regex))
-            || (String(next).length > 1 && String(next)[0] === '0' && next.indexOf('.') < 0)
-            || (parseInt(afterDot, 10) === 0 && afterDot.length > 7)
-            || (afterDot.length > 8)
-            || (floatValue === 0 && next.length > 1 && next[1] !== '.')
-            || (floatValue < 1 && next.length > 10)
-            || (floatValue > 0 && (floatValue < MIN_AMOUNT || floatValue > MAX_AMOUNT))) {
+    if (
+      (next && !String(next).match(regex))
+      || (String(next).length > 1 && String(next)[0] === '0' && next.indexOf('.') < 0)
+      || (parseInt(afterDot, 10) === 0 && afterDot.length > 7)
+      || afterDot.length > 8
+      || (floatValue === 0 && next.length > 1 && next[1] !== '.')
+      || (floatValue < 1 && next.length > 10)
+      || (floatValue > 0 && (floatValue < MIN_AMOUNT || floatValue > MAX_AMOUNT))
+    ) {
       result = false;
     }
     return result;
@@ -488,8 +512,10 @@ export default class Utils {
     } else {
       bg.style.backgroundImage = [
         'linear-gradient(to bottom,',
-        styles.background_main_top, topColor,
-        styles.background_main, mainColor,
+        styles.background_main_top,
+        topColor,
+        styles.background_main,
+        mainColor,
         styles.background_main,
       ].join(' ');
     }
@@ -509,7 +535,11 @@ export default class Utils {
       titleElem = document.createElement('h3');
       titleElem.innerText = 'Connecting to BEAM Web Wallet.';
       subtitle = document.createElement('p');
-      subtitle.innerText = ['To use ', InitParams.appname, ' you should have BEAM Web Wallet installed and allow connection.'].join('');
+      subtitle.innerText = [
+        'To use ',
+        InitParams.appname,
+        ' you should have BEAM Web Wallet installed and allow connection.',
+      ].join('');
 
       if (headless) {
         loadContainer.style.backgroundColor = 'rgba(3, 91, 133, 0.95)';
@@ -547,13 +577,21 @@ export default class Utils {
       reconnectButton.style.fontSize = '14px';
       reconnectButton.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
 
-      reconnectButton.addEventListener('mouseover', () => {
-        reconnectButton.style.boxShadow = '0 0 8px white';
-      }, false);
+      reconnectButton.addEventListener(
+        'mouseover',
+        () => {
+          reconnectButton.style.boxShadow = '0 0 8px white';
+        },
+        false,
+      );
 
-      reconnectButton.addEventListener('mouseout', () => {
-        reconnectButton.style.boxShadow = 'none';
-      }, false);
+      reconnectButton.addEventListener(
+        'mouseout',
+        () => {
+          reconnectButton.style.boxShadow = 'none';
+        },
+        false,
+      );
 
       reconnectButton.addEventListener('click', onReconnect);
 
@@ -569,16 +607,26 @@ export default class Utils {
       installButton.style.fontSize = '14px';
       installButton.style.backgroundColor = '#00f6d2';
       installButton.addEventListener('click', () => {
-        window.open('https://chrome.google.com/webstore/detail/beam-web-wallet/ilhaljfiglknggcoegeknjghdgampffk',
-          '_blank');
+        window.open(
+          'https://chrome.google.com/webstore/detail/beam-web-wallet/ilhaljfiglknggcoegeknjghdgampffk',
+          '_blank',
+        );
       });
 
-      installButton.addEventListener('mouseover', () => {
-        installButton.style.boxShadow = '0 0 8px white';
-      }, false);
-      installButton.addEventListener('mouseout', () => {
-        installButton.style.boxShadow = 'none';
-      }, false);
+      installButton.addEventListener(
+        'mouseover',
+        () => {
+          installButton.style.boxShadow = '0 0 8px white';
+        },
+        false,
+      );
+      installButton.addEventListener(
+        'mouseout',
+        () => {
+          installButton.style.boxShadow = 'none';
+        },
+        false,
+      );
       installButton.style.marginLeft = '30px';
 
       const controlsArea = document.createElement('div');
@@ -609,8 +657,10 @@ export default class Utils {
     bg.style.textAlign = 'center';
     bg.style.backgroundImage = [
       'linear-gradient(to bottom,',
-      styles.background_main_top, topColor,
-      styles.background_main, mainColor,
+      styles.background_main_top,
+      topColor,
+      styles.background_main,
+      mainColor,
       styles.background_main,
     ].join(' ');
 
@@ -626,8 +676,7 @@ export default class Utils {
     download.style.color = '#00f6d2';
 
     download.addEventListener('click', () => {
-      window.open('https://www.google.com/chrome/',
-        '_blank');
+      window.open('https://www.google.com/chrome/', '_blank');
     });
 
     bg.appendChild(notSupp);
@@ -651,8 +700,10 @@ export default class Utils {
     bg.style.textAlign = 'center';
     bg.style.backgroundImage = [
       'linear-gradient(to bottom,',
-      styles.background_main_top, topColor,
-      styles.background_main, mainColor,
+      styles.background_main_top,
+      topColor,
+      styles.background_main,
+      mainColor,
       styles.background_main,
     ].join(' ');
 
@@ -663,10 +714,8 @@ export default class Utils {
     downloadLink.style.color = '#00f6d2';
     downloadLink.addEventListener('click', () => {
       Utils.isAndroid()
-        ? window.open('https://play.google.com/store/apps/details?id=com.mw.beam.beamwallet.mainnet',
-          '_blank')
-        : window.open('https://apps.apple.com/us/app/beam-privacy-wallet/id1459842353?ls=1',
-          '_blank');
+        ? window.open('https://play.google.com/store/apps/details?id=com.mw.beam.beamwallet.mainnet', '_blank')
+        : window.open('https://apps.apple.com/us/app/beam-privacy-wallet/id1459842353?ls=1', '_blank');
     });
 
     bg.appendChild(downloadLink);
@@ -701,9 +750,7 @@ export default class Utils {
 
   static getRateStr(value, rate) {
     const rateVal = Utils.formateValue(new Big(value).times(rate));
-    return (rate > 0 && value > 0
-      ? (rateVal > 0.1 ? (`${Utils.numberWithCommas(rateVal)} USD`) : '< 1 cent')
-      : '0 USD');
+    return rate > 0 && value > 0 ? (rateVal > 0.1 ? `${Utils.numberWithCommas(rateVal)} USD` : '< 1 cent') : '0 USD';
   }
 
   static ensureField(obj, name, type) {

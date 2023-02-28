@@ -1,5 +1,5 @@
 import React, {
-  useCallback, useMemo, useState,
+  useCallback, useEffect, useMemo, useState,
 } from 'react';
 import './index.scss';
 import {
@@ -11,7 +11,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   selectFavorites, selectFilter, selectOptions, selectPoolsList,
 } from '@app/containers/Pools/store/selectors';
-import { setFilter } from '@app/containers/Pools/store/actions';
 import * as mainActions from '@app/containers/Pools/store/actions';
 import { getFilterPools, isInArray } from '@core/appUtils';
 import { styled } from '@linaria/react';
@@ -34,14 +33,14 @@ const HeaderContainer = styled.div`
 const PoolList = styled.div`
   margin: 16px 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(298px, 298px));
+  grid-template-columns: repeat(3, minmax(430px, 430px));
   grid-gap: 10px;
   grid-auto-flow: row;
   width: 100%;
   justify-content: center;
   flex-grow: 1;
-  @media (max-width: 934px) {
-    grid-template-columns: repeat(3, 1fr);
+  @media (max-width: 1330px) {
+    grid-template-columns: repeat(2, minmax(430px, 430px));
     overflow: hidden;
   }
 `;
@@ -74,41 +73,62 @@ const SortItemLink = styled.button<{ active: boolean }>`
   &:hover {
     border-bottom: 2px solid var(--color-green);
   }
+  &:disabled {
+    border-bottom: none;
+    color: rgba(255, 255, 255, 0.1);
+  }
 `;
 const WrapperSelect = styled.div`
-width: 350px`;
+  width: 350px;
+`;
 
 export const PoolsList = () => {
   const data = useSelector(selectPoolsList());
   const options = useSelector(selectOptions());
+  const favorites = JSON.parse(localStorage.getItem('favorites'));
+  const localFiltered = JSON.parse(sessionStorage.getItem('filtered'));
   const currentFilter = useSelector(selectFilter());
   const [poolsList, setPoolList] = useState(data);
   const [filtered, setFiltered] = useState(null);
   const storage = useSelector(selectFavorites());
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (!favorites.length) {
+      dispatch(mainActions.setFilter('all'));
+    }
+    if (localFiltered) {
+      setFiltered(localFiltered);
+    }
+  }, []);
+
   const handleSort = (filter) => {
-    dispatch(setFilter(filter));
+    dispatch(mainActions.setFilter(filter));
     dispatch(mainActions.loadAppParams.request(null));
   };
-
+  // todo: store
   const onFilter = useCallback(
     (value) => {
       setFiltered(value);
+      sessionStorage.setItem('filtered', JSON.stringify(value));
     },
     [data, poolsList],
   );
+  useMemo(() => {
+    if (favorites.length === 0) {
+      handleSort('all');
+    }
+  }, [favorites.length]);
 
   useMemo(() => {
     setPoolList(getFilterPools(filtered, data));
   }, [data, filtered]);
-  const checkFavorite = (poolCard:IPoolCard) => isInArray(poolCard, storage);
+  const checkFavorite = (poolCard: IPoolCard) => isInArray(poolCard, storage);
 
   return (
     <Window title="Pools" createPool>
       <Container main jystify="center">
         <HeaderContainer>
-
           <HeaderWrapperSort>
             <Sort>
               <WrapperSelect>
@@ -116,11 +136,11 @@ export const PoolsList = () => {
                   options={options}
                   isClearable
                   onChange={(e) => onFilter(e)}
+                  defaultValue={() => localFiltered}
                   isIcon
                   placeholder={placeHolder.SEARCH}
                   customPrefix="custom-filter"
                 />
-
               </WrapperSelect>
 
               {SORT.map((el) => (
@@ -129,6 +149,7 @@ export const PoolsList = () => {
                     key={el.value}
                     active={currentFilter === el.value}
                     onClick={() => handleSort(el.value)}
+                    disabled={!!(el.value === 'fav' && !favorites.length)}
                   >
                     {el.name}
                   </SortItemLink>

@@ -1,14 +1,10 @@
-import React, {
-  useMemo, useState,
-} from 'react';
+import React, { useMemo, useState } from 'react';
 import './index.scss';
 import {
   AssetsContainer, Button, Section, Window, Container, ReactSelect,
 } from '@app/shared/components';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  selectOptions,
-} from '@app/containers/Pools/store/selectors';
+import { selectOptions } from '@app/containers/Pools/store/selectors';
 import { ICreatePool, IOptions, Kind } from '@core/types';
 import {
   kindSelect, placeHolder, ROUTES, titleSections,
@@ -17,10 +13,9 @@ import * as mainActions from '@app/containers/Pools/store/actions';
 import { styled } from '@linaria/react';
 import { CancelIcon, DoneIcon } from '@app/shared/icons';
 import { useNavigate } from 'react-router-dom';
-import { element } from 'prop-types';
 
 const SectionWrapper = styled.div`
- margin: 10px 0 40px 0;
+  margin: 10px 0 40px 0;
   display: flex;
   justify-content: flex-start;
   width: 100%;
@@ -34,7 +29,7 @@ const ButtonWrapper = styled.div`
   display: flex;
   max-width: 363px;
   width: 100%;
-  justify-content: space-between; 
+  justify-content: space-between;
 `;
 
 export const CreatePool = () => {
@@ -48,11 +43,13 @@ export const CreatePool = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   useMemo(() => {
-    setRequestData([{
-      aid1: currentToken1 && currentToken1.value,
-      aid2: currentToken2 && currentToken2.value,
-      kind: currentKind && currentKind.value,
-    }]);
+    setRequestData([
+      {
+        aid1: currentToken1 && currentToken1.value,
+        aid2: currentToken2 && currentToken2.value,
+        kind: currentKind && currentKind.value,
+      },
+    ]);
   }, [currentToken1, currentToken2, currentKind]);
   // useEffect(() => {
   //   if (txStatus && txStatus === TxStatus.Completed) {

@@ -49,7 +49,6 @@ function* sharedSaga() {
   while (true) {
     try {
       const payload: any = yield take(remoteChannel);
-      console.log(payload);
       switch (payload.id) {
         case 'ev_system_state':
           store.dispatch(setSystemState(payload.result));

@@ -11,3 +11,4 @@ export const selectCurrentPool = () => createSelector(selectMain, (state) => sta
 export const selectFilter = () => createSelector(selectMain, (state) => state.filter);
 export const selectOptions = () => createSelector(selectMain, (state) => state.options);
 export const selectFavorites = () => createSelector(selectMain, (state) => state.favorites);
+export const selectCurrentLPToken = () => createSelector(selectMain, (state) => state.currentLPToken);

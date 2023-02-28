@@ -1,24 +1,29 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ITrade } from '@core/types';
 import {
-  convertLowAmount,
-  emptyPredict, fromGroths, getTotalFee, setDataRequest, toGroths, truncate,
+  emptyPredict, fromGroths, setDataRequest, toGroths, truncate,
 } from '@core/appUtils';
 import {
-  AssetsContainer, AssetsSection, Button, Input, Section, Window, Container,
+  AssetsContainer,
+  AssetsSection,
+  Button,
+  Container,
+  Input,
+  PoolStat,
+  Section,
+  Window,
 } from '@app/shared/components';
 import { useInput } from '@app/shared/hooks';
 import * as mainActions from '@app/containers/Pools/store/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import './index.scss';
-import { selectCurrentPool, selectPredirect } from '@app/containers/Pools/store/selectors';
+import { selectAssetsList, selectCurrentPool, selectPredirect } from '@app/containers/Pools/store/selectors';
 import { CancelIcon, DoneIcon, IconExchange } from '@app/shared/icons';
 import { ROUTES, titleSections } from '@app/shared/constants';
 import AssetLabel from '@app/shared/components/AssetLabel';
 import { styled } from '@linaria/react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { isValid } from 'js-base64';
 
 const ExchangeWrapper = styled.div`
   position: absolute;
@@ -29,8 +34,9 @@ const ExchangeWrapper = styled.div`
 const SectionWrapper = styled.div`
   margin: 10px 0 40px 0;
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   width: 100%;
+  height: auto;
 `;
 
 const SummaryWrapper = styled.div`
@@ -68,31 +74,34 @@ const AssetAmount = styled.div`
   display: flex;
 `;
 const Line = styled.div`
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 2px;
-    width: 412px;
-    margin: 20px 0;
-  `;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  width: 412px;
+  margin: 20px 0;
+`;
 const ButtonBlock = styled.div`
-    display: flex;
-    justify-content: center;
-    width: 100%;
-  `;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+`;
 const ButtonWrapper = styled.div`
-    display: flex;
-    max-width: 363px;
-    width: 100%;
-    justify-content: space-between;
-  `;
+  display: flex;
+  max-width: 363px;
+  width: 100%;
+  justify-content: space-between;
+`;
 
 export const TradePool = () => {
   const data = useSelector(selectCurrentPool());
+  const assets = useSelector(selectAssetsList());
   const predictData = useSelector(selectPredirect());
   const [currentToken, setCurrentToken] = useState(data.aid1);
+  const [currentLPToken, setCurrentLPToken] = useState(null);
   const [currentTokAmount, setCurrentTokenAmount] = useState<number>(data.tok1);
   const [isSwap, setIsSwap] = useState<boolean>(false);
   const amountInput = useInput({
-    initialValue: 0, validations: { isEmpty: true, isMax: fromGroths(currentTokAmount) },
+    initialValue: 0,
+    validations: { isEmpty: true, isMax: fromGroths(currentTokAmount) },
   });
   const [requestData, setRequestData] = useState(null);
   const dispatch = useDispatch();
@@ -125,6 +134,11 @@ export const TradePool = () => {
       dispatch(mainActions.onTradePool.request(requestData));
     }
   }, [requestData, amountInput.value, amountInput.isValid]);
+  useEffect(() => {
+    if (data && assets) {
+      setCurrentLPToken(assets.find((el) => el.aid === data['lp-token']));
+    }
+  }, [data, assets]);
 
   const onTrade = (dataTrade: ITrade) => {
     dispatch(mainActions.onTradePool.request(setDataRequest(dataTrade)));
@@ -133,6 +147,7 @@ export const TradePool = () => {
   const onPreviousClick = () => {
     navigate(ROUTES.POOLS.BASE);
   };
+
   return (
     <Window title="trade" backButton>
       <Container>
@@ -140,7 +155,6 @@ export const TradePool = () => {
           <Section title={titleSections.TRADE_RECEIVE}>
             <AssetsSection>
               <Input
-                type="number"
                 value={amountInput.value}
                 variant="amount"
                 pallete="blue"
@@ -155,7 +169,6 @@ export const TradePool = () => {
           <Section title={titleSections.TRADE_SEND}>
             <AssetsSection>
               <Input
-                type="number"
                 disabled
                 pallete="purple"
                 variant="amount"
@@ -216,19 +229,19 @@ export const TradePool = () => {
                 <TotalTitle>Total Pay</TotalTitle>
                 <SummaryAsset>
                   <AssetAmount>
-                    <AssetLabel
-                      variant="predict"
-                      title={isSwap ? tokenName_2 : tokenName_1}
-                      assets_id={currentToken === data.aid1 ? data.aid1 : data.aid2}
-                      amount={predictData ? predictData.buy : 0}
-                      id={false}
-                    />
-                    <div style={{ marginLeft: '14px' }}>
+                    {/* <AssetLabel */}
+                    {/*   variant="predict" */}
+                    {/*   title={isSwap ? tokenName_2 : tokenName_1} */}
+                    {/*   assets_id={currentToken === data.aid1 ? data.aid1 : data.aid2} */}
+                    {/*   amount={predictData ? predictData.buy : 0} */}
+                    {/*   id={false} */}
+                    {/* /> */}
+                    <div>
                       <AssetLabel
                         variant="predict"
                         title={isSwap ? tokenName_1 : tokenName_2}
                         assets_id={currentToken === data.aid1 ? data.aid2 : data.aid1}
-                        amount={predictData ? getTotalFee(predictData.fee_pool, predictData.fee_dao) : 0}
+                        amount={predictData ? predictData.pay : 0}
                         id={false}
                       />
                     </div>
@@ -237,13 +250,19 @@ export const TradePool = () => {
               </SummaryContainer>
             </SummaryWrapper>
           </Section>
+          <PoolStat data={data} lp={currentLPToken} />
         </SectionWrapper>
         <ButtonBlock>
           <ButtonWrapper>
             <Button icon={CancelIcon} variant="cancel" onClick={onPreviousClick}>
               Cancel
             </Button>
-            <Button disabled={!amountInput.isValid} icon={DoneIcon} variant="approve" onClick={() => onTrade(requestData)}>
+            <Button
+              disabled={!amountInput.isValid}
+              icon={DoneIcon}
+              variant="approve"
+              onClick={() => onTrade(requestData)}
+            >
               Trade
             </Button>
           </ButtonWrapper>

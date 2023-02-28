@@ -2,8 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import { IPoolCard } from '@core/types';
 import {
-  convertLowAmount,
-  fromGroths, getPoolKind, truncate,
+  convertLowAmount, fromGroths, getPoolKind, truncate,
 } from '@core/appUtils';
 import { ROUTES_PATH } from '@app/shared/constants';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +11,12 @@ import * as mainActions from '@app/containers/Pools/store/actions';
 import { Button, Section } from '@app/shared/components';
 import { styled } from '@linaria/react';
 import {
-  IconExchange, IconExchangeTrade, IconFavorite, IconFavoriteFilled, IconReceive, IconShieldChecked,
+  IconExchange,
+  IconExchangeTrade,
+  IconFavorite,
+  IconFavoriteFilled,
+  IconReceive,
+  IconShieldChecked,
 } from '@app/shared/icons';
 import AssetLabel from '@app/shared/components/AssetLabel';
 
@@ -24,7 +28,8 @@ interface PoolCardType {
 const HeaderCardWrapper = styled.div`
   position: relative;
   display: flex;
-  width: 100%;`;
+  width: 100%;
+`;
 const TitleWrapper = styled.div`
   display: flex;
   justify-content: flex-start;
@@ -32,7 +37,7 @@ const TitleWrapper = styled.div`
   align-self: center;
   line-height: 17px;
   margin-bottom: 20px;
-  &>span{
+  & > span {
     display: flex;
     font-weight: 700;
     font-size: 14px;
@@ -50,17 +55,16 @@ const Title = styled.div`
   letter-spacing: 3.11111px;
   text-transform: uppercase;
   color: white;
-  
 `;
 const Fav = styled.div`
- 
   position: absolute;
   align-items: center;
   top: -3px;
-  right: -10px;
+  right: 0;
   height: 22px;
   display: flex;
   justify-content: space-between;
+  width: 170px;
 `;
 const Kind = styled.div`
   margin-right: 3px;
@@ -82,15 +86,16 @@ const AssetAmount = styled.div`
   font-weight: 400;
   font-size: 14px;
   line-height: 17px;
-  color:white`;
+  color: white;
+`;
 const ControlWrapper = styled.div`
-
+  width: 100%;
   display: flex;
   justify-content: space-between;
   margin: 30px 0 20px 0;
 `;
 const Line = styled.div`
-width: 100%;
+  width: 100%;
   background-color: var(--color-opasity-0-1);
   height: 1px;
   border-radius: 2px;
@@ -110,6 +115,11 @@ const SideRightWrap = styled.div`
   width: 100%;
 `;
 
+const ButtonWrapper = styled.div`
+  width: 298px;
+  padding: 0 20px;
+`;
+
 export const PoolCard = ({ data, isFavorite }: PoolCardType) => {
   const nameToken1 = truncate(data.metadata1.UN);
   const nameToken2 = truncate(data.metadata2.UN);
@@ -117,15 +127,13 @@ export const PoolCard = ({ data, isFavorite }: PoolCardType) => {
   const dispatch = useDispatch();
   const [poolIsEmpty, setPoolIsEmpty] = useState(true);
   const currentCourseMain = `
-  1 ${nameToken2} = ${convertLowAmount(data.k1_2).toString().substr(0, 5)} ${nameToken1}`;
+  1 ${nameToken2} = ${truncate(convertLowAmount(data.k1_2).toString(), 6)} ${nameToken1}`;
   const currentCourseSecond = `
-  1 ${nameToken1} = ${truncate(convertLowAmount(data.k2_1).toString(), 5)} ${nameToken2}`;
+  1 ${nameToken1} = ${truncate(convertLowAmount(data.k2_1).toString(), 6)} ${nameToken2}`;
   const [exchange, setExchange] = useState(currentCourseMain);
 
   useEffect(() => {
-    setPoolIsEmpty(
-      !!(!data.tok1 || !data.tok2),
-    );
+    setPoolIsEmpty(!!(!data.tok1 || !data.tok2));
   }, []);
 
   const addLiquidityNavigation = useCallback(() => {
@@ -150,7 +158,7 @@ export const PoolCard = ({ data, isFavorite }: PoolCardType) => {
     setExchange(exchange !== currentCourseMain ? currentCourseMain : currentCourseSecond);
   };
 
-  const handleFavorite = (card:IPoolCard) => {
+  const handleFavorite = (card: IPoolCard) => {
     dispatch(mainActions.onFavorites.request(card));
   };
   // TODO: break down into components
@@ -158,27 +166,21 @@ export const PoolCard = ({ data, isFavorite }: PoolCardType) => {
     <Section variant="card">
       <HeaderCardWrapper>
         <TitleWrapper>
-          <Title>
-            {nameToken1}
-          </Title>
-          <span>
-            {' '}
-            /
-            {' '}
-          </span>
-          <Title>
-            {nameToken2}
-          </Title>
+          <Title>{nameToken1}</Title>
+          <span> / </span>
+          <Title>{nameToken2}</Title>
         </TitleWrapper>
         <Fav>
+          <AssetLabel assets_id={data['lp-token']} />
           <Kind>{`${getPoolKind(data.kind)}`}</Kind>
-          {isFavorite ? <IconFavoriteFilled onClick={() => handleFavorite(data)} /> : <IconFavorite onClick={() => handleFavorite(data)} />}
+          {isFavorite ? (
+            <IconFavoriteFilled onClick={() => handleFavorite(data)} />
+          ) : (
+            <IconFavorite onClick={() => handleFavorite(data)} />
+          )}
         </Fav>
       </HeaderCardWrapper>
       <AmountWrapper>
-        {/* <AssetIcon asset_id={data.aid1} /> */}
-        {/* <AssetName>{nameToken1}</AssetName> */}
-        {/* <AssetIcon asset_id={data.aid2} /> */}
         <SideLeftWrap>
           <AssetLabel title={nameToken1} assets_id={data.aid1} id variant="predict" />
           <AssetLabel title={nameToken2} assets_id={data.aid2} id variant="predict" />
@@ -194,16 +196,36 @@ export const PoolCard = ({ data, isFavorite }: PoolCardType) => {
             <div style={{ textTransform: 'uppercase' }}>{exchange}</div>
             <Button icon={IconExchange} variant="icon" onClick={() => changeCourse()} />
             {' '}
-
           </>
-        )
-          : <Line />}
+        ) : (
+          <Line />
+        )}
       </Section>
       <ControlWrapper>
-        <Button icon={IconShieldChecked} variant="control" onClick={addLiquidityNavigation}>add liquidity</Button>
-        <Button disabled={!!poolIsEmpty} icon={IconReceive} variant="control" pallete="blue" onClick={withdrawPoolNavigation}>withdraw</Button>
+        <Button icon={IconShieldChecked} variant="control" onClick={addLiquidityNavigation}>
+          add liquidity
+        </Button>
+        <Button
+          disabled={!!poolIsEmpty}
+          icon={IconReceive}
+          variant="control"
+          pallete="blue"
+          onClick={withdrawPoolNavigation}
+        >
+          withdraw
+        </Button>
       </ControlWrapper>
-      <Button variant="trade" icon={IconExchangeTrade} pallete="green" onClick={tradePoolNavigation} disabled={!!poolIsEmpty}>trade</Button>
+      <ButtonWrapper>
+        <Button
+          variant="trade"
+          icon={IconExchangeTrade}
+          pallete="green"
+          onClick={tradePoolNavigation}
+          disabled={!!poolIsEmpty}
+        >
+          trade
+        </Button>
+      </ButtonWrapper>
     </Section>
   );
 };

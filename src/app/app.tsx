@@ -1,10 +1,7 @@
 import React, { useEffect } from 'react';
 import { css } from '@linaria/core';
 
-import {
-  actions as sharedActions,
-  selectors as sharedSelectors,
-} from '@app/shared/store';
+import { actions as sharedActions, selectors as sharedSelectors } from '@app/shared/store';
 import 'react-toastify/dist/ReactToastify.css';
 
 import { useNavigate, useRoutes } from 'react-router-dom';
@@ -62,9 +59,7 @@ const App = () => {
   }, [navigateURL, dispatch, navigate]);
 
   return (
-    <Scrollbars
-      renderThumbVertical={(props) => <div {...props} className={trackStyle} />}
-    >
+    <Scrollbars renderThumbVertical={(props) => <div {...props} className={trackStyle} />}>
       {content}
       <ToastContainer
         position="bottom-right"

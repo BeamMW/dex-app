@@ -7,17 +7,22 @@ import {
   Button,
   Container,
   Input,
-  Section, Title,
+  PoolStat,
+  Section,
   Window,
 } from '@app/shared/components';
 import {
-  emptyPredict, fromGroths, onPredictValue, setDataRequest, toGroths, truncate,
+  emptyPredict,
+  fromGroths,
+  getLPToken,
+  onPredictValue,
+  setDataRequest,
+  toGroths,
+  truncate,
 } from '@core/appUtils';
 import { useDispatch, useSelector } from 'react-redux';
 import * as mainActions from '@app/containers/Pools/store/actions';
-import {
-  selectCurrentPool, selectPredirect,
-} from '@app/containers/Pools/store/selectors';
+import { selectAssetsList, selectCurrentPool, selectPredirect } from '@app/containers/Pools/store/selectors';
 import { useInput } from '@app/shared/hooks';
 import { ROUTES, titleSections } from '@app/shared/constants';
 import { CancelIcon, DoneIcon, IconExchange } from '@app/shared/icons';
@@ -37,68 +42,24 @@ const SectionWrapper = styled.div`
   justify-content: flex-start;
   width: 100%;
 `;
-const SectionContainer = styled.div`
-  display: flex;
-  width: 100%;
-`;
-const SideLeftWrap = styled.div`
-  width: 100%;
-  //border-right: 1px solid rgba(255, 255, 255, 0.1);
-  //border-radius: 2px;
-  height: 110px;
-`;
-// const SideRightWrap = styled.div`
-//   width: 225px;
-//   margin-left: 20px;
-// `;
-const LeftBlockPredict = styled.div`
-display: flex;
-  width: 100%;
-`;
-const TitleBlock = styled.div`
-display: flex;
-  flex-direction: column;
-width: 100%;
-`;
-const AmountBlock = styled.div`
-display: flex;
-  flex-direction: column;
-  width: 100%;
-`;
-const TitleSummary = styled.div`
-  font-style: normal;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 14px;
-  color: rgba(255, 255, 255, 0.5);
-  //text-transform: uppercase;
-  margin-bottom: 14px;
-`;
 
 const ButtonBlock = styled.div`
-    display: flex;
-    justify-content: center;
-    width: 100%;
-  `;
-const ButtonWrapper = styled.div`
-    display: flex;
-    max-width: 363px;
-    width: 100%;
-    justify-content: space-between;
-  `;
-const AmountSummary = styled(TitleSummary)`
-  color: rgba(255, 255, 255, 1);
+  display: flex;
+  justify-content: center;
+  width: 100%;
 `;
-
-const initialState = {
-  asset_1: 0,
-  asset_2: 0,
-  liquid_3: 0,
-};
+const ButtonWrapper = styled.div`
+  display: flex;
+  max-width: 363px;
+  width: 100%;
+  justify-content: space-between;
+`;
 
 export const AddLiquidity = () => {
   const data = useSelector(selectCurrentPool());
   const predictData = useSelector(selectPredirect());
+  const assets = useSelector(selectAssetsList());
+  const [currentLPToken, setCurrentLPToken] = useState(null);
   const [currentToken, setCurrentToken] = useState(data.aid1);
   const [requestData, setRequestData] = useState(null);
   const [isSwap, setIsSwap] = useState<boolean>(false);
@@ -111,16 +72,13 @@ export const AddLiquidity = () => {
     initialValue: 0,
     validations: { isEmpty: true, isMax: poolIsEmpty && 1001 },
   });
-  const [percent, setPercent] = useState(initialState);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const tokenName_1 = truncate(data.metadata1.UN);
   const tokenName_2 = truncate(data.metadata2.UN);
   useEffect(() => {
-    setPoolIsEmpty(
-      !!(!data.tok1 || !data.tok2),
-
-    );
+    setPoolIsEmpty(!!(!data.tok1 || !data.tok2));
   }, []);
 
   const getValueInput_1 = () => {
@@ -153,17 +111,26 @@ export const AddLiquidity = () => {
   useEffect(() => {
     if (!poolIsEmpty && predictData) {
       if (currentToken === data.aid1) {
-        !emptyPredict(predictData, amountInput_aid1.value) ? amountInput_aid2.onPredict(fromGroths(predictData.tok2)) : 0;
+        !emptyPredict(predictData, amountInput_aid1.value)
+          ? amountInput_aid2.onPredict(fromGroths(predictData.tok2))
+          : 0;
       } else {
-        !emptyPredict(predictData, amountInput_aid2.value) ? amountInput_aid1.onPredict(fromGroths(predictData.tok1)) : 0;
+        !emptyPredict(predictData, amountInput_aid2.value)
+          ? amountInput_aid1.onPredict(fromGroths(predictData.tok1))
+          : 0;
       }
     }
   }, [isSwap, amountInput_aid1.value, amountInput_aid2.value]);
 
+  useEffect(() => {
+    setCurrentLPToken(getLPToken(data, assets));
+  }, [data, assets]);
   const handleChange = () => {
     setIsSwap(!isSwap);
   };
-  const checkIsValid = poolIsEmpty ? (amountInput_aid1.isValid && amountInput_aid2.isValid) : (amountInput_aid1.isValid || amountInput_aid2.isValid)
+  const checkIsValid = poolIsEmpty
+    ? amountInput_aid1.isValid && amountInput_aid2.isValid
+    : amountInput_aid1.isValid || amountInput_aid2.isValid;
   useMemo(() => {
     if (amountInput_aid1.isMax || amountInput_aid2.isMax) {
       toast('Amount assets > MAX');
@@ -193,7 +160,6 @@ export const AddLiquidity = () => {
             <Section title={titleSections.ADD_LIQUIDITY}>
               <AssetsSection>
                 <Input
-                  type="number"
                   variant="amount"
                   pallete="purple"
                   value={amountInput_aid1.value}
@@ -206,7 +172,6 @@ export const AddLiquidity = () => {
               <AssetsSection>
                 <Input
                   variant="amount"
-                  type="number"
                   pallete="purple"
                   value={amountInput_aid2.value}
                   onChange={(e) => amountInput_aid2.onChange(e)}
@@ -220,7 +185,6 @@ export const AddLiquidity = () => {
             <Section title={titleSections.ADD_LIQUIDITY}>
               <AssetsSection>
                 <Input
-                  type="number"
                   value={currentInput.value}
                   variant="amount"
                   pallete="blue"
@@ -236,46 +200,56 @@ export const AddLiquidity = () => {
               <AssetsSection>
                 <Input
                   disabled
-                  type="number"
                   pallete="purple"
                   variant="amount"
-                  style={{ cursor: 'default', color: '--var(color-purple)', opacity: 1 }}
+                  style={{
+                    cursor: 'default',
+                    color: '--var(color-purple)',
+                    opacity: 1,
+                  }}
                   value={calculated}
                 />
                 <AssetLabel title={isSwap ? tokenName_1 : tokenName_2} assets_id={isSwap ? data.aid1 : data.aid2} />
               </AssetsSection>
-
             </Section>
           </AssetsContainer>
         )}
         {/* // Create components for predirect */}
+        {/* <SectionWrapper> */}
+        {/*   <Section> */}
+        {/*     <SectionContainer> */}
+        {/*       <SideLeftWrap> */}
+        {/*         <Title>pool summary</Title> */}
+        {/*         <LeftBlockPredict> */}
+        {/*           <TitleBlock> */}
+        {/*             <TitleSummary>{truncate(data.metadata1.UN)}</TitleSummary> */}
+        {/*             <TitleSummary>{truncate(data.metadata2.UN)}</TitleSummary> */}
+        {/*             <TitleSummary>Liquidity</TitleSummary> */}
+        {/*           </TitleBlock> */}
+        {/*           <AmountBlock> */}
+        {/*             <AmountSummary>{fromGroths(data.tok1)}</AmountSummary> */}
+        {/*             <AmountSummary>{fromGroths(data.tok2)}</AmountSummary> */}
+        {/*             <AmountSummary>{fromGroths(data.ctl)}</AmountSummary> */}
+        {/*           </AmountBlock> */}
+        {/*         </LeftBlockPredict> */}
+        {/*       </SideLeftWrap> */}
+        {/*     </SectionContainer> */}
+        {/*   </Section> */}
+        {/* </SectionWrapper> */}
         <SectionWrapper>
-          <Section>
-            <SectionContainer>
-              <SideLeftWrap>
-                <Title>pool summary</Title>
-                <LeftBlockPredict>
-                  <TitleBlock>
-                    <TitleSummary>{truncate(data.metadata1.UN)}</TitleSummary>
-                    <TitleSummary>{truncate(data.metadata2.UN)}</TitleSummary>
-                    <TitleSummary>Liquidity</TitleSummary>
-                  </TitleBlock>
-                  <AmountBlock>
-                    <AmountSummary>{fromGroths(data.tok1)}</AmountSummary>
-                    <AmountSummary>{fromGroths(data.tok2)}</AmountSummary>
-                    <AmountSummary>{fromGroths(data.ctl)}</AmountSummary>
-                  </AmountBlock>
-                </LeftBlockPredict>
-              </SideLeftWrap>
-            </SectionContainer>
-          </Section>
+          <PoolStat data={data} lp={currentLPToken} />
         </SectionWrapper>
         <ButtonBlock>
           <ButtonWrapper>
             <Button icon={CancelIcon} variant="cancel" onClick={() => onPreviousClick()}>
               Cancel
             </Button>
-            <Button icon={DoneIcon} variant="approve" onClick={() => onAddLiquidity(requestData)} disabled={!checkIsValid}>
+            <Button
+              icon={DoneIcon}
+              variant="approve"
+              onClick={() => onAddLiquidity(requestData)}
+              disabled={!checkIsValid}
+            >
               Add liquidity
             </Button>
           </ButtonWrapper>
