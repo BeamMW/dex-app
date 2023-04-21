@@ -24,13 +24,14 @@ const Container = styled.div<{ bgColor: string }>`
 `;
 
 const HeaderWrapper = styled.div``;
-const ButtonWrapper = styled.div`
+const ButtonWrapper = styled.div<{ margin: string }>`
    {
     width: 100%;
     display: flex;
     justify-content: flex-end;
     min-width: 914px;
     max-width: 1310px;
+    margin-top: ${() => (Utils.isWeb() ? '20px' : '0')} ;
   }
 `;
 const ButtonStyled = styled.div`

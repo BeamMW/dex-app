@@ -3,7 +3,7 @@ import React from 'react';
 import { BeamIcon as BeamIconSvg, BeamXIcon as BeamXIconSvg, AssetIcon as AssetIconSvg } from '@app/shared/icons';
 
 import { styled } from '@linaria/react';
-import { PALLETE_ASSETS } from '@app/shared/constants';
+import {BEAM_ID, BEAMX_ID, PALLETE_ASSETS} from '@app/shared/constants';
 
 export interface AssetIconProps {
   asset_id?: number;
@@ -21,10 +21,10 @@ const ContainerStyled = styled.div<AssetIconProps>`
 
 const AssetIcon: React.FC<AssetIconProps> = ({ asset_id = 0, className }) => {
   let IconComponent: any;
-  if (asset_id === 0) {
+  if (asset_id === BEAM_ID) {
     IconComponent = BeamIconSvg;
   } else {
-    IconComponent = asset_id === 3 ? BeamXIconSvg : AssetIconSvg;
+    IconComponent = asset_id === BEAMX_ID ? BeamXIconSvg : AssetIconSvg;
   }
   return (
     <ContainerStyled asset_id={asset_id} className={className}>
