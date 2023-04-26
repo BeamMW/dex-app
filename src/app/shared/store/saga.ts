@@ -16,7 +16,7 @@ export function remoteEventChannel() {
         min_api_version: '6.2',
         headless: false,
         apiResultHandler: (error, result, full) => {
-          console.log('api result data: ', result, full);
+          // console.log('api result data: ', result, full);
           if (!result.error) {
             emitter(full);
           }
@@ -26,7 +26,7 @@ export function remoteEventChannel() {
         Utils.download('./amm.wasm', (err, bytes) => {
           Utils.callApi('ev_subunsub', { ev_txs_changed: true, ev_system_state: true }, (error, result, full) => {
             if (result) {
-              console.log('Object');
+              // console.log('Object');
               store.dispatch(mainActions.loadAppParams.request(bytes));
               // store.dispatch(mainActions.loadPoolsList.request(bytes));
             }

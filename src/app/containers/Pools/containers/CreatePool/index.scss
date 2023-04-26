@@ -7,6 +7,7 @@
     width: 100% !important;
     min-width: 300px !important;
     height: 56px !important;
+    cursor: pointer !important;
     &--menu-is-open {
       box-shadow: (0 0 0 1px) var(--color-green) !important;
     }
@@ -27,6 +28,7 @@
   &__indicator,
   &__indicator-clear-value {
     padding: 0 !important;
+    cursor: pointer;
   }
   &__menu {
     background-color: var(--color-select-list) !important;
@@ -87,6 +89,7 @@
     max-width: 167px !important;
     width: 100% !important;
     height: 42px !important;
+    cursor: pointer !important;
     &--menu-is-open {
       box-shadow: (0 0 0 1px) var(--color-green) !important;
     }
@@ -107,6 +110,7 @@
   &__indicator,
   &__indicator-clear-value {
     padding: 0 !important;
+    cursor: pointer;
   }
   &__menu {
     background-color: rgba(0, 0, 0, 0.9) !important;
@@ -169,6 +173,7 @@
     //min-width: 250px !important;
     border-radius: 170px !important;
     height: 41px !important;
+    cursor: pointer !important;
     &--menu-is-open,
     &--is-focused {
       box-shadow: (0 0 0 1px) var(--color-green) !important;
@@ -191,6 +196,7 @@
   &__indicator,
   &__indicator-clear-value {
     padding: 0 !important;
+    cursor: pointer;
   }
 
   &__multi-value {

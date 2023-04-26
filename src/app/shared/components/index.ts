@@ -18,3 +18,4 @@ export { default as Container } from './Container';
 export { default as ReactSelect } from './ReactSelect';
 export { default as Loader } from './Loader';
 export { default as PoolStat } from './PoolStat';
+export { default as LoadingSkileton } from './LoadingSkileton';

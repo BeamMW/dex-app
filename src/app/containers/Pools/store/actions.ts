@@ -23,6 +23,7 @@ export const setFilter = createAction(MainActionsTypes.SET_FILTER)<string>();
 export const setOptions = createAction(MainActionsTypes.SET_OPTIONS)<IOptions[]>();
 export const setFavorites = createAction(MainActionsTypes.SET_FAVORITES)<IPoolCard[]>();
 export const setCurrentLPToken = createAction(MainActionsTypes.SET_CURRENT_LP_TOKEN)<IPoolCard>();
+export const setIsLoading = createAction(MainActionsTypes.SET_IS_LOADING)<boolean>();
 
 export const loadAppParams = createAsyncAction(
   MainActionsTypes.LOAD_PARAMS,

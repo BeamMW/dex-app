@@ -18,7 +18,6 @@ export const useValidation = ({ value, validations }: IUseValidation) => {
           setIsEmpty(!value);
           break;
         case 'isMax':
-          console.log(value);
           if (val) {
             dispatch(mainActions.setPredict(null));
             setIsMax(+value >= val);

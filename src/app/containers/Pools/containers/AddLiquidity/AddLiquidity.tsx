@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import './index.scss';
 import { IAddLiquidity } from '@core/types';
 import {
   AssetsContainer,

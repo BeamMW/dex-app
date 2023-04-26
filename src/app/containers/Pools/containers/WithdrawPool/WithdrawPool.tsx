@@ -72,7 +72,6 @@ export const WithdrawPool = () => {
       ctl: toGroths(Number(amountInput.value)),
     });
   }, [amountInput.value]);
-  console.log(data);
   useMemo(() => {
     setCurrentAmount(data.ctl);
   }, [data.ctl]);
@@ -97,7 +96,7 @@ export const WithdrawPool = () => {
   return (
     <Window title="Withdraw" backButton>
       <Container>
-        <AssetsContainer variant="center">
+        <AssetsContainer variant="space-between">
           <div style={{ height: '100% !important' }}>
             <Section title={titleSections.ADD_LIQUIDITY_SEND}>
               <AssetsSection>

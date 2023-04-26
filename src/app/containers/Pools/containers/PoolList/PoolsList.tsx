@@ -3,13 +3,13 @@ import React, {
 } from 'react';
 import './index.scss';
 import {
-  Container, Loader, ReactSelect, Window,
+  Container, Loader, LoadingSkileton, ReactSelect, Window,
 } from '@app/shared/components';
 import { PoolCard } from '@app/containers/Pools/components/PoolList';
 import { placeHolder, SORT } from '@app/shared/constants';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  selectFavorites, selectFilter, selectOptions, selectPoolsList,
+  selectFavorites, selectFilter, selectIsLoading, selectOptions, selectPoolsList,
 } from '@app/containers/Pools/store/selectors';
 import * as mainActions from '@app/containers/Pools/store/actions';
 import { getFilterPools, isInArray } from '@core/appUtils';
@@ -27,7 +27,7 @@ const Sort = styled.ul`
 const HeaderContainer = styled.div`
   display: flex;
   width: 100%;
-  justify-content: space-between;
+  justify-content: center;
 `;
 
 const PoolList = styled.div`
@@ -43,6 +43,12 @@ const PoolList = styled.div`
     grid-template-columns: repeat(2, minmax(430px, 430px));
     overflow: hidden;
   }
+  @media (max-width: 913px) {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    align-items: center;
+  }
 `;
 
 const HeaderWrapperSort = styled.div`
@@ -50,6 +56,10 @@ const HeaderWrapperSort = styled.div`
   justify-content: space-between;
   width: 100%;
   align-items: center;
+  max-width: 914px;
+  @media (max-width: 913px) {
+  flex-direction: column;
+}
 `;
 
 const SortItem = styled.li`
@@ -79,7 +89,9 @@ const SortItemLink = styled.button<{ active: boolean }>`
   }
 `;
 const WrapperSelect = styled.div`
-  width: 350px;
+ @media (max-width: 913px) {
+  margin-bottom: 15px;
+}
 `;
 
 export const PoolsList = () => {
@@ -88,6 +100,7 @@ export const PoolsList = () => {
   const favorites = JSON.parse(localStorage.getItem('favorites'));
   const localFiltered = JSON.parse(sessionStorage.getItem('filtered'));
   const currentFilter = useSelector(selectFilter());
+  const isLoading = useSelector(selectIsLoading());
   const [poolsList, setPoolList] = useState(data);
   const [filtered, setFiltered] = useState(null);
   const storage = useSelector(selectFavorites());
@@ -105,6 +118,7 @@ export const PoolsList = () => {
   const handleSort = (filter) => {
     dispatch(mainActions.setFilter(filter));
     dispatch(mainActions.loadAppParams.request(null));
+    dispatch(mainActions.setIsLoading(true));
   };
   // todo: store
   const onFilter = useCallback(
@@ -130,9 +144,8 @@ export const PoolsList = () => {
       <Container main jystify="center">
         <HeaderContainer>
           <HeaderWrapperSort>
-            <Sort>
-              <WrapperSelect>
-                <ReactSelect
+            <WrapperSelect>
+              <ReactSelect
                   options={options}
                   isClearable
                   onChange={(e) => onFilter(e)}
@@ -140,8 +153,10 @@ export const PoolsList = () => {
                   isIcon
                   placeholder={placeHolder.SEARCH}
                   customPrefix="custom-filter"
-                />
-              </WrapperSelect>
+              />
+            </WrapperSelect>
+            <Sort>
+
 
               {SORT.map((el) => (
                 <SortItem key={el.value}>
@@ -163,9 +178,11 @@ export const PoolsList = () => {
           <Loader isSearchable />
         ) : poolsList.length > 0 ? (
           <PoolList>
-            {poolsList.map((item) => (
-              <PoolCard isFavorite={checkFavorite(item)} data={item} key={`${item.aid1}_${item.aid2}_${item.kind}`} />
-            ))}
+            {isLoading
+              ? Array(10).fill(<LoadingSkileton />)
+              : poolsList.map((item) => (
+                <PoolCard isFavorite={checkFavorite(item)} data={item} key={`${item.aid1}_${item.aid2}_${item.kind}`} />
+              ))}
           </PoolList>
         ) : (
           <Loader />

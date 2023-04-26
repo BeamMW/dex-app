@@ -12,9 +12,9 @@ interface BackButtonProps {
 }
 
 const backStyle = css`
-  position: fixed;
+  position: absolute;
   z-index: 3;
-  left: 15px;
+  left: 0;
 `;
 
 const BackButton: React.FC<BackButtonProps> = ({ className, onClick, title }) => (

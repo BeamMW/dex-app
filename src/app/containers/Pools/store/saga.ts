@@ -39,7 +39,8 @@ export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.
     yield put(mainActions.setOptions(options));
     const poolsList = (yield call(LoadPoolsList, action.payload ? action.payload : null)) as IPoolCard[];
     const newPoolList = poolsList.map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList));
-    const filteredPools = (yield onFilter(newPoolList, filter, favoritesLocal).map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList))) as IPoolCard[];
+    const filteredPools = (
+      yield onFilter(newPoolList, filter, favoritesLocal).map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList))) as IPoolCard[];
     yield put(mainActions.setPoolsList(filteredPools));
   } catch (e) {
     // @ts-ignore

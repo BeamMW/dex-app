@@ -51,20 +51,6 @@ export const CreatePool = () => {
       },
     ]);
   }, [currentToken1, currentToken2, currentKind]);
-  // useEffect(() => {
-  //   if (txStatus && txStatus === TxStatus.Completed) {
-  //     let newPool;
-  //     poolsList.filter((item) => {
-  //       if (
-  //         item.aid1 === requestData[0].aid1
-  //         && item.aid2 === requestData[0].aid2
-  //         && item.kind === requestData[0].kind
-  //       ) {
-  //         newPool = item;
-  //       }
-  //     });
-  //   }
-  // }, [txStatus]);
   const getOptionsSecondPare = (lists, value: IOptions) => {
     if (value) {
       if ((lists && value) || value.value === 0) {
@@ -84,9 +70,6 @@ export const CreatePool = () => {
     } else setIsValidate(true);
   }, [currentToken1, currentToken2, currentKind]);
 
-  // const getKindValue = () => {
-  //   kindSelect.find((el) => el === currentKind);
-  // };
 
   useMemo(() => {
     getOptionsSecondPare(options, currentToken1);
@@ -123,7 +106,7 @@ export const CreatePool = () => {
           </Section>
           <Section title={titleSections.CREATE_SECOND}>
             <ReactSelect
-              options={options2pair}
+              options={options}
               onChange={(e) => setCurrentToken2(e)}
               isIcon
               placeholder={placeHolder.ASSETS}
@@ -139,6 +122,7 @@ export const CreatePool = () => {
                 defaultValue={{ value: Kind.High, label: '1%' }}
                 placeholder={placeHolder.FEE}
                 customPrefix="custom-kind"
+                isSearchable={false}
               />
             </div>
           </Section>

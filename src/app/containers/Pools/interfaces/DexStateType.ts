@@ -13,4 +13,5 @@ export interface DexStateType {
   options: IOptions[];
   favorites: IPoolCard[];
   currentLPToken: IPoolCard;
+  isLoading: boolean;
 }

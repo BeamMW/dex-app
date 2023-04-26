@@ -8,7 +8,6 @@ import { ROUTES, ROUTES_PATH } from '@app/shared/constants';
 import { IconPlus } from '@app/shared/icons';
 
 interface WindowProps {
-  onPrevious?: React.MouseEventHandler | undefined;
   title?: string;
   backButton?: boolean;
   createPool?: boolean;
@@ -23,15 +22,23 @@ const Container = styled.div<{ bgColor: string }>`
   padding: 0 20px;
 `;
 
-const HeaderWrapper = styled.div``;
+const HeaderWrapper = styled.div`
+  margin-top: ${() => (Utils.isWeb() ? '20px' : '0')};
+  max-width: 914px;
+  width: 100%;
+  position: relative;
+  text-align: center;
+`;
 const ButtonWrapper = styled.div<{ margin: string }>`
    {
     width: 100%;
     display: flex;
     justify-content: flex-end;
-    min-width: 914px;
     max-width: 1310px;
     margin-top: ${() => (Utils.isWeb() ? '20px' : '0')} ;
+     @media (max-width: 913px) {
+       justify-content: center;
+     }
   }
 `;
 const ButtonStyled = styled.div`
@@ -57,7 +64,7 @@ const Window: React.FC<WindowProps> = ({
     <>
       <Container bgColor={Utils.getStyles().background_main} ref={rootRef}>
         {createPool && (
-          <ButtonWrapper>
+          <ButtonWrapper margin={Utils.isWeb()}>
             <ButtonStyled>
               <Button onClick={createPoolNavigation} variant="ghost" icon={IconPlus}>
                 Create Pool
