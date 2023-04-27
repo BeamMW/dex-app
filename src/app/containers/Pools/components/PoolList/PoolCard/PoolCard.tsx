@@ -127,9 +127,9 @@ export const PoolCard = ({ data, isFavorite }: PoolCardType) => {
   const dispatch = useDispatch();
   const [poolIsEmpty, setPoolIsEmpty] = useState(true);
   const currentCourseMain = `
-  1 ${nameToken2} = ${truncate(convertLowAmount(data.k1_2).toString(), 6)} ${nameToken1}`;
+  1 ${nameToken2} = ${truncate(convertLowAmount(data.k1_2).toString(), 9)} ${nameToken1}`;
   const currentCourseSecond = `
-  1 ${nameToken1} = ${truncate(convertLowAmount(data.k2_1).toString(), 6)} ${nameToken2}`;
+  1 ${nameToken1} = ${truncate(convertLowAmount(data.k2_1).toString(), 9)} ${nameToken2}`;
   const [exchange, setExchange] = useState(currentCourseMain);
 
   useEffect(() => {

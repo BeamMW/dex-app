@@ -42,6 +42,11 @@ const SectionWrapper = styled.div`
   display: flex;
   justify-content: flex-start;
   width: 100%;
+  @media (max-width: 913px) {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 `;
 
 export const WithdrawPool = () => {

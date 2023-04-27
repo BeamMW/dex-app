@@ -28,7 +28,7 @@ export function remoteEventChannel() {
             if (result) {
               // console.log('Object');
               store.dispatch(mainActions.loadAppParams.request(bytes));
-              // store.dispatch(mainActions.loadPoolsList.request(bytes));
+              store.dispatch(mainActions.loadPoolsList.request(null));
             }
           });
         });
@@ -53,6 +53,7 @@ function* sharedSaga() {
         case 'ev_system_state':
           store.dispatch(setSystemState(payload.result));
           store.dispatch(mainActions.loadAppParams.request(null));
+          store.dispatch(mainActions.loadPoolsList.request(null));
           break;
         case 'ev_txs_changed':
           store.dispatch(setTxStatus(payload.result));

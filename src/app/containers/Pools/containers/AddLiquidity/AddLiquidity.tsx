@@ -34,12 +34,20 @@ const ExchangeWrapper = styled.div`
   position: absolute;
   top: 71px;
   left: 435px;
+  @media (max-width: 913px) {
+    top:135px;
+  }
 `;
 const SectionWrapper = styled.div`
   margin: 10px 0 40px 0;
   display: flex;
   justify-content: flex-start;
   width: 100%;
+  @media (max-width: 913px) {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 `;
 
 const ButtonBlock = styled.div`

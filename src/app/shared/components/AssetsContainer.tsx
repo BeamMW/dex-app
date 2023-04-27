@@ -10,6 +10,11 @@ const SectionStyled = styled.div<SectionProps>`
   max-width: 954px;
   width: 100%;
   position: relative;
+  @media (max-width: 913px) {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 `;
 const AssetsContainer: React.FC<SectionProps> = ({ children, variant = 'space-between' }) => (
   <SectionStyled variant={variant}>{children}</SectionStyled>

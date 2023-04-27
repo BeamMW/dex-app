@@ -29,6 +29,9 @@ const ExchangeWrapper = styled.div`
   position: absolute;
   top: 71px;
   left: 435px;
+  @media (max-width: 913px) {
+    top:135px;
+  }
 `;
 
 const SectionWrapper = styled.div`
@@ -37,6 +40,11 @@ const SectionWrapper = styled.div`
   justify-content: space-between;
   width: 100%;
   height: auto;
+  @media (max-width: 913px) {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 `;
 
 const SummaryWrapper = styled.div`

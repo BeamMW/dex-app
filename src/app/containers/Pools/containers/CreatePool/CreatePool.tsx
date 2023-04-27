@@ -19,6 +19,11 @@ const SectionWrapper = styled.div`
   display: flex;
   justify-content: flex-start;
   width: 100%;
+  @media (max-width: 913px) {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 `;
 const ButtonBlock = styled.div`
   display: flex;
@@ -34,7 +39,6 @@ const ButtonWrapper = styled.div`
 
 export const CreatePool = () => {
   const options = useSelector(selectOptions());
-  const [options2pair, setOptions2Pair] = useState([]);
   const [requestData, setRequestData] = useState(null);
   const [currentToken1, setCurrentToken1] = useState<IOptions>(null);
   const [currentToken2, setCurrentToken2] = useState<IOptions>(null);
@@ -51,15 +55,7 @@ export const CreatePool = () => {
       },
     ]);
   }, [currentToken1, currentToken2, currentKind]);
-  const getOptionsSecondPare = (lists, value: IOptions) => {
-    if (value) {
-      if ((lists && value) || value.value === 0) {
-        setOptions2Pair(lists.filter((item) => item.value > value.value));
-      }
-      return lists;
-    }
-    return lists;
-  };
+
   useMemo(() => {
     if (currentToken1 === null) {
       setIsValidate(false);
@@ -69,21 +65,6 @@ export const CreatePool = () => {
       setIsValidate(false);
     } else setIsValidate(true);
   }, [currentToken1, currentToken2, currentKind]);
-
-
-  useMemo(() => {
-    getOptionsSecondPare(options, currentToken1);
-  }, [currentToken1]);
-
-  // const onChangeToken1 = useCallback((newValue) => {
-  //   setCurrentToken1(newValue);
-  // }, []);
-  // const onChangeToken2 = (newValue) => {
-  //   setCurrentToken2(newValue);
-  // };
-  // const onChangeKind = (newValue) => {
-  //   setCurrentKind(newValue);
-  // };
   const onPreviousClick = () => {
     navigate(ROUTES.POOLS.BASE);
   };
