@@ -6,6 +6,8 @@ export const REG_AMOUNT = /^(?!0\d)(\d+)(\.)?(\d{0,8})?$/;
 export const BEAM_ID = 0;
 export const BEAMX_ID = 3;
 // export const BEAMX_ID = 7;
+export const NPH_ID = 357;
+// export const NPH_ID = 47;
 
 export const ASSET_BEAM = {
   N: 'Beam Coin',
