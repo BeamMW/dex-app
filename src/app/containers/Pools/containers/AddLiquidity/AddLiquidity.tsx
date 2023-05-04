@@ -73,11 +73,11 @@ export const AddLiquidity = () => {
   const [poolIsEmpty, setPoolIsEmpty] = useState(true);
   const amountInput_aid1 = useInput({
     initialValue: 0,
-    validations: { isEmpty: true, isMax: 1001 },
+    validations: { isEmpty: true },
   });
   const amountInput_aid2 = useInput({
     initialValue: 0,
-    validations: { isEmpty: true, isMax: poolIsEmpty && 1001 },
+    validations: { isEmpty: true },
   });
 
   const dispatch = useDispatch();
@@ -138,10 +138,9 @@ export const AddLiquidity = () => {
   const checkIsValid = poolIsEmpty
     ? amountInput_aid1.isValid && amountInput_aid2.isValid
     : amountInput_aid1.isValid || amountInput_aid2.isValid;
+
   useMemo(() => {
-    if (amountInput_aid1.isMax || amountInput_aid2.isMax) {
-      toast('Amount assets > MAX');
-    } else if (checkIsValid) {
+    if (checkIsValid) {
       dispatch(mainActions.onAddLiquidity.request(requestData));
     }
   }, [requestData, amountInput_aid1.isValid, amountInput_aid2.isValid]);
@@ -255,7 +254,7 @@ export const AddLiquidity = () => {
               icon={DoneIcon}
               variant="approve"
               onClick={() => onAddLiquidity(requestData)}
-              disabled={!checkIsValid}
+              disabled={!checkIsValid || !amountInput_aid2.value || !amountInput_aid1.value || !calculated}
             >
               Add liquidity
             </Button>

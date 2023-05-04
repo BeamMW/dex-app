@@ -104,6 +104,7 @@ export function* addLiquidity(action: ReturnType<typeof mainActions.onAddLiquidi
     }
   } catch (e) {
     // @ts-ignore
+    console.log(e)
     yield put(mainActions.onAddLiquidity.failure(e));
     // toast(e.error);
   }
