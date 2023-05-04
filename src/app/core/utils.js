@@ -25,7 +25,7 @@ export default class Utils {
   }
 
   static isWeb() {
-    return !Utils.isDesktop() && !Utils.isMobile();
+    return !Utils.isDesktop() && !Utils.isMobile() && !Utils.isAndroid();
   }
 
   static isHeadless() {
@@ -244,6 +244,9 @@ export default class Utils {
     if (Utils.isMobile()) {
       return BEAM.api.callWalletApi(JSON.stringify(request));
     }
+    if (Utils.isAndroid()) {
+      return BEAM.api.callWalletApi(JSON.stringify(request));
+    }
 
     if (Utils.isDesktop()) {
       return BEAM.api.callWalletApi(JSON.stringify(request));
@@ -351,6 +354,16 @@ export default class Utils {
       if (Utils.isMobile()) {
         try {
           BEAM = await Utils.createMobileAPI((...args) => Utils.handleApiResult(...args));
+          Utils.applyStyles(styles);
+        } catch (e) {
+          Utils.showMobileStoresLinks();
+          return false;
+        }
+      }
+      if (Utils.isAndroid()) {
+        try {
+          BEAM = await Utils.createMobileAPI((...args) => Utils.handleApiResult(...args));
+          Utils.applyStyles(styles);
         } catch (e) {
           Utils.showMobileStoresLinks();
           return false;
@@ -395,6 +408,13 @@ export default class Utils {
 
     if (Utils.isMobile()) {
       document.body.classList.add('mobile');
+      const topColor = [styles.appsGradientOffset, 'px,'].join('');
+      const mainColor = [styles.appsGradientTop, 'px,'].join('');
+
+      'linear-gradient(to bottom,',
+          style.background_main_top, topColor,
+          style.background_main, mainColor,
+          style.background_main;
     }
 
     if (Utils.isWeb()) {
