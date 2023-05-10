@@ -14,4 +14,5 @@ export interface DexStateType {
   favorites: IPoolCard[];
   currentLPToken: IPoolCard;
   isLoading: boolean;
+  myPools: IPoolCard[];
 }

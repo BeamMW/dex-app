@@ -9,7 +9,7 @@ import { PoolCard } from '@app/containers/Pools/components/PoolList';
 import { placeHolder, SORT } from '@app/shared/constants';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  selectFavorites, selectFilter, selectIsLoading, selectOptions, selectPoolsList,
+  selectFavorites, selectFilter, selectIsLoading, selectMyPools, selectOptions, selectPoolsList,
 } from '@app/containers/Pools/store/selectors';
 import * as mainActions from '@app/containers/Pools/store/actions';
 import { getFilterPools, isInArray } from '@core/appUtils';
@@ -93,8 +93,8 @@ const WrapperSelect = styled.div`
   margin-bottom: 15px;
 }
 `;
-
 export const PoolsList = () => {
+  console.log(1);
   const data = useSelector(selectPoolsList());
   const options = useSelector(selectOptions());
   const favorites = JSON.parse(localStorage.getItem('favorites'));
@@ -105,6 +105,7 @@ export const PoolsList = () => {
   const [filtered, setFiltered] = useState(null);
   const storage = useSelector(selectFavorites());
   const dispatch = useDispatch();
+  const myPools = useSelector(selectMyPools());
 
   useEffect(() => {
     if (!favorites.length) {
@@ -146,17 +147,16 @@ export const PoolsList = () => {
           <HeaderWrapperSort>
             <WrapperSelect>
               <ReactSelect
-                  options={options}
-                  isClearable
-                  onChange={(e) => onFilter(e)}
-                  defaultValue={() => localFiltered}
-                  isIcon
-                  placeholder={placeHolder.SEARCH}
-                  customPrefix="custom-filter"
+                options={options}
+                isClearable
+                onChange={(e) => onFilter(e)}
+                defaultValue={() => localFiltered}
+                isIcon
+                placeholder={placeHolder.SEARCH}
+                customPrefix="custom-filter"
               />
             </WrapperSelect>
             <Sort>
-
 
               {SORT.map((el) => (
                 <SortItem key={el.value}>
@@ -164,7 +164,7 @@ export const PoolsList = () => {
                     key={el.value}
                     active={currentFilter === el.value}
                     onClick={() => handleSort(el.value)}
-                    disabled={!!(el.value === 'fav' && !favorites.length)}
+                    disabled={!!((el.value === 'fav' && !favorites.length) || (el.value === 'my' && !myPools.length))}
                   >
                     {el.name}
                   </SortItemLink>
