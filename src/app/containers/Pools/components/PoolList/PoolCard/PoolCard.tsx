@@ -65,6 +65,7 @@ const Fav = styled.div`
   display: flex;
   justify-content: space-between;
   width: 170px;
+  cursor: pointer;
 `;
 const Kind = styled.div`
   margin-right: 3px;

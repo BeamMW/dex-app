@@ -140,7 +140,7 @@ export function onFilter(data: IPoolCard[], filter, favorite: IPoolCard[]) {
       return data.filter((el) => !el.ctl);
     }
     case 'fav': {
-      return favorite;
+      return data.filter((item) => favorite.some((item2) => item.aid1 === item2.aid1 && item.aid2 === item2.aid2 && item.kind === item2.kind));
     }
     default:
       return data.sort((a, b) => b.ctl - a.ctl);

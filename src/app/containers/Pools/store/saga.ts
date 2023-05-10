@@ -38,7 +38,9 @@ export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.
     const options = getOptions(assetsList);
     yield put(mainActions.setOptions(options));
     const poolsList = (yield call(LoadPoolsList, action.payload ? action.payload : null)) as IPoolCard[];
-    const newPoolList = poolsList.map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList));
+    const newPoolList: IPoolCard[] = poolsList.map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList));
+    const myPools = newPoolList.filter((el) => el.creator);
+    yield put(mainActions.setMyPools(myPools));
     const filteredPools = (
       yield onFilter(newPoolList, filter, favoritesLocal).map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList))) as IPoolCard[];
     yield put(mainActions.setPoolsList(filteredPools));
@@ -104,7 +106,7 @@ export function* addLiquidity(action: ReturnType<typeof mainActions.onAddLiquidi
     }
   } catch (e) {
     // @ts-ignore
-    console.log(e)
+    console.log(e);
     yield put(mainActions.onAddLiquidity.failure(e));
     // toast(e.error);
   }
@@ -146,6 +148,7 @@ export function* withdrawPool(action: ReturnType<typeof mainActions.onWithdraw.r
 }
 export function* favorites(action: ReturnType<typeof mainActions.onFavorites.request>): Generator {
   try {
+    console.log('fav');
     const favoritesList = yield select((state: AppState) => state.main.favorites);
     const pool = action.payload as IPoolCard;
     let storage = (favoritesList as IPoolCard[]) || [];

@@ -17,6 +17,7 @@ const initialState: DexStateType = {
   favorites: [],
   currentLPToken: null,
   isLoading: false,
+  myPools: [],
 };
 
 const reducer = createReducer<DexStateType, Action>(initialState)
@@ -51,8 +52,11 @@ const reducer = createReducer<DexStateType, Action>(initialState)
   .handleAction(actions.setCurrentLPToken, (state, action) => produce(state, (nexState) => {
     nexState.currentPool = action.payload;
   }))
-.handleAction(actions.setIsLoading, (state, action) => produce(state, (nexState) => {
-  nexState.isLoading = action.payload;
-}));
+  .handleAction(actions.setIsLoading, (state, action) => produce(state, (nexState) => {
+    nexState.isLoading = action.payload;
+  }))
+  .handleAction(actions.setMyPools, (state, action) => produce(state, (nexState) => {
+    nexState.myPools = action.payload;
+  }));
 
 export { reducer as MainReducer };

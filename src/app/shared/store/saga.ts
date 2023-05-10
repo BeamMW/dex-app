@@ -1,4 +1,4 @@
-import { call, take } from 'redux-saga/effects';
+import { call, take, takeLatest } from 'redux-saga/effects';
 
 import { eventChannel, END } from 'redux-saga';
 import { setSystemState } from '@app/shared/store/actions';
