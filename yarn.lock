@@ -2472,6 +2472,11 @@ beam-wasm-client-dappnet@^7.3.13673:
   resolved "https://registry.yarnpkg.com/beam-wasm-client-dappnet/-/beam-wasm-client-dappnet-7.3.13673.tgz#91f1bfd9be1c99be77e4448070e91b4a1c24adf4"
   integrity sha512-8wfR04zOaDtDOY5RQOE0brRrnyOQI5B0IaAPdLnoC1pFUL7o0vQ2M3+vZ/oH1QF2grL7A27jRGVorRRXYMTDBQ==
 
+beam-wasm-client@^7.3.14073:
+  version "7.3.14073"
+  resolved "https://registry.yarnpkg.com/beam-wasm-client/-/beam-wasm-client-7.3.14073.tgz#b1c48f40d009ef0b30ded4ddb5e3cbdcce46d650"
+  integrity sha512-uWJm1aF9hssRdBYAD+s1geGRLdInkyn5SWZEX3jnXrB7NWJWmE4iYTh2aR5nwQpxSi8SpKU9GYA+J7CHiSyrvA==
+
 big.js@^5.2.2:
   version "5.2.2"
   resolved "https://registry.npmjs.org/big.js/-/big.js-5.2.2.tgz"

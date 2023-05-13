@@ -7,7 +7,8 @@ const Calls = {};
 let APIResCB;
 const ipfsGateway = 'https://apps-dappnet.beam.mw/ipfs/';
 const webGateway = 'https://apps-dappnet.beam.mw/cache/';
-const headlessNode = 'eu-node02.dappnet.beam.mw:8200';
+// const headlessNode = 'eu-node02.dappnet.beam.mw:8200';
+const headlessNode = 'eu-node01.mainnet.beam.mw:8200';
 let InitParams;
 
 export default class Utils {
@@ -597,7 +598,7 @@ export default class Utils {
 
     loadContainer.style.textAlign = 'center';
     loadContainer.style.margin = '50px auto 0 auto';
-    loadContainer.style.maxWidth = '585px';
+    loadContainer.style.maxWidth = '1000px';
     loadContainer.style.width = '100%';
     loadContainer.style.padding = '5%';
     loadContainer.style.borderRadius = '10px';

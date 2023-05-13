@@ -36,6 +36,7 @@ const ExchangeWrapper = styled.div`
   left: 435px;
   @media (max-width: 913px) {
     top:135px;
+    left: 44%;
   }
 `;
 const SectionWrapper = styled.div`
@@ -198,10 +199,10 @@ export const AddLiquidity = () => {
                 />
                 <AssetLabel title={isSwap ? tokenName_2 : tokenName_1} assets_id={isSwap ? data.aid2 : data.aid1} />
               </AssetsSection>
+              <ExchangeWrapper>
+                <Button icon={IconExchange} variant="icon" onClick={() => handleChange()} />
+              </ExchangeWrapper>
             </Section>
-            <ExchangeWrapper>
-              <Button icon={IconExchange} variant="icon" onClick={() => handleChange()} />
-            </ExchangeWrapper>
             <Section title={titleSections.ADD_LIQUIDITY}>
               <AssetsSection>
                 <Input

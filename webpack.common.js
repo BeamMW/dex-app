@@ -99,7 +99,7 @@ module.exports = {
           context: 'public',
         },
         {
-          from: path.join(__dirname, './node_modules/beam-wasm-client-dappnet/'),
+          from: path.join(__dirname, './node_modules/beam-wasm-client/'),
           globOptions: {
             ignore: ['**/package.json', '**/README.md'],
           },

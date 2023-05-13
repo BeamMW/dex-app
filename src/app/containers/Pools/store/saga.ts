@@ -175,7 +175,6 @@ export function* withdrawPool(action: ReturnType<typeof mainActions.onWithdraw.r
 }
 export function* favorites(action: ReturnType<typeof mainActions.onFavorites.request>): Generator {
   try {
-    console.log('fav');
     const favoritesList = yield select((state: AppState) => state.main.favorites);
     const pool = action.payload as IPoolCard;
     let storage = (favoritesList as IPoolCard[]) || [];

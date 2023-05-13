@@ -16,8 +16,11 @@ const ContainerStyled = styled.div<ContainerProps>`
   height: 100%;
   align-items: ${({ variant }) => variant};
   justify-content: ${({ jystify }) => jystify};
-  width: ${({ main }) => (main ? '100%' : '914px')};
+  max-width: ${({ main }) => (main ? '100%' : '914px')};
   align-content: center;
+  @media (max-width: 480){
+    padding: 5px;
+  }
 `;
 
 const Container: React.FC<ContainerProps> = ({

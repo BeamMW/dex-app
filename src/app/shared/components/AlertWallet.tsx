@@ -12,9 +12,9 @@ width: 100%;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
+  padding: 10px;
   @media (max-width: 480px) {
     flex-direction: column;
-    padding: 3px;
     span{
       text-align: center;
     };
