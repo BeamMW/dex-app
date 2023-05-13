@@ -2,6 +2,12 @@ import {
   IAsset, IOptions, IPoolCard, IPredict, ITxStatus, Kind,
 } from '@core/types';
 import { ASSET_BEAM, GROTHS_IN_BEAM } from '@app/shared/constants';
+// eslint-disable-next-line import/extensions
+import Utils from '@app/core/utils.js';
+import { start } from '@app/shared/store/saga';
+import { toast } from 'react-toastify';
+import store from '../../index';
+import {actions as mainActions} from '@app/containers/Pools/store';
 
 const LENGTH_MAX = 6;
 
@@ -239,4 +245,17 @@ export function setStorage() {
     localStorage.setItem('favorites', JSON.stringify([]));
   }
   return fav;
+}
+
+export async function onSwitchToApi() {
+  if (await Utils.switchToWebAPI()) {
+    await start()
+      .then(() => {
+        store.dispatch(mainActions.setIsHeadless(false));
+        toast('Your wallet is connected');
+      })
+      .catch((e) => {
+        toast('Sorry, wallet not connected');
+      });
+  }
 }

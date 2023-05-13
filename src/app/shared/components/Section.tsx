@@ -67,7 +67,8 @@ const SectionGrayStyled = styled.div`
 `;
 
 const SectionCardStyled = styled(SectionStyled)`
-  width: 430px;
+  max-width: 430px;
+  width: 100%;
   height: 301px;
   justify-self: center;
   display: flex;

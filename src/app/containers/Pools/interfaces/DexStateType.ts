@@ -15,4 +15,5 @@ export interface DexStateType {
   currentLPToken: IPoolCard;
   isLoading: boolean;
   myPools: IPoolCard[];
+  isHeadless: boolean;
 }

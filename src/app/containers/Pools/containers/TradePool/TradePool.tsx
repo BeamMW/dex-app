@@ -31,6 +31,7 @@ const ExchangeWrapper = styled.div`
   left: 435px;
   @media (max-width: 913px) {
     top:135px;
+    left: 44%;
   }
 `;
 
@@ -170,10 +171,10 @@ export const TradePool = () => {
               />
               <AssetLabel title={isSwap ? tokenName_2 : tokenName_1} assets_id={currentToken} />
             </AssetsSection>
+            <ExchangeWrapper>
+              <Button icon={IconExchange} variant="icon" onClick={() => handleChange()} />
+            </ExchangeWrapper>
           </Section>
-          <ExchangeWrapper>
-            <Button icon={IconExchange} variant="icon" onClick={() => handleChange()} />
-          </ExchangeWrapper>
           <Section title={titleSections.TRADE_SEND}>
             <AssetsSection>
               <Input

@@ -14,3 +14,4 @@ export const selectFavorites = () => createSelector(selectMain, (state) => state
 export const selectCurrentLPToken = () => createSelector(selectMain, (state) => state.currentLPToken);
 export const selectIsLoading = () => createSelector(selectMain, (state) => state.isLoading);
 export const selectMyPools = () => createSelector(selectMain, (state) => state.myPools);
+export const selectIsHeadless = () => createSelector(selectMain, (state) => state.isHeadless);

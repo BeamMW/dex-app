@@ -5,58 +5,89 @@ let BEAM = null;
 let CallID = 0;
 const Calls = {};
 let APIResCB;
-const headlessNode = 'eu-node01.masternet.beam.mw:8200';
+const ipfsGateway = 'https://apps-dappnet.beam.mw/ipfs/';
+const webGateway = 'https://apps-dappnet.beam.mw/cache/';
+// const headlessNode = 'eu-node02.dappnet.beam.mw:8200';
+const headlessNode = 'eu-node01.mainnet.beam.mw:8200';
 let InitParams;
 
 export default class Utils {
-  static isMobile() {
-    const ua = navigator.userAgent;
-    return /android/i.test(ua) || /iPad|iPhone|iPod/.test(ua);
+  static is_desktop = undefined;
+
+  static is_mobile = undefined;
+
+  static is_android = undefined;
+
+  static is_web = undefined;
+
+  static is_chrome = undefined;
+
+  static get ipfsGateway() {
+    return ipfsGateway;
   }
 
-  static isAndroid() {
-    const ua = navigator.userAgent;
-    return /android/i.test(ua);
+  static get webGateway() {
+    return webGateway;
+  }
+
+  static isMobile() {
+    if (Utils.is_mobile === undefined) {
+      const ua = navigator.userAgent;
+      Utils.is_mobile = (/android/i.test(ua) || /iPad|iPhone|iPod/.test(ua));
+    }
+    return Utils.is_mobile;
   }
 
   static isDesktop() {
-    const ua = navigator.userAgent;
-    return /QtWebEngine/i.test(ua);
+    if (Utils.is_mobile === undefined) {
+      const ua = navigator.userAgent;
+      Utils.is_desktop = (/QtWebEngine/i.test(ua));
+    }
+    return Utils.is_desktop;
   }
 
   static isWeb() {
-    return !Utils.isDesktop() && !Utils.isMobile() && !Utils.isAndroid();
+    if (Utils.is_web === undefined) {
+      Utils.is_web = (!Utils.is_desktop && !Utils.is_mobile);
+    }
+    return Utils.is_web;
+  }
+
+  static isAndroid() {
+    if (Utils.is_android === undefined) {
+      const ua = navigator.userAgent;
+      Utils.is_android = (/android/i.test(ua));
+    }
+    return Utils.is_android;
+  }
+
+  static isChrome() {
+    if (Utils.is_chrome === undefined) {
+      const ua = navigator.userAgent;
+      Utils.is_chrome = (/chrome|chromium|crios/i.test(ua) && ua.indexOf('Edg') == -1);
+    }
+    return Utils.is_chrome;
   }
 
   static isHeadless() {
     return BEAM && BEAM.headless;
   }
 
-  static isChrome() {
-    const { userAgent } = navigator;
-    const isChrome = userAgent.match(/chrome|chromium|crios/i);
-    return isChrome && userAgent.indexOf('Edg') == -1;
-  }
-
   static async createMobileAPI(apirescback) {
-    return new Promise((resolve) => {
-      if (Utils.isAndroid()) {
-        document.addEventListener('onCallWalletApiResult', (res) => {
-          apirescback(res.detail);
-        });
-      } else {
-        window.BEAM.callWalletApiResult(apirescback);
+    return new Promise((resolve, reject) => {
+      if (!window.BEAM) {
+        return reject();
       }
-      resolve({
-        api: window.BEAM,
-      });
+      if (Utils.isAndroid()) document.addEventListener('onCallWalletApiResult', (res) => apirescback(res.detail));
+      else window.BEAM.callWalletApiResult(apirescback);
+      resolve(window.BEAM);
     });
   }
 
   static async createDesktopAPI(apirescback) {
     await Utils.injectScript('qrc:///qtwebchannel/qwebchannel.js');
-    return new Promise(async (resolve) => {
-      new QWebChannel(qt.webChannelTransport, (channel) => {
+    return new Promise((resolve) => {
+      new QWebChannel(qt.webChannelTransport, (channel) => { // eslint-disable-line no-undef
         channel.objects.BEAM.api.callWalletApiResult.connect(apirescback);
         resolve({
           api: channel.objects.BEAM.api,
@@ -68,46 +99,34 @@ export default class Utils {
 
   static async createWebAPI(apiver, apivermin, appname, apirescback) {
     return new Promise((resolve) => {
-      window.addEventListener(
-        'message',
-        async (ev) => {
-          if (ev.data === 'apiInjected') {
-            await window.BeamApi.callWalletApiResult(apirescback);
-            resolve({
-              api: window.BeamApi,
-            });
-          }
-        },
-        false,
-      );
-      window.postMessage(
-        {
-          type: 'create_beam_api',
-          apiver,
-          apivermin,
-          appname,
-        },
-        window.origin,
-      );
+      window.addEventListener('message', async (ev) => {
+        if (ev.data === 'apiInjected') {
+          await window.BeamApi.callWalletApiResult(apirescback);
+          resolve({
+            api: window.BeamApi,
+          });
+        }
+      }, false);
+      window.postMessage({
+        type: 'create_beam_api', apiver, apivermin, appname,
+      }, window.origin);
     });
   }
 
   static async createHeadlessAPI(apiver, apivermin, appname, apirescback) {
     await Utils.injectScript('wasm-client.js');
 
-    const WasmModule = await BeamModule();
+    const WasmModule = await BeamModule(); // eslint-disable-line no-undef
     const { WasmWalletClient } = WasmModule;
     const client = new WasmWalletClient(headlessNode);
     client.startWallet();
 
     client.subscribe((response) => {
-      const err = `Unexpected wasm wallet client response call: ${response}`;
-      throw err;
+      throw new Error(`Unexpected wasm wallet client response call: ${response}`);
     });
 
     client.setApproveContractInfoHandler((info) => {
-      const err = `Unexpected wasm wallet client transaction in headless wallet: ${info}`;
-      throw err;
+      throw new Error(`Unexpected wasm wallet client transaction in headless wallet ${info}`);
     });
 
     return new Promise((resolve, reject) => {
@@ -148,7 +167,7 @@ export default class Utils {
 
   static async switchToWebAPI() {
     if (!Utils.isHeadless()) {
-      throw 'Wallet must be opened in a headless mode';
+      throw new Error('Wallet must be opened in a headless mode');
     }
 
     const apiver = InitParams.api_version || 'current';
@@ -165,9 +184,12 @@ export default class Utils {
         }
 
         if (ev.data === 'rejected') {
+          // TODO
         }
       };
 
+      // TODO: add some delay before showing connecting message
+      //       if extension is installed and app is allowed it would filck
       window.addEventListener('message', listener, false);
       Utils.showLoading({
         headless: true,
@@ -176,38 +198,20 @@ export default class Utils {
           Utils.hideLoading();
           window.removeEventListener('message', listener);
           // TODO: add cancel handling in wallet
-          window.postMessage(
-            {
-              type: 'cancel_beam_api',
-              apiver,
-              apivermin,
-              appname,
-            },
-            window.origin,
-          );
+          window.postMessage({
+            type: 'cancel_beam_api', apiver, apivermin, appname,
+          }, window.origin);
           resolve(res);
         },
         onReconnect: () => {
-          window.postMessage(
-            {
-              type: 'retry_beam_api',
-              apiver,
-              apivermin,
-              appname,
-            },
-            window.origin,
-          );
+          window.postMessage({
+            type: 'retry_beam_api', apiver, apivermin, appname,
+          }, window.origin);
         },
       });
-      window.postMessage(
-        {
-          type: 'create_beam_api',
-          apiver,
-          apivermin,
-          appname,
-        },
-        window.origin,
-      );
+      window.postMessage({
+        type: 'create_beam_api', apiver, apivermin, appname,
+      }, window.origin);
     });
 
     if (newAPI) {
@@ -221,18 +225,25 @@ export default class Utils {
     return newAPI;
   }
 
-  static callApi(method, params, cback) {
-    const callid = ['call', CallID++].join('-');
-    Calls[callid] = cback;
+  static async callApiAsync(method, params) {
+    return new Promise((resolve, reject) => {
+      Utils.callApi(method, params, (err, res, full) => {
+        if (err) return reject(err);
+        return resolve({ res, full });
+      });
+    });
+  }
 
+  static callApi(method, params, cback) {
+    const callid = ['call', CallID++, method].join('-');
     const request = {
       jsonrpc: '2.0',
       id: callid,
       method,
       params,
     };
+    Calls[callid] = { cback, request };
 
-    console.log(Utils.formatJSON(request));
     if (Utils.isHeadless()) {
       return BEAM.api.callWalletApi(JSON.stringify(request));
     }
@@ -244,12 +255,35 @@ export default class Utils {
     if (Utils.isMobile()) {
       return BEAM.api.callWalletApi(JSON.stringify(request));
     }
-    if (Utils.isAndroid()) {
-      return BEAM.api.callWalletApi(JSON.stringify(request));
-    }
 
     if (Utils.isDesktop()) {
       return BEAM.api.callWalletApi(JSON.stringify(request));
+    }
+  }
+
+  static async invokeContractAsync(args, bytes) {
+    return new Promise((resolve, reject) => {
+      Utils.invokeContract(args, (err, res, full, request) => {
+        if (err) return reject(err);
+        return resolve({ res, full, request });
+      },
+      bytes);
+    });
+  }
+
+  static async invokeContractAsyncAndMakeTx(args) {
+    const { full } = await Utils.invokeContractAsync(args);
+    Utils.ensureField(full.result, 'raw_data', 'array');
+
+    try {
+      const { res } = await Utils.callApiAsync('process_invoke_data', { data: full.result.raw_data });
+      Utils.ensureField(res, 'txid', 'string');
+      return res.txid;
+    } catch (err) {
+      if (Utils.isUserCancelled(err)) {
+        return undefined;
+      }
+      throw err;
     }
   }
 
@@ -259,29 +293,35 @@ export default class Utils {
     };
 
     if (args) {
-      params = { args, ...params };
+      let assign = args;
+
+      if (typeof args === 'object') {
+        assign = '';
+        for (const key in args) {
+          assign += `${(assign ? ',' : '') + key}=${args[key]}`;
+        }
+      }
+
+      params = { args: assign, ...params };
     }
 
     if (bytes) {
       params = { contract: bytes, ...params };
     }
 
+    // console.log('invoke contract', params)
     return Utils.callApi('invoke_contract', params, cback);
   }
 
   static handleApiResult(json) {
     let answer;
+
     try {
       answer = JSON.parse(json);
-
-      if (answer.result && answer.result.output) {
-        // console.log('Output: ', JSON.parse(answer.result.output));
-      } else {
-        // console.log('Api result: ', answer);
-      }
-
       const { id } = answer;
-      const cback = Calls[id] || APIResCB;
+      const call = Calls[id] || {};
+      const cback = call.cback || APIResCB;
+      const { request } = call;
       delete Calls[id];
 
       if (answer.error) {
@@ -302,12 +342,13 @@ export default class Utils {
           return cback({
             error: shaderAnswer.error,
             answer,
+            request,
           });
         }
-        return cback(null, shaderAnswer, answer);
+        return cback(null, shaderAnswer, answer, request);
       }
 
-      return cback(null, answer.result, answer);
+      return cback(null, answer.result, answer, request);
     } catch (err) {
       APIResCB({
         error: err.toString(),
@@ -341,29 +382,25 @@ export default class Utils {
             headless: true,
             connecting: false,
           });
-          BEAM = await Utils.createHeadlessAPI(apiver, apivermin, appname, (...args) => Utils.handleApiResult(...args));
+          BEAM = await Utils.createHeadlessAPI(
+            apiver, apivermin, appname,
+            (...args) => Utils.handleApiResult(...args),
+          );
         } else {
           Utils.showLoading({
             headless: false,
             connecting: true,
           });
-          BEAM = await Utils.createWebAPI(apiver, apivermin, appname, (...args) => Utils.handleApiResult(...args));
+          BEAM = await Utils.createWebAPI(
+            apiver, apivermin, appname,
+            (...args) => Utils.handleApiResult(...args),
+          );
         }
       }
 
       if (Utils.isMobile()) {
         try {
           BEAM = await Utils.createMobileAPI((...args) => Utils.handleApiResult(...args));
-          Utils.applyStyles(styles);
-        } catch (e) {
-          Utils.showMobileStoresLinks();
-          return false;
-        }
-      }
-      if (Utils.isAndroid()) {
-        try {
-          BEAM = await Utils.createMobileAPI((...args) => Utils.handleApiResult(...args));
-          Utils.applyStyles(styles);
         } catch (e) {
           Utils.showMobileStoresLinks();
           return false;
@@ -402,19 +439,8 @@ export default class Utils {
   }
 
   static applyStyles(style) {
-    if (!Utils.isDesktop()) {
-      document.head.innerHTML += '<meta name="viewport" content="width=device-width, initial-scale=1" />';
-    }
-
     if (Utils.isMobile()) {
       document.body.classList.add('mobile');
-      const topColor = [styles.appsGradientOffset, 'px,'].join('');
-      const mainColor = [styles.appsGradientTop, 'px,'].join('');
-
-      'linear-gradient(to bottom,',
-          style.background_main_top, topColor,
-          style.background_main, mainColor,
-          style.background_main;
     }
 
     if (Utils.isWeb()) {
@@ -460,6 +486,39 @@ export default class Utils {
     Utils.getById(id).classList.add('hidden');
   }
 
+  // static downloadAsync(url, type) {
+  //   return new Promise((resolve, reject) => {
+  //     var xhr = new XMLHttpRequest()
+  //     xhr.onreadystatechange = () => {
+  //       if (xhr.readyState !== XMLHttpRequest.DONE) {
+  //         return
+  //       }
+  //
+  //       if (xhr.status === 200) {
+  //         if (type) {
+  //           return resolve(xhr.response)
+  //         }
+  //
+  //         let buffer    = xhr.response
+  //         let byteArray = new Uint8Array(buffer)
+  //         let array     = Array.from(byteArray)
+  //
+  //         if (array && array.length) {
+  //           return resolve(array)
+  //         }
+  //
+  //         return reject(new Error(`Empty data for ${url}`))
+  //       }
+  //
+  //       let errMsg = `Code ${xhr.status} for ${url}`
+  //       reject(new Error(errMsg))
+  //     }
+  //
+  //     xhr.open('GET', url, true)
+  //     xhr.responseType = type ? type : 'arraybuffer'
+  //     xhr.send(null)
+  //   })
+  // }
   static download(url, cback) {
     const xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
@@ -489,27 +548,24 @@ export default class Utils {
     const regex = new RegExp(/^-?\d+(\.\d*)?$/g);
     const floatValue = parseFloat(next);
     const afterDot = next.indexOf('.') > 0 ? next.substring(next.indexOf('.') + 1) : '0';
-    if (
-      (next && !String(next).match(regex))
-      || (String(next).length > 1 && String(next)[0] === '0' && next.indexOf('.') < 0)
-      || (parseInt(afterDot, 10) === 0 && afterDot.length > 7)
-      || afterDot.length > 8
-      || (floatValue === 0 && next.length > 1 && next[1] !== '.')
-      || (floatValue < 1 && next.length > 10)
-      || (floatValue > 0 && (floatValue < MIN_AMOUNT || floatValue > MAX_AMOUNT))
-    ) {
+    if ((next && !String(next).match(regex))
+        || (String(next).length > 1 && String(next)[0] === '0' && next.indexOf('.') < 0)
+        || (parseInt(afterDot, 10) === 0 && afterDot.length > 7)
+        || (afterDot.length > 8)
+        || (floatValue === 0 && next.length > 1 && next[1] !== '.')
+        || (floatValue < 1 && next.length > 10)
+        || (floatValue > 0 && (floatValue < MIN_AMOUNT || floatValue > MAX_AMOUNT))) {
       result = false;
     }
     return result;
   }
 
-  static showLoading(params) {
-    const {
-      headless, connecting, onCancel, onReconnect,
-    } = params;
-
+  static showLoading({
+    headless, connecting, onCancel, onReconnect,
+  }) {
     const styles = Utils.getStyles();
     Utils.applyStyles(styles);
+
     const topColor = [styles.appsGradientOffset, 'px,'].join('');
     const mainColor = [styles.appsGradientTop, 'px,'].join('');
 
@@ -532,10 +588,8 @@ export default class Utils {
     } else {
       bg.style.backgroundImage = [
         'linear-gradient(to bottom,',
-        styles.background_main_top,
-        topColor,
-        styles.background_main,
-        mainColor,
+        styles.background_main_top, topColor,
+        styles.background_main, mainColor,
         styles.background_main,
       ].join(' ');
     }
@@ -544,7 +598,8 @@ export default class Utils {
 
     loadContainer.style.textAlign = 'center';
     loadContainer.style.margin = '50px auto 0 auto';
-    loadContainer.style.width = '585px';
+    loadContainer.style.maxWidth = '1000px';
+    loadContainer.style.width = '100%';
     loadContainer.style.padding = '5%';
     loadContainer.style.borderRadius = '10px';
 
@@ -555,13 +610,10 @@ export default class Utils {
       titleElem = document.createElement('h3');
       titleElem.innerText = 'Connecting to BEAM Web Wallet.';
       subtitle = document.createElement('p');
-      subtitle.innerText = [
-        'To use ',
-        InitParams.appname,
-        ' you should have BEAM Web Wallet installed and allow connection.',
-      ].join('');
+      subtitle.innerText = ['To use ', InitParams.appname, ' you should have BEAM Web Wallet installed and allow connection.'].join('');
 
       if (headless) {
+        loadContainer.style.backgroundColor = 'rgba(3, 91, 133, 0.95)';
         loadContainer.style.backgroundColor = 'rgba(3, 91, 133, 0.95)';
         const container = document.getElementById('container');
         if (container) {
@@ -597,25 +649,18 @@ export default class Utils {
       reconnectButton.style.fontSize = '14px';
       reconnectButton.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
 
-      reconnectButton.addEventListener(
-        'mouseover',
-        () => {
-          reconnectButton.style.boxShadow = '0 0 8px white';
-        },
-        false,
-      );
+      reconnectButton.addEventListener('mouseover', () => {
+        reconnectButton.style.boxShadow = '0 0 8px white';
+      }, false);
 
-      reconnectButton.addEventListener(
-        'mouseout',
-        () => {
-          reconnectButton.style.boxShadow = 'none';
-        },
-        false,
-      );
+      reconnectButton.addEventListener('mouseout', () => {
+        reconnectButton.style.boxShadow = 'none';
+      }, false);
 
       reconnectButton.addEventListener('click', onReconnect);
 
       const installButton = document.createElement('button');
+      installButton.id = 'btn_install';
       installButton.innerText = 'Install BEAM Web Wallet';
       installButton.style.height = '44px';
       installButton.style.padding = '13px 30px';
@@ -627,26 +672,16 @@ export default class Utils {
       installButton.style.fontSize = '14px';
       installButton.style.backgroundColor = '#00f6d2';
       installButton.addEventListener('click', () => {
-        window.open(
-          'https://chrome.google.com/webstore/detail/beam-web-wallet/ilhaljfiglknggcoegeknjghdgampffk',
-          '_blank',
-        );
+        window.open('https://chrome.google.com/webstore/detail/beam-web-wallet/ilhaljfiglknggcoegeknjghdgampffk',
+          '_blank');
       });
 
-      installButton.addEventListener(
-        'mouseover',
-        () => {
-          installButton.style.boxShadow = '0 0 8px white';
-        },
-        false,
-      );
-      installButton.addEventListener(
-        'mouseout',
-        () => {
-          installButton.style.boxShadow = 'none';
-        },
-        false,
-      );
+      installButton.addEventListener('mouseover', () => {
+        installButton.style.boxShadow = '0 0 8px white';
+      }, false);
+      installButton.addEventListener('mouseout', () => {
+        installButton.style.boxShadow = 'none';
+      }, false);
       installButton.style.marginLeft = '30px';
 
       const controlsArea = document.createElement('div');
@@ -677,10 +712,8 @@ export default class Utils {
     bg.style.textAlign = 'center';
     bg.style.backgroundImage = [
       'linear-gradient(to bottom,',
-      styles.background_main_top,
-      topColor,
-      styles.background_main,
-      mainColor,
+      styles.background_main_top, topColor,
+      styles.background_main, mainColor,
       styles.background_main,
     ].join(' ');
 
@@ -691,12 +724,13 @@ export default class Utils {
     notSupp.style.fontSize = '18px';
     notSupp.style.marginTop = '200px';
     const download = document.createElement('p');
-    download.innerText = 'Download chrome browser';
+    download.innerText = 'Download any Chromium-based browser';
     download.style.cursor = 'pointer';
     download.style.color = '#00f6d2';
 
     download.addEventListener('click', () => {
-      window.open('https://www.google.com/chrome/', '_blank');
+      window.open('https://download-chromium.appspot.com/',
+        '_blank');
     });
 
     bg.appendChild(notSupp);
@@ -720,22 +754,22 @@ export default class Utils {
     bg.style.textAlign = 'center';
     bg.style.backgroundImage = [
       'linear-gradient(to bottom,',
-      styles.background_main_top,
-      topColor,
-      styles.background_main,
-      mainColor,
+      styles.background_main_top, topColor,
+      styles.background_main, mainColor,
       styles.background_main,
     ].join(' ');
 
     const downloadLink = document.createElement('p');
-    downloadLink.innerText = 'Download beam wallet';
+    downloadLink.innerHTML = `To use ${InitParams.appname}<br>please download BEAM wallet`;
     downloadLink.style.marginTop = '100px';
     downloadLink.style.fontSize = '20px';
     downloadLink.style.color = '#00f6d2';
     downloadLink.addEventListener('click', () => {
       Utils.isAndroid()
-        ? window.open('https://play.google.com/store/apps/details?id=com.mw.beam.beamwallet.mainnet', '_blank')
-        : window.open('https://apps.apple.com/us/app/beam-privacy-wallet/id1459842353?ls=1', '_blank');
+        ? window.open('https://play.google.com/store/apps/details?id=com.mw.beam.beamwallet.mainnet',
+          '_blank')
+        : window.open('https://apps.apple.com/us/app/beam-privacy-wallet/id1459842353?ls=1',
+          '_blank');
     });
 
     bg.appendChild(downloadLink);
@@ -768,19 +802,23 @@ export default class Utils {
     return x;
   }
 
+  /*
   static getRateStr(value, rate) {
-    const rateVal = Utils.formateValue(new Big(value).times(rate));
-    return rate > 0 && value > 0 ? (rateVal > 0.1 ? `${Utils.numberWithCommas(rateVal)} USD` : '< 1 cent') : '0 USD';
+    const rateVal = Utils.formateValue(new Big(value).times(rate))
+    return (rate > 0 && value > 0
+      ? (rateVal > 0.1 ? (Utils.numberWithCommas(rateVal) + ' USD') : '< 1 cent')
+      : '0 USD')
   }
+  */
 
   static ensureField(obj, name, type) {
     if (obj[name] == undefined) {
-      throw `No '${name}' field on object`;
+      throw new Error(`No '${name}' field on object`);
     }
 
     if (type == 'array') {
       if (!Array.isArray(obj[name])) {
-        throw `${name} is expected to be an array`;
+        throw new Error(`${name} is expected to be an array`);
       }
       return;
     }
@@ -788,7 +826,7 @@ export default class Utils {
     if (type) {
       const tof = typeof obj[name];
       if (tof !== type) {
-        throw `Bad type '${tof}' for '${name}'. '${type}' expected.`;
+        throw new Error(`Bad type '${tof}' for '${name}'. '${type}' expected.`);
       }
     }
   }
@@ -800,5 +838,107 @@ export default class Utils {
   static formatJSON(obj) {
     const res = JSON.stringify(obj, null, 2);
     return res == '{}' ? obj.toString() : res;
+  }
+
+  static formatAmountFixed(amount, fixed) {
+    const str = (amount / 100000000).toFixed(fixed);
+    if (parseFloat(str) == 0) {
+      let res = '< 0.';
+      for (let i = 0; i < fixed - 1; ++i) {
+        res += '0';
+      }
+      res += '1';
+      return res;
+    }
+    return str.replace(/([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/, '$1');
+  }
+
+  static formatAmount3(amount) {
+    amount /= 100000000;
+    const fixedNum = amount.toFixed(3);
+
+    if (amount == 0) {
+      return '0';
+    }
+
+    if (amount < 0.01) {
+      return '< 0.01';
+    }
+
+    if (amount >= 0.01 && fixedNum < 1000) {
+      return +amount.toFixed(2);
+    }
+
+    if (fixedNum >= 1000 && fixedNum < 1000000) {
+      const head = fixedNum.slice(0, -7);
+      const tail = fixedNum.slice(-7, -5);
+      const n = +(`${head}.${tail}`);
+      return `${n} k`;
+    }
+
+    if (fixedNum >= 1000000 && fixedNum < 1000000000) {
+      const head = fixedNum.slice(0, -10);
+      const tail = fixedNum.slice(-10, -8);
+      const n = +(`${head}.${tail}`);
+      return `${n} m`;
+    }
+
+    if (fixedNum >= 1000000000) {
+      const head = fixedNum.slice(0, -13);
+      const tail = fixedNum.slice(-13, -11);
+      const n = +(`${head}.${tail}`);
+      return `${n} b`;
+    }
+
+    return 'error';
+  }
+
+  static formatHeight(height) {
+    return new Intl.NumberFormat().format(height);
+  }
+
+  static formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return '0 Bytes';
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+  }
+
+  static clearAssign(oldobj, newobj) {
+    for (const key in oldobj) {
+      // eslint-disable-next-line no-prototype-builtins
+      if (oldobj.hasOwnProperty(key)) {
+        delete oldobj[key];
+      }
+    }
+    for (const key in newobj) {
+      // eslint-disable-next-line no-prototype-builtins
+      if (newobj.hasOwnProperty(key)) {
+        oldobj[key] = newobj[key];
+      }
+    }
+  }
+
+  static copyText(text) {
+    const textArea = document.createElement('textarea');
+    textArea.style.position = 'fixed';
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      return document.execCommand('copy');
+    } finally {
+      document.body.removeChild(textArea);
+    }
+  }
+
+  static waitAsync(msecs) {
+    return new Promise((resolve) => setTimeout(() => resolve(), msecs));
   }
 }

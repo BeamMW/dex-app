@@ -94,7 +94,6 @@ const WrapperSelect = styled.div`
 }
 `;
 export const PoolsList = () => {
-  console.log(1);
   const data = useSelector(selectPoolsList());
   const options = useSelector(selectOptions());
   const favorites = JSON.parse(localStorage.getItem('favorites'));

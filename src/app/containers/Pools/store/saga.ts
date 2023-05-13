@@ -11,7 +11,7 @@ import {
   checkTxStatus,
   getOptions,
   isInArray,
-  onFilter,
+  onFilter, onSwitchToApi,
   parseMetadata,
   parsePoolMetadata,
   setStorage,
@@ -22,7 +22,9 @@ import { selectFilter } from '@app/containers/Pools/store/selectors';
 import { toast } from 'react-toastify';
 import { navigate } from '@app/shared/store/actions';
 import { ROUTES } from '@app/shared/constants';
+import Utils from '@core/utils.js';
 import { actions } from '.';
+import sharedSaga from '@app/shared/store/saga';
 
 export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.request>): Generator {
   try {
@@ -79,76 +81,100 @@ function* getStatus(txid: string) {
   }
 }
 export function* createPool(action: ReturnType<typeof mainActions.onCreatePool.request>): Generator {
-  try {
-    // @ts-ignore
-    const { txid } = (yield call(CreatePoolApi, action.payload ? action.payload : null)) as ITxId;
-    if (txid) {
-      yield navigateToHome(txid);
-      yield getStatus(txid);
+  if (yield Utils.isHeadless()) {
+    yield onSwitchToApi();
+  } else {
+    try {
+      // @ts-ignore
+      const { txid } = (yield call(CreatePoolApi, action.payload ? action.payload : null)) as ITxId;
+      if (txid) {
+        yield navigateToHome(txid);
+        yield getStatus(txid);
+      }
+    } catch (e) {
+      // @ts-ignore
+      yield put(mainActions.onCreatePool.failure(e));
+      toast(e.error === 'pool already exists' ? 'This pool already exists' : e.error);
     }
-  } catch (e) {
-    // @ts-ignore
-    yield put(mainActions.onCreatePool.failure(e));
-    toast(e.error === 'pool already exists' ? 'This pool already exists' : e.error);
   }
 }
 
 export function* addLiquidity(action: ReturnType<typeof mainActions.onAddLiquidity.request>): Generator {
-  try {
-    // @ts-ignore
-    const { txid, res } = (yield call(AddLiquidityApi, action.payload ? action.payload : null)) as ITxResult;
-    if (res) {
-      yield put(mainActions.setPredict(res));
+  if (yield Utils.isHeadless()) {
+    yield onSwitchToApi();
+  } else {
+    try {
+      // @ts-ignore
+      const {
+        txid,
+        res,
+      } = (yield call(AddLiquidityApi, action.payload ? action.payload : null)) as ITxResult;
+      if (res) {
+        yield put(mainActions.setPredict(res));
+      }
+      if (txid) {
+        yield navigateToHome(txid);
+        yield getStatus(txid);
+      }
+    } catch (e) {
+      // @ts-ignore
+      console.log(e);
+      yield put(mainActions.onAddLiquidity.failure(e));
+      // toast(e.error);
     }
-    if (txid) {
-      yield navigateToHome(txid);
-      yield getStatus(txid);
-    }
-  } catch (e) {
-    // @ts-ignore
-    console.log(e);
-    yield put(mainActions.onAddLiquidity.failure(e));
-    // toast(e.error);
   }
 }
 export function* tradePool(action: ReturnType<typeof mainActions.onTradePool.request>): Generator {
-  try {
-    // @ts-ignore0
-    const { res, txid } = (yield call(TradePoolApi, action.payload ? action.payload : null)) as ITxResult;
-    if (res) {
-      yield put(mainActions.setPredict(res));
+  if (yield Utils.isHeadless()) {
+    yield onSwitchToApi();
+  } else {
+    try {
+      // @ts-ignore0
+      const {
+        res,
+        txid,
+      } = (yield call(TradePoolApi, action.payload ? action.payload : null)) as ITxResult;
+      if (res) {
+        yield put(mainActions.setPredict(res));
+      }
+      if (txid) {
+        yield navigateToHome(txid);
+        yield getStatus(txid);
+      }
+    } catch (e) {
+      // @ts-ignore
+      // yield put(mainActions.onTradePool.failure(e));
+      yield put(mainActions.setErrorMessage(e));
+      // toast(e.error);
     }
-    if (txid) {
-      yield navigateToHome(txid);
-      yield getStatus(txid);
-    }
-  } catch (e) {
-    // @ts-ignore
-    // yield put(mainActions.onTradePool.failure(e));
-    yield put(mainActions.setErrorMessage(e));
-    // toast(e.error);
   }
 }
 export function* withdrawPool(action: ReturnType<typeof mainActions.onWithdraw.request>): Generator {
-  try {
-    // @ts-ignore
-    const { res, txid } = (yield call(WithdrawApi, action.payload ? action.payload : null)) as ITxResult;
-    if (res) {
-      yield put(mainActions.setPredict(res));
+  if (yield Utils.isHeadless()) {
+    yield onSwitchToApi();
+  } else {
+    try {
+      // @ts-ignore
+      const {
+        res,
+        txid,
+      } = (yield call(WithdrawApi, action.payload ? action.payload : null)) as ITxResult;
+      if (res) {
+        yield put(mainActions.setPredict(res));
+      }
+      if (txid) {
+        yield navigateToHome(txid);
+        yield getStatus(txid);
+      }
+    } catch (e) {
+      // @ts-ignore
+      yield put(mainActions.onWithdraw.failure(e));
+      // toast(e.error);
     }
-    if (txid) {
-      yield navigateToHome(txid);
-      yield getStatus(txid);
-    }
-  } catch (e) {
-    // @ts-ignore
-    yield put(mainActions.onWithdraw.failure(e));
-    // toast(e.error);
   }
 }
 export function* favorites(action: ReturnType<typeof mainActions.onFavorites.request>): Generator {
   try {
-    console.log('fav');
     const favoritesList = yield select((state: AppState) => state.main.favorites);
     const pool = action.payload as IPoolCard;
     let storage = (favoritesList as IPoolCard[]) || [];

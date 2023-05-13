@@ -3,7 +3,7 @@ import { styled } from '@linaria/react';
 import Utils from '@core/utils.js';
 import { useNavigate } from 'react-router-dom';
 import Title from '@app/shared/components/Title';
-import { BackButton, Button } from '@app/shared/components/index';
+import { AlertWallet, BackButton, Button } from '@app/shared/components/index';
 import { ROUTES, ROUTES_PATH } from '@app/shared/constants';
 import { IconPlus } from '@app/shared/icons';
 
@@ -11,6 +11,7 @@ interface WindowProps {
   title?: string;
   backButton?: boolean;
   createPool?: boolean;
+  headless?: boolean;
 }
 
 const Container = styled.div<{ bgColor: string }>`
@@ -20,6 +21,9 @@ const Container = styled.div<{ bgColor: string }>`
   flex-direction: column;
   align-items: center;
   padding: 0 20px;
+  @media (max-width: 480px) {
+    padding: 0 5px;
+  }
 `;
 
 const HeaderWrapper = styled.div`
@@ -50,7 +54,7 @@ const ButtonStyled = styled.div`
 `;
 
 const Window: React.FC<WindowProps> = ({
-  children, title, backButton, createPool,
+  children, title, backButton, createPool,headless
 }) => {
   const rootRef = useRef();
   const navigate = useNavigate();
@@ -62,6 +66,7 @@ const Window: React.FC<WindowProps> = ({
   }, [navigate]);
   return (
     <>
+      {headless ? <AlertWallet></AlertWallet> : null}
       <Container bgColor={Utils.getStyles().background_main} ref={rootRef}>
         {createPool && (
           <ButtonWrapper margin={Utils.isWeb()}>
