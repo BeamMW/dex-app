@@ -8,6 +8,12 @@ module.exports = {
   mode: 'development',
   devtool: 'eval-source-map',
   devServer: {
+    historyApiFallback: true,
+    watchFiles: path.join(__dirname, 'src'),
+    headers: {
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+      'Cross-Origin-Opener-Policy': 'same-origin',
+    },
     port: 13666,
   },
   entry: {
@@ -91,6 +97,12 @@ module.exports = {
           from: path.join(__dirname, 'src/index.html'),
           to: path.join(__dirname, 'html'),
           context: 'public',
+        },
+        {
+          from: path.join(__dirname, './node_modules/beam-wasm-client-dappnet/'),
+          globOptions: {
+            ignore: ['**/package.json', '**/README.md'],
+          },
         },
       ],
     }),

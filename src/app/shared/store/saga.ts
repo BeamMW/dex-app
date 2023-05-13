@@ -8,37 +8,44 @@ import Utils from '@core/utils.js';
 import { setTxStatus } from '@app/containers/Pools/store/actions';
 import store from '../../../index';
 
-export function remoteEventChannel() {
+export async function start() {
+  await Utils.download('./amm.wasm', async (err, bytes) => {
+    await Utils.callApi('ev_subunsub', { ev_txs_changed: true, ev_system_state: true }, (error, result, full) => {
+      if (error) {
+        console.log(err);
+      }
+      if (result) {
+        console.log('result');
+        store.dispatch(mainActions.loadAppParams.request(bytes));
+        store.dispatch(mainActions.loadPoolsList.request(null));
+      }
+    });
+  });
+}
+export async function remoteEventChannel() {
   return eventChannel((emitter) => {
     Utils.initialize(
       {
         appname: 'DEX',
         min_api_version: '6.2',
-        headless: false,
+        headless: true,
         apiResultHandler: (error, result, full) => {
-          // console.log('api result data: ', result, full);
-          if (!result.error) {
+          console.log('api result data: ', result, full);
+          if (!result) {
             emitter(full);
           }
         },
       },
       (err) => {
-        Utils.download('./amm.wasm', (err, bytes) => {
-          Utils.callApi('ev_subunsub', { ev_txs_changed: true, ev_system_state: true }, (error, result, full) => {
-            if (result) {
-              // console.log('Object');
-              store.dispatch(mainActions.loadAppParams.request(bytes));
-              store.dispatch(mainActions.loadPoolsList.request(null));
-            }
-          });
-        });
+        if (!err) {
+          console.log(Utils.isWeb())
+          start();
+        }
       },
     );
-
     const unsubscribe = () => {
       emitter(END);
     };
-
     return unsubscribe;
   });
 }

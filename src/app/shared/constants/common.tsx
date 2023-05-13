@@ -8,6 +8,7 @@ export const BEAMX_ID = 3;
 // export const BEAMX_ID = 7;
 export const NPH_ID = 357;
 // export const NPH_ID = 47;
+export const ULR_WEB_WALLET = 'https://chrome.google.com/webstore/detail/beam-web-wallet/ilhaljfiglknggcoegeknjghdgampffk';
 
 export const ASSET_BEAM = {
   N: 'Beam Coin',
