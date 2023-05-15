@@ -3,7 +3,7 @@ import React from 'react';
 import { styled } from '@linaria/react';
 
 const Section = styled.div`
-  width: 430px;
+  max-width: 430px;
   height: 301px;
   justify-self: center;
   display: flex;

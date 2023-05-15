@@ -16,10 +16,13 @@ const ContainerStyled = styled.div<ContainerProps>`
   height: 100%;
   align-items: ${({ variant }) => variant};
   justify-content: ${({ jystify }) => jystify};
-  max-width: ${({ main }) => (main ? '100%' : '914px')};
+  width: ${({ main }) => (main ? '100%' : '914px')};
   align-content: center;
-  @media (max-width: 480){
+  @media (max-width: 480px){
     padding: 5px;
+    max-width: 914px;
+    width: 100%;
+  }
   }
 `;
 
