@@ -21,23 +21,39 @@ export default class Utils {
 
   static is_chrome = undefined;
 
-  static isMobile() {
-    const ua = navigator.userAgent;
-    return (/android/i.test(ua) || /iPad|iPhone|iPod/.test(ua));
+  static isMobile () {
+    if (Utils.is_mobile === undefined) {
+      const ua = navigator.userAgent
+      Utils.is_mobile  = (/android/i.test(ua) || /iPad|iPhone|iPod/.test(ua))
+    }
+    return Utils.is_mobile
   }
 
-  static isAndroid() {
-    const ua = navigator.userAgent;
-    return (/android/i.test(ua));
+  static isCompact () {
+    return Utils.isMobile()
   }
 
-  static isDesktop() {
-    const ua = navigator.userAgent;
-    return (/QtWebEngine/i.test(ua));
+  static isDesktop () {
+    if (Utils.is_desktop === undefined) {
+      const ua = navigator.userAgent
+      Utils.is_desktop = (/QtWebEngine/i.test(ua))
+    }
+    return Utils.is_desktop
   }
 
-  static isWeb() {
-    return !Utils.isDesktop() && !Utils.isMobile();
+  static isWeb () {
+    if (Utils.is_web === undefined) {
+      Utils.is_web = (!Utils.isDesktop() && !Utils.isMobile())
+    }
+    return Utils.is_web
+  }
+
+  static isAndroid () {
+    if (Utils.is_android === undefined) {
+      const ua = navigator.userAgent
+      Utils.is_android = (/android/i.test(ua))
+    }
+    return Utils.is_android
   }
 
   static isHeadless() {
