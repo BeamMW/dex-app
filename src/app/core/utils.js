@@ -5,8 +5,7 @@ let BEAM = null;
 let CallID = 0;
 const Calls = {};
 let APIResCB;
-const ipfsGateway = 'https://apps-dappnet.beam.mw/ipfs/';
-const webGateway = 'https://apps-dappnet.beam.mw/cache/';
+const network = 'WasmModule.Network.dappnet'
 // const headlessNode = 'eu-node02.dappnet.beam.mw:8200';
 const headlessNode = 'eu-node01.mainnet.beam.mw:8200';
 let InitParams;
@@ -98,7 +97,7 @@ export default class Utils {
 
     const WasmModule = await BeamModule(); // eslint-disable-line no-undef
     const { WasmWalletClient } = WasmModule;
-    const client = new WasmWalletClient(headlessNode);
+    const client = new WasmWalletClient(headlessNode, network);
     client.startWallet();
 
     client.subscribe((response) => {
