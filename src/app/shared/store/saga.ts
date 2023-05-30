@@ -6,6 +6,7 @@ import { actions as mainActions } from '@app/containers/Pools/store/index';
 
 import Utils from '@core/utils.js';
 import { setTxStatus } from '@app/containers/Pools/store/actions';
+import { actions } from '@app/shared/store/index';
 import store from '../../../index';
 
 export async function start() {
@@ -15,7 +16,6 @@ export async function start() {
         console.log(err);
       }
       if (result) {
-        console.log('result');
         store.dispatch(mainActions.loadAppParams.request(bytes));
         store.dispatch(mainActions.loadPoolsList.request(null));
       }
@@ -38,7 +38,7 @@ export async function remoteEventChannel() {
       },
       (err) => {
         if (!err) {
-          console.log(Utils.isWeb())
+          store.dispatch(actions.setIsLoaded(true));
           start();
         }
       },

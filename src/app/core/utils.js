@@ -22,43 +22,27 @@ export default class Utils {
 
   static is_chrome = undefined;
 
-  static get ipfsGateway() {
-    return ipfsGateway;
-  }
-
-  static get webGateway() {
-    return webGateway;
-  }
-
   static isMobile() {
-    if (Utils.is_mobile === undefined) {
-      const ua = navigator.userAgent;
-      Utils.is_mobile = (/android/i.test(ua) || /iPad|iPhone|iPod/.test(ua));
-    }
-    return Utils.is_mobile;
-  }
-
-  static isDesktop() {
-    if (Utils.is_mobile === undefined) {
-      const ua = navigator.userAgent;
-      Utils.is_desktop = (/QtWebEngine/i.test(ua));
-    }
-    return Utils.is_desktop;
-  }
-
-  static isWeb() {
-    if (Utils.is_web === undefined) {
-      Utils.is_web = (!Utils.is_desktop && !Utils.is_mobile);
-    }
-    return Utils.is_web;
+    const ua = navigator.userAgent;
+    return (/android/i.test(ua) || /iPad|iPhone|iPod/.test(ua));
   }
 
   static isAndroid() {
-    if (Utils.is_android === undefined) {
-      const ua = navigator.userAgent;
-      Utils.is_android = (/android/i.test(ua));
-    }
-    return Utils.is_android;
+    const ua = navigator.userAgent;
+    return (/android/i.test(ua));
+  }
+
+  static isDesktop() {
+    const ua = navigator.userAgent;
+    return (/QtWebEngine/i.test(ua));
+  }
+
+  static isWeb() {
+    return !Utils.isDesktop() && !Utils.isMobile();
+  }
+
+  static isHeadless() {
+    return BEAM && BEAM.headless;
   }
 
   static isChrome() {
@@ -67,10 +51,6 @@ export default class Utils {
       Utils.is_chrome = (/chrome|chromium|crios/i.test(ua) && ua.indexOf('Edg') == -1);
     }
     return Utils.is_chrome;
-  }
-
-  static isHeadless() {
-    return BEAM && BEAM.headless;
   }
 
   static async createMobileAPI(apirescback) {
@@ -249,7 +229,7 @@ export default class Utils {
     }
 
     if (Utils.isWeb()) {
-      return BEAM.api.callWalletApi(callid, method, params, InitParams["appname"]);
+      return BEAM.api.callWalletApi(callid, method, params, InitParams.appname);
     }
 
     if (Utils.isMobile()) {
