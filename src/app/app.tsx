@@ -67,7 +67,7 @@ const App = () => {
 
   return (
     <>
-      {/* {isLoaded ? ( */}
+      {isLoaded ? (
         <Scrollbars renderThumbVertical={(props) => <div {...props} className={trackStyle} />}>
           {isHeadless && isWeb ? <AlertWallet /> : null}
           {content}
@@ -93,7 +93,7 @@ const App = () => {
             }}
           />
         </Scrollbars>
-      {/* ) : null} */}
+      ) : null}
     </>
   );
 };

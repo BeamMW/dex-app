@@ -3,8 +3,8 @@ import {
   IAddLiquidity, ICreatePool, IError, ITrade, ITxId, IWithdraw,
 } from '@core/types';
 
-const CID = '729fe098d9fd2b57705db1a05a74103dd4b891f535aef2ae69b47bcfdeef9cbf';
-// const CID = '4e0a28b2b2a83b811ad17ba8228b0645dbce2969fd453a68fbc0b60bc8860e02'; // dappnet
+// const CID = '729fe098d9fd2b57705db1a05a74103dd4b891f535aef2ae69b47bcfdeef9cbf';
+const CID = '4e0a28b2b2a83b811ad17ba8228b0645dbce2969fd453a68fbc0b60bc8860e02'; // dappnet
 const onMakeTx = (err, sres, full) => {
   if (err) {
     console.log(err, 'Failed to generate transaction request');
