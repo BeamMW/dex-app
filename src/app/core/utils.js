@@ -22,35 +22,35 @@ export default class Utils {
 
   static is_chrome = undefined;
 
-  static isMobile () {
+  static isMobile() {
     if (Utils.is_mobile === undefined) {
-      const ua = navigator.userAgent
-      Utils.is_mobile  = (/android/i.test(ua) || /iPad|iPhone|iPod/.test(ua))
+      const ua = navigator.userAgent;
+      Utils.is_mobile = (/android/i.test(ua) || /iPad|iPhone|iPod/.test(ua));
     }
-    return Utils.is_mobile
+    return Utils.is_mobile;
   }
 
-  static isDesktop () {
+  static isDesktop() {
     if (Utils.is_desktop === undefined) {
-      const ua = navigator.userAgent
-      Utils.is_desktop = (/QtWebEngine/i.test(ua))
+      const ua = navigator.userAgent;
+      Utils.is_desktop = (/QtWebEngine/i.test(ua));
     }
-    return Utils.is_desktop
+    return Utils.is_desktop;
   }
 
-  static isWeb () {
+  static isWeb() {
     if (Utils.is_web === undefined) {
-      Utils.is_web = (!Utils.isDesktop() && !Utils.isMobile())
+      Utils.is_web = (!Utils.isDesktop() && !Utils.isMobile());
     }
-    return Utils.is_web
+    return Utils.is_web;
   }
 
-  static isAndroid () {
+  static isAndroid() {
     if (Utils.is_android === undefined) {
-      const ua = navigator.userAgent
-      Utils.is_android = (/android/i.test(ua))
+      const ua = navigator.userAgent;
+      Utils.is_android = (/android/i.test(ua));
     }
-    return Utils.is_android
+    return Utils.is_android;
   }
 
   static isHeadless() {
@@ -70,9 +70,14 @@ export default class Utils {
       if (!window.BEAM) {
         return reject();
       }
-      if (Utils.isAndroid()) document.addEventListener('onCallWalletApiResult', (res) => apirescback(res.detail));
-      else window.BEAM.callWalletApiResult(apirescback);
-      resolve(window.BEAM);
+      if (Utils.isAndroid()) {
+        document.addEventListener('onCallWalletApiResult', (res) => apirescback(res.detail));
+      } else {
+        window.BEAM.callWalletApiResult(apirescback);
+      }
+      resolve({
+        api: window.BEAM,
+      });
     });
   }
 
