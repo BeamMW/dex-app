@@ -29,10 +29,6 @@ export default class Utils {
     return Utils.is_mobile
   }
 
-  static isCompact () {
-    return Utils.isMobile()
-  }
-
   static isDesktop () {
     if (Utils.is_desktop === undefined) {
       const ua = navigator.userAgent
