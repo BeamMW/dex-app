@@ -28,7 +28,7 @@ export async function remoteEventChannel() {
       {
         appname: 'DEX',
         min_api_version: '6.2',
-        headless: true,
+        headless: !!Utils.isWeb(),
         apiResultHandler: (error, result, full) => {
           console.log('api result data: ', result, full);
           if (!result) {

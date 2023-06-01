@@ -129,7 +129,7 @@ export const PoolsList = () => {
     [data, poolsList],
   );
   useMemo(() => {
-    if (favorites.length === 0) {
+    if (favorites.length === 0 || favorites.length === undefined || favorites.length === null) {
       handleSort('all');
     }
   }, [favorites.length]);
