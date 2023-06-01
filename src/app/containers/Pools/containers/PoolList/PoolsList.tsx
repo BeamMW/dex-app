@@ -128,11 +128,11 @@ export const PoolsList = () => {
     },
     [data, poolsList],
   );
-  useMemo(() => {
-    if (favorites.length === 0 || favorites.length === undefined || favorites.length === null) {
-      handleSort('all');
-    }
-  }, [favorites.length]);
+  // useMemo(() => {
+  //   if (favorites.length === 0 || favorites.length === undefined || favorites.length === null) {
+  //     handleSort('all');
+  //   }
+  // }, [favorites.length]);
 
   useMemo(() => {
     setPoolList(getFilterPools(filtered, data));
