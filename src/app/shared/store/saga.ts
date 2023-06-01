@@ -9,9 +9,9 @@ import { setTxStatus } from '@app/containers/Pools/store/actions';
 import { actions } from '@app/shared/store/index';
 import store from '../../../index';
 
-export async function start() {
-  await Utils.download('./amm.wasm', async (err, bytes) => {
-    await Utils.callApi('ev_subunsub', { ev_txs_changed: true, ev_system_state: true }, (error, result, full) => {
+export  function start() {
+   Utils.download('./amm.wasm',  (err, bytes) => {
+     Utils.callApi('ev_subunsub', { ev_txs_changed: true, ev_system_state: true }, (error, result, full) => {
       if (error) {
         console.log(err);
       }
@@ -28,7 +28,7 @@ export async function remoteEventChannel() {
       {
         appname: 'DEX',
         min_api_version: '6.2',
-        headless: true,
+        headless: !!Utils.isWeb(),
         apiResultHandler: (error, result, full) => {
           console.log('api result data: ', result, full);
           if (!result) {

@@ -128,11 +128,11 @@ export const PoolsList = () => {
     },
     [data, poolsList],
   );
-  useMemo(() => {
-    if (favorites.length === 0) {
-      handleSort('all');
-    }
-  }, [favorites.length]);
+  // useMemo(() => {
+  //   if (favorites.length === 0 || favorites.length === undefined || favorites.length === null) {
+  //     handleSort('all');
+  //   }
+  // }, [favorites.length]);
 
   useMemo(() => {
     setPoolList(getFilterPools(filtered, data));
@@ -140,53 +140,58 @@ export const PoolsList = () => {
   const checkFavorite = (poolCard: IPoolCard) => isInArray(poolCard, storage);
 
   return (
-    <Window title="Pools" createPool>
-      <Container main jystify="center">
-        <HeaderContainer>
-          <HeaderWrapperSort>
-            <WrapperSelect>
-              <ReactSelect
-                options={options}
-                isClearable
-                onChange={(e) => onFilter(e)}
-                defaultValue={() => localFiltered}
-                isIcon
-                placeholder={placeHolder.SEARCH}
-                customPrefix="custom-filter"
-              />
-            </WrapperSelect>
-            <Sort>
+    <>
+      { data.length
+        ? (
+          <Window title="Pools" createPool>
+            <Container main jystify="center">
+              <HeaderContainer>
+                <HeaderWrapperSort>
+                  <WrapperSelect>
+                    <ReactSelect
+                      options={options}
+                      isClearable
+                      onChange={(e) => onFilter(e)}
+                      defaultValue={() => localFiltered}
+                      isIcon
+                      placeholder={placeHolder.SEARCH}
+                      customPrefix="custom-filter"
+                    />
+                  </WrapperSelect>
+                  <Sort>
 
-              {SORT.map((el) => (
-                <SortItem key={el.value}>
-                  <SortItemLink
-                    key={el.value}
-                    active={currentFilter === el.value}
-                    onClick={() => handleSort(el.value)}
-                    disabled={!!((el.value === 'fav' && !favorites.length) || (el.value === 'my' && !myPools.length))}
-                  >
-                    {el.name}
-                  </SortItemLink>
-                </SortItem>
-              ))}
-            </Sort>
-          </HeaderWrapperSort>
-        </HeaderContainer>
+                    {SORT.map((el) => (
+                      <SortItem key={el.value}>
+                        <SortItemLink
+                key={el.value}
+                active={currentFilter === el.value}
+                onClick={() => handleSort(el.value)}
+                disabled={!!((el.value === 'fav' && !favorites.length) || (el.value === 'my' && !myPools.length))}
+              >
+                {el.name}
+              </SortItemLink>
+                      </SortItem>
+                    ))}
+                  </Sort>
+                </HeaderWrapperSort>
+              </HeaderContainer>
 
-        {poolsList === null ? (
-          <Loader isSearchable />
-        ) : poolsList.length > 0 ? (
-          <PoolList>
-            {isLoading
-              ? Array(10).fill(<LoadingSkileton />)
-              : poolsList.map((item) => (
-                <PoolCard isFavorite={checkFavorite(item)} data={item} key={`${item.aid1}_${item.aid2}_${item.kind}`} />
-              ))}
-          </PoolList>
-        ) : (
-          <Loader />
-        )}
-      </Container>
-    </Window>
+              {poolsList === null ? (
+                <Loader isSearchable />
+              ) : poolsList.length > 0 ? (
+                <PoolList>
+                  {isLoading
+                    ? Array(10).fill(<LoadingSkileton />)
+                    : poolsList.map((item) => (
+                      <PoolCard isFavorite={checkFavorite(item)} data={item} key={`${item.aid1}_${item.aid2}_${item.kind}`} />
+                    ))}
+                </PoolList>
+              ) : (
+                <Loader />
+              )}
+            </Container>
+          </Window>
+        ) : <Loader />}
+    </>
   );
 };
