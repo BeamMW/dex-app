@@ -5,10 +5,9 @@ let BEAM = null;
 let CallID = 0;
 const Calls = {};
 let APIResCB;
-// const network = WasmModule.Network.dappnet
-// const network = 'WasmModule.Network.mainnet'
+const ipfsGateway = 'https://gallery20.apps.beam.mw/ipfs/';
+const webGateway = 'https://gallery20.apps.beam.mw/cache/';
 const headlessNode = 'eu-node02.dappnet.beam.mw:8200';
-// const headlessNode = 'eu-node01.mainnet.beam.mw:8200';
 let InitParams;
 
 export default class Utils {
@@ -22,12 +21,24 @@ export default class Utils {
 
   static is_chrome = undefined;
 
+  static get ipfsGateway() {
+    return ipfsGateway;
+  }
+
+  static get webGateway() {
+    return webGateway;
+  }
+
   static isMobile() {
     if (Utils.is_mobile === undefined) {
       const ua = navigator.userAgent;
       Utils.is_mobile = (/android/i.test(ua) || /iPad|iPhone|iPod/.test(ua));
     }
     return Utils.is_mobile;
+  }
+
+  static isCompact() {
+    return Utils.isMobile();
   }
 
   static isDesktop() {
@@ -53,16 +64,16 @@ export default class Utils {
     return Utils.is_android;
   }
 
-  static isHeadless() {
-    return BEAM && BEAM.headless;
-  }
-
   static isChrome() {
     if (Utils.is_chrome === undefined) {
       const ua = navigator.userAgent;
       Utils.is_chrome = (/chrome|chromium|crios/i.test(ua) && ua.indexOf('Edg') == -1);
     }
     return Utils.is_chrome;
+  }
+
+  static isHeadless() {
+    return BEAM && BEAM.headless;
   }
 
   static async createMobileAPI(apirescback) {
@@ -231,7 +242,7 @@ export default class Utils {
     });
   }
 
-  static callApi(method, params, cback) {
+  static async callApi(method, params, cback) {
     const callid = ['call', CallID++, method].join('-');
     const request = {
       jsonrpc: '2.0',
@@ -240,13 +251,15 @@ export default class Utils {
       params,
     };
     Calls[callid] = { cback, request };
+    console.log('REQQQ');
+    console.log(Utils.formatJSON(request));
 
     if (Utils.isHeadless()) {
       return BEAM.api.callWalletApi(JSON.stringify(request));
     }
 
     if (Utils.isWeb()) {
-      return BEAM.api.callWalletApi(callid, method, params, InitParams.appname);
+      return BEAM.api.callWalletApi(callid, method, params);
     }
 
     if (Utils.isMobile()) {
@@ -266,6 +279,30 @@ export default class Utils {
       },
       bytes);
     });
+  }
+
+  static download(url, cback) {
+    const xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        if (xhr.status === 200) {
+          const buffer = xhr.response;
+          const byteArray = new Uint8Array(buffer);
+          const array = Array.from(byteArray);
+
+          if (!array || !array.length) {
+            return cback('empty shader');
+          }
+
+          return cback(null, array);
+        }
+        const errMsg = ['code', xhr.status].join(' ');
+        return cback(errMsg);
+      }
+    };
+    xhr.open('GET', url, true);
+    xhr.responseType = 'arraybuffer';
+    xhr.send(null);
   }
 
   static async invokeContractAsyncAndMakeTx(args) {
@@ -306,7 +343,7 @@ export default class Utils {
       params = { contract: bytes, ...params };
     }
 
-    // console.log('invoke contract', params)
+    console.log('invoke contract', params);
     return Utils.callApi('invoke_contract', params, cback);
   }
 
@@ -320,7 +357,8 @@ export default class Utils {
       const cback = call.cback || APIResCB;
       const { request } = call;
       delete Calls[id];
-
+      console.log('AnswerUtils');
+      console.log(answer);
       if (answer.error) {
         return cback(answer);
       }
@@ -344,7 +382,8 @@ export default class Utils {
         }
         return cback(null, shaderAnswer, answer, request);
       }
-
+      console.log('Api result: ', request);
+      console.log('Api result: ', answer);
       return cback(null, answer.result, answer, request);
     } catch (err) {
       APIResCB({
@@ -396,6 +435,7 @@ export default class Utils {
       }
 
       if (Utils.isMobile()) {
+        console.log('Mobile');
         try {
           BEAM = await Utils.createMobileAPI((...args) => Utils.handleApiResult(...args));
         } catch (e) {
@@ -443,6 +483,10 @@ export default class Utils {
     if (Utils.isWeb()) {
       document.body.classList.add('web');
     }
+
+    if (Utils.isCompact()) {
+      document.body.classList.add('compact');
+    }
   }
 
   //
@@ -483,61 +527,38 @@ export default class Utils {
     Utils.getById(id).classList.add('hidden');
   }
 
-  // static downloadAsync(url, type) {
-  //   return new Promise((resolve, reject) => {
-  //     var xhr = new XMLHttpRequest()
-  //     xhr.onreadystatechange = () => {
-  //       if (xhr.readyState !== XMLHttpRequest.DONE) {
-  //         return
-  //       }
-  //
-  //       if (xhr.status === 200) {
-  //         if (type) {
-  //           return resolve(xhr.response)
-  //         }
-  //
-  //         let buffer    = xhr.response
-  //         let byteArray = new Uint8Array(buffer)
-  //         let array     = Array.from(byteArray)
-  //
-  //         if (array && array.length) {
-  //           return resolve(array)
-  //         }
-  //
-  //         return reject(new Error(`Empty data for ${url}`))
-  //       }
-  //
-  //       let errMsg = `Code ${xhr.status} for ${url}`
-  //       reject(new Error(errMsg))
-  //     }
-  //
-  //     xhr.open('GET', url, true)
-  //     xhr.responseType = type ? type : 'arraybuffer'
-  //     xhr.send(null)
-  //   })
-  // }
-  static download(url, cback) {
-    const xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function () {
-      if (xhr.readyState === XMLHttpRequest.DONE) {
+  static downloadAsync(url, type) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState !== XMLHttpRequest.DONE) {
+          return;
+        }
+
         if (xhr.status === 200) {
+          if (type) {
+            return resolve(xhr.response);
+          }
+
           const buffer = xhr.response;
           const byteArray = new Uint8Array(buffer);
           const array = Array.from(byteArray);
 
-          if (!array || !array.length) {
-            return cback('empty shader');
+          if (array && array.length) {
+            return resolve(array);
           }
 
-          return cback(null, array);
+          return reject(new Error(`Empty data for ${url}`));
         }
-        const errMsg = ['code', xhr.status].join(' ');
-        return cback(errMsg);
-      }
-    };
-    xhr.open('GET', url, true);
-    xhr.responseType = 'arraybuffer';
-    xhr.send(null);
+
+        const errMsg = `Code ${xhr.status} for ${url}`;
+        reject(new Error(errMsg));
+      };
+
+      xhr.open('GET', url, true);
+      xhr.responseType = type || 'arraybuffer';
+      xhr.send(null);
+    });
   }
 
   static handleString(next) {
@@ -595,8 +616,7 @@ export default class Utils {
 
     loadContainer.style.textAlign = 'center';
     loadContainer.style.margin = '50px auto 0 auto';
-    loadContainer.style.maxWidth = '1000px';
-    loadContainer.style.width = '100%';
+    loadContainer.style.width = '585px';
     loadContainer.style.padding = '5%';
     loadContainer.style.borderRadius = '10px';
 
@@ -610,7 +630,6 @@ export default class Utils {
       subtitle.innerText = ['To use ', InitParams.appname, ' you should have BEAM Web Wallet installed and allow connection.'].join('');
 
       if (headless) {
-        loadContainer.style.backgroundColor = 'rgba(3, 91, 133, 0.95)';
         loadContainer.style.backgroundColor = 'rgba(3, 91, 133, 0.95)';
         const container = document.getElementById('container');
         if (container) {
@@ -657,7 +676,6 @@ export default class Utils {
       reconnectButton.addEventListener('click', onReconnect);
 
       const installButton = document.createElement('button');
-      installButton.id = 'btn_install';
       installButton.innerText = 'Install BEAM Web Wallet';
       installButton.style.height = '44px';
       installButton.style.padding = '13px 30px';
@@ -838,6 +856,7 @@ export default class Utils {
   }
 
   static formatAmountFixed(amount, fixed) {
+    if (amount == 0) return '0';
     const str = (amount / 100000000).toFixed(fixed);
     if (parseFloat(str) == 0) {
       let res = '< 0.';

@@ -15,6 +15,7 @@ import * as mainActions from '@app/containers/Pools/store/actions';
 import { getFilterPools, isInArray } from '@core/appUtils';
 import { styled } from '@linaria/react';
 import { IPoolCard } from '@core/types';
+import {selectIsLoaded} from '@app/shared/store/selectors';
 
 const Sort = styled.ul`
   position: relative;
@@ -105,6 +106,7 @@ export const PoolsList = () => {
   const storage = useSelector(selectFavorites());
   const dispatch = useDispatch();
   const myPools = useSelector(selectMyPools());
+  const isLoaded = useSelector(selectIsLoaded);
 
   useEffect(() => {
     if (!favorites.length) {
@@ -117,6 +119,7 @@ export const PoolsList = () => {
 
   const handleSort = (filter) => {
     dispatch(mainActions.setFilter(filter));
+    // console.log(1)
     dispatch(mainActions.loadAppParams.request(null));
     dispatch(mainActions.setIsLoading(true));
   };
@@ -128,11 +131,11 @@ export const PoolsList = () => {
     },
     [data, poolsList],
   );
-  // useMemo(() => {
+  // useEffect(() => {
   //   if (favorites.length === 0 || favorites.length === undefined || favorites.length === null) {
   //     handleSort('all');
   //   }
-  // }, [favorites.length]);
+  // }, []);
 
   useMemo(() => {
     setPoolList(getFilterPools(filtered, data));
@@ -163,13 +166,13 @@ export const PoolsList = () => {
                     {SORT.map((el) => (
                       <SortItem key={el.value}>
                         <SortItemLink
-                key={el.value}
-                active={currentFilter === el.value}
-                onClick={() => handleSort(el.value)}
-                disabled={!!((el.value === 'fav' && !favorites.length) || (el.value === 'my' && !myPools.length))}
-              >
-                {el.name}
-              </SortItemLink>
+                          key={el.value}
+                          active={currentFilter === el.value}
+                          onClick={() => handleSort(el.value)}
+                          disabled={!!((el.value === 'fav' && !favorites.length) || (el.value === 'my' && !myPools.length))}
+                        >
+                          {el.name}
+                        </SortItemLink>
                       </SortItem>
                     ))}
                   </Sort>

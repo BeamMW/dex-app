@@ -30,6 +30,18 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.(woff|woff2|eot|ttf|otf)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'assets/fonts/', // the fonts will output in this directory
+            },
+          },
+        ],
+      },
+      {
         test: /\.tsx?$/,
         use: ['babel-loader', '@linaria/webpack-loader'],
         exclude: /node_modules/,

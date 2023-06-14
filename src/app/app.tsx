@@ -15,7 +15,7 @@ import {
   PoolsContainer, CreatePool, AddLiquidity, TradePool, WithdrawPool,
 } from '@app/containers';
 import { ROUTES } from '@app/shared/constants';
-import { AlertWallet } from '@app/shared/components';
+import {AlertWallet, Loader} from '@app/shared/components';
 import Utils from '@core/utils.js';
 import { selectIsHeadless, selectOptions } from '@app/containers/Pools/store/selectors';
 import { selectIsLoaded } from '@app/shared/store/selectors';
@@ -56,6 +56,7 @@ const App = () => {
   const navigateURL = useSelector(sharedSelectors.selectRouterLink());
   const isHeadless = useSelector(selectIsHeadless());
   const isLoaded = useSelector(selectIsLoaded());
+  const iFrameDetection = window !== window.parent;
   const isWeb = Utils.isWeb();
 
   useEffect(() => {
@@ -69,7 +70,7 @@ const App = () => {
     <>
       {isLoaded ? (
         <Scrollbars renderThumbVertical={(props) => <div {...props} className={trackStyle} />}>
-          {isHeadless && isWeb ? <AlertWallet /> : null}
+          {isHeadless && isWeb && !iFrameDetection ? <AlertWallet /> : null}
           {content}
           <ToastContainer
             position="bottom-right"
@@ -93,7 +94,7 @@ const App = () => {
             }}
           />
         </Scrollbars>
-      ) : null}
+      ) : <Loader />}
     </>
   );
 };

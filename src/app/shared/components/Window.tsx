@@ -66,7 +66,6 @@ const Window: React.FC<WindowProps> = ({
   }, [navigate]);
   return (
     <>
-      {headless ? <AlertWallet></AlertWallet> : null}
       <Container bgColor={Utils.getStyles().background_main} ref={rootRef}>
         {createPool && (
           <ButtonWrapper margin={Utils.isWeb()}>

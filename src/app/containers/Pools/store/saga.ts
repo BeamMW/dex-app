@@ -23,8 +23,8 @@ import { toast } from 'react-toastify';
 import { navigate } from '@app/shared/store/actions';
 import { ROUTES } from '@app/shared/constants';
 import Utils from '@core/utils.js';
+import { actions as Shared } from '@app/shared/store/index';
 import { actions } from '.';
-import sharedSaga from '@app/shared/store/saga';
 
 export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.request>): Generator {
   try {
@@ -43,9 +43,9 @@ export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.
     const newPoolList: IPoolCard[] = poolsList.map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList));
     const myPools = newPoolList.filter((el) => el.creator);
     yield put(mainActions.setMyPools(myPools));
-    const filteredPools = (
-      yield onFilter(newPoolList, filter, favoritesLocal).map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList))) as IPoolCard[];
+    const filteredPools = onFilter(newPoolList, filter, favoritesLocal).map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList)) as IPoolCard[];
     yield put(mainActions.setPoolsList(filteredPools));
+    yield put(Shared.setIsLoaded(true));
   } catch (e) {
     // @ts-ignore
     yield put(mainActions.loadAppParams.failure(e));

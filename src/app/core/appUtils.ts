@@ -6,8 +6,8 @@ import { ASSET_BEAM, GROTHS_IN_BEAM } from '@app/shared/constants';
 import Utils from '@app/core/utils.js';
 import { start } from '@app/shared/store/saga';
 import { toast } from 'react-toastify';
+import { actions as mainActions } from '@app/containers/Pools/store';
 import store from '../../index';
-import {actions as mainActions} from '@app/containers/Pools/store';
 
 const LENGTH_MAX = 6;
 
@@ -131,7 +131,12 @@ export function checkTxStatus(txId: string, txList: ITxStatus[]) {
 export function setDataRequest(data) {
   return { ...data, bPredictOnly: 0 };
 }
-export function onFilter(data: IPoolCard[], filter, favorite: IPoolCard[]) {
+export function onFilter(data: IPoolCard[], filter = 'all', favorite: IPoolCard[]) {
+  console.log({
+    data,
+    filter,
+    favorite
+  })
   switch (filter) {
     case 'all': {
       return data.sort((a, b) => b.ctl - a.ctl);

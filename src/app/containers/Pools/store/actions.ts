@@ -64,3 +64,8 @@ export const onFavorites = createAsyncAction(
   MainActionsTypes.FAVORITES_SUCCESS,
   MainActionsTypes.FAVORITES_FAILURE,
 )<IWithdraw, any>();
+export const onFilterz = createAsyncAction(
+  MainActionsTypes.FILTERZ,
+  MainActionsTypes.FILTERZ_SUCCESS,
+  MainActionsTypes.FILTERZ_FAILURE,
+)<IWithdraw, any>();

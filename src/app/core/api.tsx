@@ -4,7 +4,7 @@ import {
 } from '@core/types';
 
 // const CID = '729fe098d9fd2b57705db1a05a74103dd4b891f535aef2ae69b47bcfdeef9cbf';
-const CID = '4e0a28b2b2a83b811ad17ba8228b0645dbce2969fd453a68fbc0b60bc8860e02'; // dappnet
+export const CID = '4e0a28b2b2a83b811ad17ba8228b0645dbce2969fd453a68fbc0b60bc8860e02'; // dappnet
 const onMakeTx = (err, sres, full) => {
   if (err) {
     console.log(err, 'Failed to generate transaction request');
@@ -17,11 +17,17 @@ const onMakeTx = (err, sres, full) => {
 };
 
 export function LoadAssetsList<T = any>(payload): Promise<T> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     Utils.invokeContract(
       `action=view_all_assets,cid=${CID}`,
       (error, result) => {
+        if (error) {
+          reject(error);
+          console.log('errrrrrr');
+        }
         resolve(result.res);
+        console.log(result);
+        console.log('apiREs');
       },
       payload || null,
     );
