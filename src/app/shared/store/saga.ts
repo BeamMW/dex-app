@@ -1,4 +1,4 @@
-import { call, take } from 'redux-saga/effects';
+import { call, select, take } from 'redux-saga/effects';
 
 import { eventChannel, END } from 'redux-saga';
 import { setSystemState } from '@app/shared/store/actions';
@@ -6,6 +6,7 @@ import { actions as mainActions } from '@app/containers/Pools/store/index';
 
 import Utils from '@core/utils.js';
 import { setTxStatus } from '@app/containers/Pools/store/actions';
+import { SharedStateType } from '@app/shared/interface';
 import store from '../../../index';
 
 const iFrameDetection = window !== window.parent;
@@ -37,7 +38,7 @@ export function remoteEventChannel() {
           if (!result.error) {
             emitter(full);
           }
-        }
+        },
       },
       (err) => {
         if (err) {
@@ -61,10 +62,13 @@ function* sharedSaga() {
       const payload: any = yield take(remoteChannel);
       switch (payload.id) {
         case 'ev_system_state':
-          console.log(1);
+          const appParams = (yield select()) as { main: any, shared: SharedStateType };
           store.dispatch(setSystemState(payload.result));
-          store.dispatch(mainActions.loadAppParams.request(null));
-          // store.dispatch(mainActions.loadPoolsList.request(null));
+
+          if (appParams.shared.isLoaded) {
+            store.dispatch(mainActions.loadAppParams.request(null));
+          }
+
           break;
 
         case 'ev_txs_changed':
