@@ -23,14 +23,10 @@ export function LoadAssetsList<T = any>(payload): Promise<T> {
       (error, result) => {
         if (error) {
           reject(error);
-          console.log('errrrrrr');
         }
         resolve(result.res);
-        console.log(result);
-        console.log('apiREs');
       },
-      payload || null,
-    );
+        payload ? payload : null);
   });
 }
 
