@@ -21,7 +21,7 @@ export function start(): void {
       }
       if (result) {
         store.dispatch(mainActions.loadAppParams.request(bytes));
-        store.dispatch(mainActions.loadPoolsList.request(null));
+        // store.dispatch(mainActions.loadPoolsList.request(null));
       }
     });
   });
@@ -62,6 +62,7 @@ function* sharedSaga() {
       const payload: any = yield take(remoteChannel);
       switch (payload.id) {
         case 'ev_system_state':
+          // eslint-disable-next-line no-case-declarations
           const appParams = (yield select()) as { main: any, shared: SharedStateType };
           store.dispatch(setSystemState(payload.result));
 
