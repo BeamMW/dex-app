@@ -9,7 +9,7 @@ import { setTxStatus } from '@app/containers/Pools/store/actions';
 import store from '../../../index';
 
 const iFrameDetection = window !== window.parent;
-export function start(): void {
+export  function start(): void {
   Utils.download('./amm.wasm', (err, bytes) => {
     Utils.callApi('ev_subunsub', {
       ev_txs_changed: true,
@@ -29,7 +29,7 @@ export function remoteEventChannel() {
   Utils.initialize(
     {
       appname: 'DEX',
-      min_api_version: '6.2',
+      min_api_version: '7.3',
       headless: !iFrameDetection || !!Utils.isHeadless(),
       apiResultHandler: (error, result, full) => {
         console.log('api result data: ', result, full);
