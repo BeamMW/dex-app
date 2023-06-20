@@ -26,30 +26,36 @@ export function start(): void {
     });
   });
 }
+
 export function remoteEventChannel() {
   return eventChannel((emitter) => {
-    Utils.initialize(
-      {
-        appname: 'DEX',
-        min_api_version: '7.2',
-        headless: !iFrameDetection || !!Utils.isHeadless(),
-        apiResultHandler: (error, result, full) => {
-          console.log('api result data: ', result, full);
-          if (!result.error) {
-            emitter(full);
-          }
-        },
-      },
-      (err) => {
-        if (err) {
-          console.log(err);
+    Utils.initialize({
+      appname: 'Beam Dex App',
+      min_api_version: '7.2',
+      headless: !iFrameDetection || !!Utils.isHeadless(),
+      apiResultHandler: (error, result, full) => {
+        console.log('api result data: ', result, full);
+        if (!result.error) {
+          emitter(full);
         }
-        start();
       },
-    );
+    }, (err) => {
+      Utils.download('./amm.wasm', (err, bytes) => {
+        console.log(bytes.length);
+        Utils.callApi('ev_subunsub', { ev_txs_changed: true, ev_system_state: true },
+          (error, result, full) => {
+            if (result) {
+              store.dispatch(mainActions.loadAppParams.request(bytes));
+              // store.dispatch(mainActions.loadRate.request());
+            }
+          });
+      });
+    });
+
     const unsubscribe = () => {
       emitter(END);
     };
+
     return unsubscribe;
   });
 }
