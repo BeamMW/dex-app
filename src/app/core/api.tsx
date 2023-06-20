@@ -21,10 +21,6 @@ export function LoadAssetsList<T = any>(payload): Promise<T> {
     Utils.invokeContract(
       `action=view_all_assets,cid=${CID}`,
       (error, result) => {
-        if (error) {
-          reject(error);
-          console.log('errrrrrr');
-        }
         resolve(result.res);
         console.log(result);
         console.log('apiREs');

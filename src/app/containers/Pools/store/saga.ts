@@ -32,7 +32,7 @@ export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.
     const favoritesLocal = JSON.parse(localStorage.getItem('favorites'));
     const filter = yield select(selectFilter());
     const assetsList = (yield call(LoadAssetsList, action.payload ? action.payload : null)) as IAsset[];
-    console.log(assetsList.length)
+    console.log(assetsList.length);
     yield assetsList.forEach((asset) => {
       asset.parsedMetadata = parseMetadata(asset.metadata);
     });
