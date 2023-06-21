@@ -10,13 +10,12 @@
     display: flex;
     justify-content: space-between;
 
-  .poop-list-sort-wrapper {
-    display: flex;
-    max-width: 800px;
-    width: 100%;
-    justify-content: space-between;
+    .poop-list-sort-wrapper {
+      display: flex;
+      max-width: 800px;
+      width: 100%;
+      justify-content: space-between;
     }
-
 
     input {
       width: 300px;
@@ -54,34 +53,33 @@
           }
 
           .asset-icon-wrapper {
-
-            .asset-icon{
+            .asset-icon {
               position: absolute;
-              top:0;
+              top: 0;
               right: 0;
               width: 40px;
               height: 40px;
               border-radius: 50%;
               background: gray;
 
-              &.main{
+              &.main {
                 right: 20px;
               }
-              &.secondary{
+              &.secondary {
                 background: white;
               }
             }
           }
         }
 
-        .pool-card-content{
+        .pool-card-content {
           margin: 16px 0;
-          .asset-count{
+          .asset-count {
             color: var(--color-green);
             font-weight: bold;
             margin-bottom: 8px;
           }
-          .asset-exchange-rate:not(:last-child){
+          .asset-exchange-rate:not(:last-child) {
             margin-bottom: 8px;
           }
         }

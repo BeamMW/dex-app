@@ -73,6 +73,7 @@ import IconLoader from './icon-loader.svg';
 
 import IconFavorite from './icon-favorite.svg';
 import IconFavoriteFilled from './icon-favorite-filled.svg';
+import IconNPHAsset from './icon-nph.svg';
 
 export {
   IconReceive,
@@ -141,4 +142,5 @@ export {
   IconLoader,
   IconFavorite,
   IconFavoriteFilled,
+  IconNPHAsset
 };

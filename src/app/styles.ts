@@ -18,6 +18,12 @@ css`
       --color-disabled: #8da1ad;
       --color-select-list: rgba(0, 0, 0, 0.8);
       --color-opasity-0-1: rgba(255, 255, 255, 0.1);
+      @media (max-width: 480px) {
+        #btn_install {
+       margin-left: 0 !important;
+          margin-top: 10px;
+        }
+      }
     }
 
     * {
@@ -26,65 +32,71 @@ css`
     }
     @font-face {
       font-family: 'ProximaNova';
-      src: url('../assets/fonts/ProximaNova-Regular.ttf');
-      font-weight: 400;
+      src: url('../assets/fonts/ProximaNova-Regular.woff2') format('woff2'),
+      url('../assets/fonts/ProximaNova-Regular.woff') format('woff'),
+      url('../assets/fonts/ProximaNova-Regular.ttf') format('truetype');
+      font-weight: normal;
       font-style: normal;
+      font-display: swap;
     }
 
     @font-face {
       font-family: 'ProximaNova';
-      src: url('/assets/fonts/ProximaNova-RegularIt.ttf');
-      font-weight: 400;
+      src: url('../assets/fonts/ProximaNova-RegularIt.woff2') format('woff2'),
+      url('../assets/fonts/ProximaNova-RegularIt.woff') format('woff'),
+      url('../assets/fonts/ProximaNova-RegularIt.ttf') format('truetype');
+      font-weight: normal;
       font-style: italic;
+      font-display: swap;
     }
 
     @font-face {
-      font-family: 'ProximaNova';
-      src: url('/assets/fonts/ProximaNova-Semibold.ttf');
+      src: url('../assets/fonts/ProximaNova-Semibold.woff2') format('woff2'),
+      url('../assets/fonts/ProximaNova-Semibold.woff') format('woff'),
+      url('../assets/fonts/ProximaNova-Semibold.ttf') format('truetype');
       font-weight: 600;
       font-style: normal;
+      font-display: swap;
     }
 
     @font-face {
       font-family: 'ProximaNova';
-      src: url('/assets/fonts/ProximaNova-Bold.ttf');
-      font-weight: 700;
+      src: url('../assets/fonts/ProximaNova-Bold.woff2') format('woff2'),
+      url('../assets/fonts/ProximaNova-Bold.woff') format('woff'),
+      url('../assets/fonts/ProximaNova-Bold.ttf') format('truetype');
+      font-weight: bold;
       font-style: normal;
+      font-display: swap;
     }
 
     @font-face {
       font-family: 'SFProDisplay';
-      src: url('/assets/fonts/SFProDisplay-Regular.ttf');
-      font-weight: 400;
+      src: url('../assets/fonts/SFProDisplay-Regular.woff2') format('woff2'),
+      url('../assets/fonts/SFProDisplay-Regular.woff') format('woff'),
+      url('../assets/fonts/SFProDisplay-Regular.ttf') format('truetype');
+      font-weight: normal;
       font-style: normal;
+      font-display: swap;
     }
 
     @font-face {
       font-family: 'SFProDisplay';
-      src: url('/assets/fonts/SFProDisplay-RegularItalic.ttf');
-      font-weight: 400;
-      font-style: italic;
+      src: url('../assets/fonts/SFUIDisplay-Medium.woff2') format('woff2'),
+      url('../assets/fonts/SFUIDisplay-Medium.woff') format('woff'),
+      url('../assets/fonts/SFUIDisplay-Medium.ttf') format('truetype');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
     }
 
     @font-face {
       font-family: 'SFProDisplay';
-      src: url('/assets/fonts/SFUIDisplay-Medium.otf');
-      font-weight: 600;
+      src: url('../assets/fonts/SFProDisplay-Bold.woff2') format('woff2'),
+      url('../assets/fonts/SFProDisplay-Bold.woff') format('woff'),
+      url('../assets/fonts/SFProDisplay-Bold.ttf') format('truetype');
+      font-weight: bold;
       font-style: normal;
-    }
-
-    @font-face {
-      font-family: 'SFProDisplay';
-      src: url('/assets/fonts/SFProDisplay-Bold.ttf');
-      font-weight: 700;
-      font-style: normal;
-    }
-
-    @font-face {
-      font-family: 'SFProDisplay';
-      src: url('/assets/fonts/SFProDisplay-Bold.ttf');
-      font-weight: 700;
-      font-style: normal;
+      font-display: swap;
     }
 
     html,
@@ -92,7 +104,7 @@ css`
       margin: 0;
       padding: 0;
       height: 100%;
-      min-width: 860px;
+      min-width: 375px;
       font-family: 'ProximaNova', 'SFProDisplay', sans-serif;
       font-weight: 600;
     }
@@ -130,5 +142,6 @@ css`
       margin: 0;
       border-collapse: inherit;
     }
+  }
   }
 `;

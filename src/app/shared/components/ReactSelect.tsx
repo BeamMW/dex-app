@@ -9,22 +9,28 @@ const AssetsId = styled.span`
   font-weight: 400;
   font-size: 14px;
   line-height: 14px;
-display: flex;
-margin-left: 4px;
-color: rgba(255,255,255, 0.7);
-text-transform: lowercase;
+  display: flex;
+  margin-left: 4px;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: lowercase;
 `;
 interface IReactSelectProps extends Props {
   options: IOptions[];
   onChange: (any) => void;
   isFilter?: boolean;
-  isIcon?: boolean
-  customPrefix?: string,
-  ref?
+  isIcon?: boolean;
+  customPrefix?: string;
+  ref?;
 }
 
 const ReactSelect = ({
-  options, onChange, isFilter, isIcon, ref, customPrefix = 'custom-select', ...rest
+  options,
+  onChange,
+  isFilter,
+  isIcon,
+  ref,
+  customPrefix = 'custom-select',
+  ...rest
 }: IReactSelectProps) => {
   const {
     Option, DropdownIndicator, ClearIndicator, SingleValue,
@@ -36,14 +42,15 @@ const ReactSelect = ({
       // @ts-ignore
       <Option {...props}>
         <>
-          {isIcon
-            ? (
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <AssetIcon asset_id={value} />
-                <span>{label}</span>
-                <AssetsId style={{}}>{`(id:${value})`}</AssetsId>
-              </div>
-            ) : <span>{label}</span> }
+          {isIcon ? (
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <AssetIcon asset_id={value} />
+              <span>{label}</span>
+              <AssetsId style={{}}>{`(id:${value})`}</AssetsId>
+            </div>
+          ) : (
+            <span>{label}</span>
+          )}
         </>
       </Option>
     );
@@ -55,14 +62,15 @@ const ReactSelect = ({
       // @ts-ignore
       <SingleValue {...props}>
         <>
-          {isIcon
-            ? (
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <AssetIcon asset_id={data.value} />
-                <span>{data.label}</span>
-                <AssetsId style={{}}>{`(id:${data.value})`}</AssetsId>
-              </div>
-            ) : <span>{data.label}</span>}
+          {isIcon ? (
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <AssetIcon asset_id={data.value} />
+              <span>{data.label}</span>
+              <AssetsId style={{}}>{`(id:${data.value})`}</AssetsId>
+            </div>
+          ) : (
+            <span>{data.label}</span>
+          )}
         </>
       </SingleValue>
     );
@@ -97,6 +105,7 @@ const ReactSelect = ({
       isSearchable
       ref={ref}
       onChange={onChange}
+      noOptionsMessage={({ inputValue }) => (!inputValue ? noOptionsText : 'No assets were found')}
       components={{
         Option: IconOption,
         DropdownIndicator: IndicatorSVG,

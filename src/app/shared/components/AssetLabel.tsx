@@ -4,11 +4,11 @@ import AssetIcon from '@app/shared/components/AssetsIcon';
 import { fromGroths } from '@core/appUtils';
 
 interface AssetLabeProps {
-  title:string,
-  assets_id: number,
-  amount?: number,
-  variant?: 'regular' | 'predict'
-  id?: boolean
+  title?: string;
+  assets_id: number;
+  amount?: number;
+  variant?: 'regular' | 'predict';
+  id?: boolean;
 }
 // TODO: LABEL POSITION
 const AssetStyled = styled.div`
@@ -17,14 +17,13 @@ const AssetStyled = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  
 `;
 const RegularTitleStyled = styled.span`
   font-style: normal;
   font-weight: 400;
   font-size: 20px;
   line-height: 20px;
-  color: rgba(255,255,255, 0.7);
+  color: rgba(255, 255, 255, 0.7);
   text-transform: uppercase;
 `;
 const Amount = styled(RegularTitleStyled)`
@@ -46,7 +45,7 @@ const PredictTitleStyled = styled(RegularTitleStyled)`
 const AssetsId = styled(PredictTitleStyled)`
   display: flex;
   margin-left: 4px;
-  color: rgba(255,255,255, 0.7);
+  color: rgba(255, 255, 255, 0.7);
   text-transform: lowercase;
 `;
 // const AssetsId = styled.h5`
@@ -55,7 +54,7 @@ const AssetsId = styled(PredictTitleStyled)`
 // `;
 const AssetLabel = ({
   title, assets_id, amount, variant = 'regular', id = true,
-}:AssetLabeProps) => {
+}: AssetLabeProps) => {
   const TitleComponent = {
     regular: RegularTitleStyled,
     predict: PredictTitleStyled,

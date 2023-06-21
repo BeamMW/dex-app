@@ -2,6 +2,12 @@ import {
   IAsset, IOptions, IPoolCard, IPredict, ITxStatus, Kind,
 } from '@core/types';
 import { ASSET_BEAM, GROTHS_IN_BEAM } from '@app/shared/constants';
+// eslint-disable-next-line import/extensions
+import Utils from '@app/core/utils.js';
+import { start } from '@app/shared/store/saga';
+import { toast } from 'react-toastify';
+import { actions as mainActions } from '@app/containers/Pools/store';
+import store from '../../index';
 
 const LENGTH_MAX = 6;
 
@@ -96,9 +102,6 @@ export const parsePoolMetadata = (poolCard, aid1, aid2, assetList: IAsset[]) => 
 };
 
 export function fromGroths(value: number): string | number {
-  if (value < GROTHS_IN_BEAM) {
-    return value;
-  }
   return value && value !== 0 ? value / GROTHS_IN_BEAM : 0;
 }
 
@@ -128,7 +131,12 @@ export function checkTxStatus(txId: string, txList: ITxStatus[]) {
 export function setDataRequest(data) {
   return { ...data, bPredictOnly: 0 };
 }
-export function onFilter(data: IPoolCard[], filter, favorite: IPoolCard[]) {
+export function onFilter(data: IPoolCard[], filter = 'all', favorite: IPoolCard[]) {
+  console.log({
+    data,
+    filter,
+    favorite
+  })
   switch (filter) {
     case 'all': {
       return data.sort((a, b) => b.ctl - a.ctl);
@@ -143,7 +151,7 @@ export function onFilter(data: IPoolCard[], filter, favorite: IPoolCard[]) {
       return data.filter((el) => !el.ctl);
     }
     case 'fav': {
-      return favorite;
+      return data.filter((item) => favorite.some((item2) => item.aid1 === item2.aid1 && item.aid2 === item2.aid2 && item.kind === item2.kind));
     }
     default:
       return data.sort((a, b) => b.ctl - a.ctl);
@@ -161,13 +169,13 @@ export const onPredictValue = (value, swap: boolean, predict: IPredict) => {
   }
   return fromGroths(predict.tok2);
 };
-export const getFilterPools = (value: IOptions,
-  data: IPoolCard[]): IPoolCard[] => {
+export const getFilterPools = (value: IOptions, data: IPoolCard[]): IPoolCard[] => {
   let newList = [];
   if (value !== null || undefined) {
-    newList = data.filter((el) => el.aid1 === value.value || el.aid2 === value.value);
+    newList = data.filter((el) => el.aid1 === value.value || el.aid2 === value.value || el['lp-token'] === value.value);
     return newList.length === 0 ? null : newList;
-  } return data;
+  }
+  return data;
 };
 
 export const getTotalFee = (daoFee: number, poolFee: number) => daoFee + poolFee;
@@ -215,7 +223,7 @@ export function convertLowAmount(explicitNum) {
 export function isInArray(card, arr: IPoolCard[]) {
   if (card && arr) {
     if (card.isArray) {
-      card.map((item:IPoolCard) => item.aid1 === card.aid1 && item.aid2 === card.aid2 && item.kind === card.kind);
+      card.map((item: IPoolCard) => item.aid1 === card.aid1 && item.aid2 === card.aid2 && item.kind === card.kind);
     } else {
       if (arr.some((e) => e.aid1 === card.aid1 && e.aid2 === card.aid2 && e.kind === card.kind)) {
         return true;
@@ -225,4 +233,34 @@ export function isInArray(card, arr: IPoolCard[]) {
     return false;
   }
   return false;
+}
+
+export function getLPToken(poolCard: IPoolCard, assets: IAsset[]): IAsset {
+  let currentLpToken = null;
+  if (poolCard && assets) {
+    currentLpToken = assets.find((el) => el.aid === poolCard['lp-token']);
+    return currentLpToken;
+  }
+  return currentLpToken;
+}
+
+export function setStorage() {
+  const fav = JSON.parse(localStorage.getItem('favorites'));
+  if (!fav) {
+    localStorage.setItem('favorites', JSON.stringify([]));
+  }
+  return fav;
+}
+
+export async function onSwitchToApi() {
+  if (await Utils.switchToWebAPI()) {
+    await start()
+      .then(() => {
+        store.dispatch(mainActions.setIsHeadless(false));
+        toast('Your wallet is connected');
+      })
+      .catch((e) => {
+        toast('Sorry, wallet not connected');
+      });
+  }
 }

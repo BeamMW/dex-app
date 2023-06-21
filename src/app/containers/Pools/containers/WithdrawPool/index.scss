@@ -1,11 +1,11 @@
-.amount-wrapper{
+.amount-wrapper {
   display: flex;
-  .amount-title{
+  .amount-title {
     margin-right: 24px;
     max-width: 100px;
     width: 100%;
   }
-  .amount-value{
-    color:var(  --color-green)
+  .amount-value {
+    color: var(--color-green);
   }
 }
