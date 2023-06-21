@@ -20,7 +20,7 @@ export function start(): void {
         console.log(err);
       }
       if (result) {
-        store.dispatch(mainActions.loadAppParams.request(bytes));
+        // store.dispatch(mainActions.loadAppParams.request(bytes));
         // store.dispatch(mainActions.loadPoolsList.request(null));
       }
     });
@@ -46,7 +46,7 @@ export function remoteEventChannel() {
           (error, result, full) => {
             if (result) {
               store.dispatch(mainActions.loadAppParams.request(bytes));
-              // store.dispatch(mainActions.loadRate.request());
+              store.dispatch(mainActions.loadPoolsList.request(bytes));
             }
           });
       });
@@ -66,24 +66,24 @@ function* sharedSaga() {
   while (true) {
     try {
       const payload: any = yield take(remoteChannel);
-      switch (payload.id) {
-        case 'ev_system_state':
-          // eslint-disable-next-line no-case-declarations
-          const appParams = (yield select()) as { main: any, shared: SharedStateType };
-          store.dispatch(setSystemState(payload.result));
-
-          if (appParams.shared.isLoaded) {
-            store.dispatch(mainActions.loadAppParams.request(null));
-          }
-
-          break;
-
-        case 'ev_txs_changed':
-          store.dispatch(setTxStatus(payload.result));
-          break;
-        default:
-          break;
-      }
+      // switch (payload.id) {
+      //   case 'ev_system_state':
+      //     // eslint-disable-next-line no-case-declarations
+      //     const appParams = (yield select()) as { main: any, shared: SharedStateType };
+      //     store.dispatch(setSystemState(payload.result));
+      //
+      //     if (appParams.shared.isLoaded) {
+      //       store.dispatch(mainActions.loadAppParams.request(null));
+      //     }
+      //
+      //     break;
+      //
+      //   case 'ev_txs_changed':
+      //     store.dispatch(setTxStatus(payload.result));
+      //     break;
+      //   default:
+      //     break;
+      // }
     } catch (err) {
       remoteChannel.close();
     }

@@ -82,7 +82,11 @@ export default class Utils {
         return reject();
       }
       if (Utils.isAndroid()) {
-        document.addEventListener('onCallWalletApiResult', (res) => apirescback(res.detail));
+        document.addEventListener('onCallWalletApiResult', (res) => {
+          console.log('onCallWallet');
+          console.log(res);
+          apirescback(res.detail);
+        });
       } else {
         window.BEAM.callWalletApiResult(apirescback);
       }
@@ -408,10 +412,10 @@ export default class Utils {
         const apivermin = params.min_api_version || '';
         const { appname } = params;
 
-        if (!Utils.isChrome()) {
-          Utils.showChromeDownload();
-          return false;
-        }
+        // if (!Utils.isChrome()) {
+        //   Utils.showChromeDownload();
+        //   return false;
+        // }
 
         if (headless) {
           Utils.showLoading({
