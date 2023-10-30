@@ -14,13 +14,77 @@ css`
       --color-darkest-blue: #032e49;
       --color-white: #ffffff;
       --color-gray: #8196a4;
-      --color-white: white;
+      //--color-white: white;
       --color-disabled: #8da1ad;
+      --color-select-list: rgba(0, 0, 0, 0.8);
+      --color-opasity-0-1: rgba(255, 255, 255, 0.1);
     }
 
     * {
       box-sizing: border-box;
       outline: none;
+    }
+    @font-face {
+      font-family: 'ProximaNova';
+      src: url('../assets/fonts/ProximaNova-Regular.ttf');
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'ProximaNova';
+      src: url('/assets/fonts/ProximaNova-RegularIt.ttf');
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    @font-face {
+      font-family: 'ProximaNova';
+      src: url('/assets/fonts/ProximaNova-Semibold.ttf');
+      font-weight: 600;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'ProximaNova';
+      src: url('/assets/fonts/ProximaNova-Bold.ttf');
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'SFProDisplay';
+      src: url('/assets/fonts/SFProDisplay-Regular.ttf');
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'SFProDisplay';
+      src: url('/assets/fonts/SFProDisplay-RegularItalic.ttf');
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    @font-face {
+      font-family: 'SFProDisplay';
+      src: url('/assets/fonts/SFUIDisplay-Medium.otf');
+      font-weight: 600;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'SFProDisplay';
+      src: url('/assets/fonts/SFProDisplay-Bold.ttf');
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    @font-face {
+      font-family: 'SFProDisplay';
+      src: url('/assets/fonts/SFProDisplay-Bold.ttf');
+      font-weight: 700;
+      font-style: normal;
     }
 
     html,
@@ -29,6 +93,8 @@ css`
       padding: 0;
       height: 100%;
       min-width: 860px;
+      font-family: 'ProximaNova', 'SFProDisplay', sans-serif;
+      font-weight: 600;
     }
 
     #root {

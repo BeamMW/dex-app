@@ -12,7 +12,7 @@ export function remoteEventChannel() {
   return eventChannel((emitter) => {
     Utils.initialize(
       {
-        appname: 'BEAM Faucet',
+        appname: 'DEX',
         min_api_version: '6.2',
         headless: false,
         apiResultHandler: (error, result, full) => {

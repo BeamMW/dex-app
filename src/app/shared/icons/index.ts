@@ -62,6 +62,17 @@ import SettingsIcon from './icon-settings.svg';
 import WalletIcon from './ic-wallet.svg';
 import ErrorSvg from './error-svg.svg';
 import TxSentOfflineMPOwnIcon from './icon-sent-own-offline.svg';
+import IconSwap from './icon-swap.svg';
+import IconPlus from './icon-plus.svg';
+import IconShieldChecked from './bxs-check-shield.svg';
+import IconExchangeTrade from './icon-exchange_trade.svg';
+import IconExchange from './icon-exchange.svg';
+import IconDropdownDown from './icon-arrow-dropdown-down.svg';
+import IconSearchResult from './icon-search-result.svg';
+import IconLoader from './icon-loader.svg';
+
+import IconFavorite from './icon-favorite.svg';
+import IconFavoriteFilled from './icon-favorite-filled.svg';
 
 export {
   IconReceive,
@@ -120,4 +131,14 @@ export {
   WalletIcon,
   ErrorSvg,
   TxSentOfflineMPOwnIcon,
+  IconSwap,
+  IconPlus,
+  IconShieldChecked,
+  IconExchangeTrade,
+  IconExchange,
+  IconDropdownDown,
+  IconSearchResult,
+  IconLoader,
+  IconFavorite,
+  IconFavoriteFilled,
 };

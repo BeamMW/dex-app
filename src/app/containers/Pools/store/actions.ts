@@ -1,6 +1,14 @@
 import { createAction, createAsyncAction } from 'typesafe-actions';
 import {
-  IAddLiquidity, IAsset, ICreatePool, IPoolCard, IPredict, ITrade, ITxStatus, IWithdraw,
+  IAddLiquidity,
+  IAsset,
+  ICreatePool,
+  IOptions,
+  IPoolCard,
+  IPredict,
+  ITrade,
+  ITxStatus,
+  IWithdraw,
 } from '@core/types';
 import { MainActionsTypes } from '@app/containers/Pools/store/constants';
 
@@ -8,10 +16,12 @@ export const setAssetsList = createAction(MainActionsTypes.SET_ASSETS_LIST)<IAss
 export const setPoolsList = createAction(MainActionsTypes.SET_POOLS_LIST)<IPoolCard[]>();
 export const setTxStatus = createAction(MainActionsTypes.SET_TX_STATUS)<ITxStatus[]>();
 export const setErrorMessage = createAction(MainActionsTypes.SET_ERROR_MESSAGE)<string | null>();
-export const setTransactionStatus = createAction(MainActionsTypes.SET_TRANSACTIONS_STATUS)<Number>();
+export const setTransactionStatus = createAction(MainActionsTypes.SET_TRANSACTIONS_STATUS)<number>();
 export const setPredict = createAction(MainActionsTypes.SET_PREDICT)<IPredict>();
 export const setCurrentPool = createAction(MainActionsTypes.SET_CURRENT_POOL)<IPoolCard>();
 export const setFilter = createAction(MainActionsTypes.SET_FILTER)<string>();
+export const setOptions = createAction(MainActionsTypes.SET_OPTIONS)<IOptions[]>();
+export const setFavorites = createAction(MainActionsTypes.SET_FAVORITES)<IPoolCard[]>();
 
 export const loadAppParams = createAsyncAction(
   MainActionsTypes.LOAD_PARAMS,
@@ -44,4 +54,9 @@ export const onWithdraw = createAsyncAction(
   MainActionsTypes.WITHDRAW,
   MainActionsTypes.WITHDRAW_SUCCESS,
   MainActionsTypes.WITHDRAW_FAILURE,
+)<IWithdraw, any>();
+export const onFavorites = createAsyncAction(
+  MainActionsTypes.FAVORITES,
+  MainActionsTypes.FAVORITES_SUCCESS,
+  MainActionsTypes.FAVORITES_FAILURE,
 )<IWithdraw, any>();

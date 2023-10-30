@@ -1,74 +1,46 @@
-.create-pool-wrapper{
-  width: 600px;
-  margin: 0 auto;
-  h2{
-    text-align: center;
-  }
-
-  .create-pool-assets-container{
-
-    .assets-selector-wrapper{
-      margin: 32px 0;
-      .asset-selector{
-        display: flex;
-        align-items: center;
-        margin-bottom: 24px;
-        justify-content: space-between;
-        .select-wrapper{
-          width: 130px;
-          height: 41px;
-          border: 1px solid;
-        }
-        input{
-          width: 450px;
-        }
-      }
-    }
-
-    .custom-select {
-      &__control{
-        background-color: var(--color-darkest-blue) !important;
-      }
-      &__menu{
-        background-color: var(--color-darkest-blue) !important;
-      }
-      &__single-value{
-        color: white;
-      }
-    }
-
-    .price-wrapper{
-      display: flex;
-      font-size: 18px;
-      .price-title{
-        margin-right: 24px;
-      }
-      .price-value{
-        color:var(  --color-green)
-      }
-    }
-
-
-    .fees-container{
-      margin: 32px 0;
-      .fees-wrapper{
-        border: 2px solid var(  --color-green);
-        padding: 24px;
-        .information{
-          margin-bottom: 24px;
-        }
-      }
-
-    }
-  }
-
-    .select-wrapper{
-      .select-content{
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-    }
-}
+    //
+    //.custom-select {
+    //  &__control{
+    //    background-color: var(--color-darkest-blue) !important;
+    //  }
+    //  &__menu{
+    //    background-color: var(--color-darkest-blue) !important;
+    //  }
+    //  &__single-value{
+    //    color: white;
+    //  }
+    //}
+    //
+    //.price-wrapper{
+    //  display: flex;
+    //  font-size: 18px;
+    //  .price-title{
+    //    margin-right: 24px;
+    //  }
+    //  .price-value{
+    //    color:var(  --color-green)
+    //  }
+    //}
+    //
+    //
+    //.fees-container{
+    //  margin: 32px 0;
+    //  .fees-wrapper{
+    //    border: 2px solid var(  --color-green);
+    //    padding: 24px;
+    //    .information{
+    //      margin-bottom: 24px;
+    //    }
+    //  }
+    //
+    //}
+    //
+    //.select-wrapper{
+    //  .select-content{
+    //    width: 100%;
+    //    height: 100%;
+    //    display: flex;
+    //    align-items: center;
+    //    justify-content: center;
+    //  }
+    //}

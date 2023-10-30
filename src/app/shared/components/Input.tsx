@@ -20,16 +20,17 @@ const ContainerStyled = styled.div<InputProps>`
 
 const InputStyled = styled.input<InputProps>`
   width: 100%;
-  height: 45px;
-  line-height: 40px;
+  height: 56px;
   padding: 15px;
   border: none;
   outline: none;
-  // background-color: transparent;
-  font-size: 14px;
+  background-color: transparent;
+  font-weight: 400;
+  font-size: 36px;
+  line-height: 36px;
   color: white;
   border-radius: 10px;
-  background-color: rgba(255, 255, 255, 0.05);
+  //background-color: rgba(255, 255, 255, 0.05);
 
   &::placeholder {
     transform: translateX(1px);
@@ -55,7 +56,7 @@ const InputStyled = styled.input<InputProps>`
   }
 
   &:focus {
-    background-color: rgba(255, 255, 255, 0.1);
+    //background-color: rgba(255, 255, 255, 0.1);
   }
 
   &.invalid {
@@ -74,15 +75,12 @@ const InputGrayStyled = styled(InputStyled)`
 `;
 
 const InputAmountStyled = styled(InputGrayStyled)<{ pallete: string }>`
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 0.34px;
   color: ${({ pallete }) => `var(--color-${pallete})`};
 `;
 
 const LabelStyled = styled.div<InputProps>`
   margin-top: 4px;
-  font-family: SFProDisplay;
+  font-family: 'SFProDisplay', sans-serif;
   font-size: 14px;
   font-style: italic;
   color: ${({ valid }) => (valid ? 'var(--color-gray)' : 'var(--color-red)')};

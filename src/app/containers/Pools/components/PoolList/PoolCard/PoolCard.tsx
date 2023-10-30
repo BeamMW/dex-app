@@ -1,78 +1,209 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
-import { IAsset, IPoolCard } from '@core/types';
+import { IPoolCard } from '@core/types';
 import {
-  fromGroths, getPoolKind, parseIntToNum, setDataRequest,
+  convertLowAmount,
+  fromGroths, getPoolKind, truncate,
 } from '@core/appUtils';
 import { ROUTES_PATH } from '@app/shared/constants';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import * as mainActions from '@app/containers/Pools/store/actions';
-import { Button } from '@app/shared/components';
+import { Button, Section } from '@app/shared/components';
 import { styled } from '@linaria/react';
-import { toast } from 'react-toastify';
+import {
+  IconExchange, IconExchangeTrade, IconFavorite, IconFavoriteFilled, IconReceive, IconShieldChecked,
+} from '@app/shared/icons';
+import AssetLabel from '@app/shared/components/AssetLabel';
 
 interface PoolCardType {
   data: IPoolCard;
-  assets: IAsset[];
+  isFavorite?: boolean;
 }
 
-const ButtonWrapper = styled.div`
+const HeaderCardWrapper = styled.div`
+  position: relative;
+  display: flex;
+  width: 100%;`;
+const TitleWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  align-self: center;
+  line-height: 17px;
+  margin-bottom: 20px;
+  &>span{
+    display: flex;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 17px;
+    letter-spacing: 3.11111px;
+    text-transform: uppercase;
+    color: white;
+  }
+`;
+const Title = styled.div`
+  display: flex;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 17px;
+  letter-spacing: 3.11111px;
+  text-transform: uppercase;
+  color: white;
+  
+`;
+const Fav = styled.div`
+ 
+  position: absolute;
+  align-items: center;
+  top: -3px;
+  right: -10px;
+  height: 22px;
   display: flex;
   justify-content: space-between;
-  flex-direction: column;
 `;
-export const PoolCard = ({ data, assets }: PoolCardType) => {
-  const nameToken1 = data.metadata1.N;
-  const nameToken2 = data.metadata2.N;
-  // const isCreator = !!data.creator
+const Kind = styled.div`
+  margin-right: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 14px;
+`;
+const AmountWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  height: 50px;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+`;
+const AssetAmount = styled.div`
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+  color:white`;
+const ControlWrapper = styled.div`
+
+  display: flex;
+  justify-content: space-between;
+  margin: 30px 0 20px 0;
+`;
+const Line = styled.div`
+width: 100%;
+  background-color: var(--color-opasity-0-1);
+  height: 1px;
+  border-radius: 2px;
+`;
+const SideLeftWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+`;
+const SideRightWrap = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+`;
+
+export const PoolCard = ({ data, isFavorite }: PoolCardType) => {
+  const nameToken1 = truncate(data.metadata1.UN);
+  const nameToken2 = truncate(data.metadata2.UN);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [poolIsEmpty, setPoolIsEmpty] = useState(true);
+  const currentCourseMain = `
+  1 ${nameToken2} = ${convertLowAmount(data.k1_2).toString().substr(0, 5)} ${nameToken1}`;
+  const currentCourseSecond = `
+  1 ${nameToken1} = ${truncate(convertLowAmount(data.k2_1).toString(), 5)} ${nameToken2}`;
+  const [exchange, setExchange] = useState(currentCourseMain);
+
+  useEffect(() => {
+    setPoolIsEmpty(
+      !!(!data.tok1 || !data.tok2),
+    );
+  }, []);
 
   const addLiquidityNavigation = useCallback(() => {
     dispatch(mainActions.setCurrentPool(data));
+    dispatch(mainActions.setPredict(null));
     navigate(ROUTES_PATH.POOLS.ADD_LIQUIDITY);
   }, [navigate]);
+
   const tradePoolNavigation = useCallback(() => {
     dispatch(mainActions.setCurrentPool(data));
+    dispatch(mainActions.setPredict(null));
     navigate(ROUTES_PATH.POOLS.TRADE_POOL);
   }, [navigate]);
 
-  const onWithdraw = (data) => {
-    dispatch(mainActions.onWithdraw.request(setDataRequest(data)));
+  const withdrawPoolNavigation = useCallback(() => {
+    dispatch(mainActions.setCurrentPool(data));
+    dispatch(mainActions.setPredict(null));
+    navigate(ROUTES_PATH.POOLS.WITHDRAW_POOL);
+  }, [navigate]);
+
+  const changeCourse = () => {
+    setExchange(exchange !== currentCourseMain ? currentCourseMain : currentCourseSecond);
   };
 
+  const handleFavorite = (card:IPoolCard) => {
+    dispatch(mainActions.onFavorites.request(card));
+  };
+  // TODO: break down into components
   return (
-    <div className="pool-card-wrapper">
-      <div className="pool-card">
-        <div className="pool-card-header">
-          <div className="pool-card-title">
+    <Section variant="card">
+      <HeaderCardWrapper>
+        <TitleWrapper>
+          <Title>
             {nameToken1}
+          </Title>
+          <span>
             {' '}
             /
+            {' '}
+          </span>
+          <Title>
             {nameToken2}
-          </div>
-          <div className="pool-fees">
-            fee:
-            {getPoolKind(data.kind)}
-          </div>
-          <div className="asset-icon-wrapper">
-            <div className="asset-icon main" />
-            <div className="asset-icon secondary" />
-          </div>
-        </div>
-        <div className="pool-card-content">
-          <div className="asset-count">{`${fromGroths(data.tok1)} ${nameToken1}`}</div>
-          <div className="asset-count">{`${fromGroths(data.tok2)} ${nameToken2}`}</div>
-          <div className="asset-exchange-rate">{`1 ${nameToken1} = ${parseIntToNum(data.k1_2)}  ${nameToken2}`}</div>
-          <div className="asset-exchange-rate">{`1 ${nameToken2} = ${parseIntToNum(data.k2_1)}  ${nameToken1}`}</div>
-        </div>
-        <ButtonWrapper>
-          <Button onClick={addLiquidityNavigation}>Add Liquidity</Button>
-          <Button onClick={tradePoolNavigation}>Trade</Button>
-          {data.ctl ? <Button onClick={() => onWithdraw(data)}>Withdraw</Button> : null}
-        </ButtonWrapper>
-      </div>
-    </div>
+          </Title>
+        </TitleWrapper>
+        <Fav>
+          <Kind>{`${getPoolKind(data.kind)}`}</Kind>
+          {isFavorite ? <IconFavoriteFilled onClick={() => handleFavorite(data)} /> : <IconFavorite onClick={() => handleFavorite(data)} />}
+        </Fav>
+      </HeaderCardWrapper>
+      <AmountWrapper>
+        {/* <AssetIcon asset_id={data.aid1} /> */}
+        {/* <AssetName>{nameToken1}</AssetName> */}
+        {/* <AssetIcon asset_id={data.aid2} /> */}
+        <SideLeftWrap>
+          <AssetLabel title={nameToken1} assets_id={data.aid1} id variant="predict" />
+          <AssetLabel title={nameToken2} assets_id={data.aid2} id variant="predict" />
+        </SideLeftWrap>
+        <SideRightWrap>
+          <AssetAmount>{fromGroths(data.tok1)}</AssetAmount>
+          <AssetAmount>{fromGroths(data.tok2)}</AssetAmount>
+        </SideRightWrap>
+      </AmountWrapper>
+      <Section variant="exchange">
+        {!poolIsEmpty ? (
+          <>
+            <div style={{ textTransform: 'uppercase' }}>{exchange}</div>
+            <Button icon={IconExchange} variant="icon" onClick={() => changeCourse()} />
+            {' '}
+
+          </>
+        )
+          : <Line />}
+      </Section>
+      <ControlWrapper>
+        <Button icon={IconShieldChecked} variant="control" onClick={addLiquidityNavigation}>add liquidity</Button>
+        <Button disabled={!!poolIsEmpty} icon={IconReceive} variant="control" pallete="blue" onClick={withdrawPoolNavigation}>withdraw</Button>
+      </ControlWrapper>
+      <Button variant="trade" icon={IconExchangeTrade} pallete="green" onClick={tradePoolNavigation} disabled={!!poolIsEmpty}>trade</Button>
+    </Section>
   );
 };
