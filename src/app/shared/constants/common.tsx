@@ -25,7 +25,7 @@ export const kindSelect = [
 
 export const SORT = [
   { name: 'All', value: 'all' },
-  { name: 'My', value: 'my' },
+  { name: 'Created', value: 'created' },
   { name: 'Liquid', value: 'liquid' },
   { name: 'Empty', value: 'empty' },
   { name: 'Favorites', value: 'fav' },

@@ -141,7 +141,7 @@ export function onFilter(data: IPoolCard[], filter = 'all', favorite: IPoolCard[
     case 'all': {
       return data.sort((a, b) => b.ctl - a.ctl);
     }
-    case 'my': {
+    case 'created': {
       return data.filter((el) => el.creator);
     }
     case 'liquid': {
