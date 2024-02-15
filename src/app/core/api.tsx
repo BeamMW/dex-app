@@ -2,9 +2,9 @@ import Utils from '@core/utils.js';
 import {
   IAddLiquidity, ICreatePool, IError, ITrade, ITxId, IWithdraw,
 } from '@core/types';
+import {CID} from "@app/shared/constants";
 
-const CID = '729fe098d9fd2b57705db1a05a74103dd4b891f535aef2ae69b47bcfdeef9cbf';
-// export const CID = '4e0a28b2b2a83b811ad17ba8228b0645dbce2969fd453a68fbc0b60bc8860e02'; // dappnet
+
 const onMakeTx = (err, sres, full) => {
   if (err) {
     console.log(err, 'Failed to generate transaction request');
@@ -69,6 +69,11 @@ export function AddLiquidityApi<T = any>({
   bPredictOnly = 1,
 }: IAddLiquidity): Promise<T> | any {
   return new Promise((resolve, reject) => {
+      console.log( aid1,
+          aid2,
+          kind,
+          val1,
+          val2,)
     Utils.invokeContract(
       `action=pool_add_liquidity,aid1=${aid1},aid2=${aid2},kind=${kind},val1=${val1},val2=${val2},bPredictOnly=${bPredictOnly},cid=${CID}`,
       (error, result, full) => {
@@ -86,11 +91,11 @@ export function AddLiquidityApi<T = any>({
   });
 }
 export function TradePoolApi<T = any>({
-  aid1, aid2, kind, val1_buy, bPredictOnly = 1,
+  aid1, aid2, kind, val1_buy, val2_pay, bPredictOnly = 1,
 }: ITrade): Promise<T> | any {
   return new Promise((resolve, reject) => {
     Utils.invokeContract(
-      `action=pool_trade,aid1=${aid1},aid2=${aid2},kind=${kind},val1_buy=${val1_buy},bPredictOnly=${bPredictOnly},cid=${CID}`,
+      `action=pool_trade,aid1=${aid1},aid2=${aid2},kind=${kind},val1_buy=${val1_buy || 0}, val2_pay=${val2_pay || 0},bPredictOnly=${bPredictOnly},cid=${CID}`,
       (error, result, full) => {
         if (error) {
           reject(error);
