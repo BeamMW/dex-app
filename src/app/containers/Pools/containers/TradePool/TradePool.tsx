@@ -112,6 +112,10 @@ export const TradePool = () => {
     initialValue: 0,
     validations: { isEmpty: true, isMax: fromGroths(currentTokAmount) },
   });
+  const amountSendInput = useInput({
+    initialValue: 0,
+    validations: { isEmpty: true, isMax: fromGroths(currentTokAmount) },
+  });
   const [requestData, setRequestData] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -127,14 +131,44 @@ export const TradePool = () => {
     setCurrentTokenAmount(!isSwap ? data.tok1 : data.tok2);
   }, [isSwap]);
 
+  const [lastChangedInput, setLastChangedInput] = useState<number>(1);
+
   useMemo(() => {
-    setRequestData({
-      aid1: currentToken,
-      aid2: currentToken === data.aid1 ? data.aid2 : data.aid1,
-      kind: data.kind,
-      val1_buy: toGroths(Number(amountInput.value)),
-    });
-  }, [amountInput.value, currentToken]);
+    if (lastChangedInput === 1) {
+      setRequestData({
+        aid1: currentToken,
+        aid2: currentToken === data.aid1 ? data.aid2 : data.aid1,
+        kind: data.kind,
+        val1_buy: toGroths(Number(amountInput.value)),
+      });
+    }
+  }, [amountInput.value, currentToken, lastChangedInput]);
+
+  useMemo(() => {
+    if (lastChangedInput === 2) {
+      setRequestData({
+        aid1: currentToken,
+        aid2: currentToken === data.aid1 ? data.aid2 : data.aid1,
+        kind: data.kind,
+        val2_pay: toGroths(Number(amountSendInput.value)),
+      });
+    }
+    console.log(amountInput.value, amountSendInput.value)
+  }, [amountSendInput.value, currentToken, lastChangedInput]);
+
+
+  useEffect(() => {
+    if (amountInput.value === "") {
+      amountSendInput.onPredict(0);
+    }
+  }, [amountInput]);
+
+  useEffect(() => {
+    if (amountSendInput.value === "") {
+      amountInput.onPredict(0);
+    }
+  }, [amountSendInput]);
+
 
   useMemo(() => {
     if (amountInput.isMax) {
@@ -142,7 +176,14 @@ export const TradePool = () => {
     } else if (amountInput.isValid) {
       dispatch(mainActions.onTradePool.request(requestData));
     }
-  }, [requestData, amountInput.value, amountInput.isValid]);
+  }, [requestData, amountInput.value, amountInput.isValid, amountSendInput.isValid]);
+  useMemo(() => {
+    if (amountSendInput.isMax) {
+      toast('Amount assets > MAX');
+    } else if (amountSendInput.isValid) {
+      dispatch(mainActions.onTradePool.request(requestData));
+    }
+  }, [requestData, amountSendInput.value, amountSendInput.isValid, amountSendInput.isValid]);
   useEffect(() => {
     if (data && assets) {
       setCurrentLPToken(assets.find((el) => el.aid === data['lp-token']));
@@ -164,10 +205,13 @@ export const TradePool = () => {
           <Section title={titleSections.TRADE_RECEIVE}>
             <AssetsSection>
               <Input
-                value={amountInput.value}
+                value={emptyPredict(predictData, amountSendInput.value) ? amountInput.value : fromGroths(predictData.buy)}
                 variant="amount"
                 pallete="blue"
-                onChange={(e) => amountInput.onChange(e)}
+                onChange={(e) => {
+                  amountInput.onChange(e)
+                  setLastChangedInput(1)
+                }}
               />
               <AssetLabel title={isSwap ? tokenName_2 : tokenName_1} assets_id={currentToken} />
             </AssetsSection>
@@ -178,11 +222,14 @@ export const TradePool = () => {
           <Section title={titleSections.TRADE_SEND}>
             <AssetsSection>
               <Input
-                disabled
                 pallete="purple"
                 variant="amount"
                 style={{ cursor: 'default', color: '--var(color-purple)', opacity: 1 }}
-                value={emptyPredict(predictData, amountInput.value) ? '0' : fromGroths(predictData.pay)}
+                value={emptyPredict(predictData, amountInput.value) ? amountSendInput.value : fromGroths(predictData.pay)}
+                onChange={(e) => {
+                  amountSendInput.onChange(e)
+                  setLastChangedInput(2)
+                }}
               />
               <AssetLabel
                 title={isSwap ? tokenName_1 : tokenName_2}
@@ -267,7 +314,7 @@ export const TradePool = () => {
               Cancel
             </Button>
             <Button
-              disabled={!amountInput.isValid}
+              disabled={!amountInput.isValid && !amountSendInput.isValid}
               icon={DoneIcon}
               variant="approve"
               onClick={() => onTrade(requestData)}

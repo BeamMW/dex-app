@@ -9,8 +9,9 @@ import { setTxStatus } from '@app/containers/Pools/store/actions';
 import store from '../../../index';
 
 const iFrameDetection = window !== window.parent;
-export function start(): void {
+export  async function start() {
   Utils.download('./amm.wasm', (err, bytes) => {
+    console.log(1)
     Utils.callApi('ev_subunsub', {
       ev_txs_changed: true,
       ev_system_state: true,

@@ -1,3 +1,5 @@
+import {CURRENT_NETWORK, NETWORK} from "@app/shared/constants";
+
 const MIN_AMOUNT = 0.00000001;
 const MAX_AMOUNT = 254000000;
 
@@ -8,7 +10,7 @@ let APIResCB;
 const ipfsGateway = 'https://gallery20.apps.beam.mw/ipfs/';
 const webGateway = 'https://gallery20.apps.beam.mw/cache/';
 // const headlessNode = 'eu-node02.dappnet.beam.mw:8200';
-const headlessNode = 'eu-node01.mainnet.beam.mw:8200';
+const headlessNode =  CURRENT_NETWORK === NETWORK.MAINNET ?  'eu-node01.mainnet.beam.mw:8200' : 'eu-node02.dappnet.beam.mw:8200';
 let InitParams;
 
 export default class Utils {
@@ -127,7 +129,7 @@ export default class Utils {
 
     const WasmModule = await BeamModule(); // eslint-disable-line no-undef
     const { WasmWalletClient } = WasmModule;
-    const client = new WasmWalletClient(headlessNode, WasmModule.Network.mainnet);
+    const client =  CURRENT_NETWORK === NETWORK.MAINNET ? new WasmWalletClient(headlessNode, WasmModule.Network.mainnet) :  new WasmWalletClient(headlessNode, WasmModule.Network.dappnet);
     client.startWallet();
 
     client.subscribe((response) => {
