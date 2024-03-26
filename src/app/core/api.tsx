@@ -18,14 +18,14 @@ const onMakeTx = (err, sres, full) => {
 
 export function LoadAssetsList<T = any>(payload): Promise<T> {
   return new Promise((resolve, reject) => {
-    Utils.invokeContract(
-      `action=view_all_assets,cid=${CID}`,
+    Utils.callApi(
+       'assets_list', { refresh: true},
       (error, result) => {
         if (error) {
           reject(error);
           console.log('errrrrrr');
         }
-        resolve(result.res);
+        resolve(result.assets);
         console.log(result);
         console.log('apiREs');
       },

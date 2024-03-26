@@ -362,6 +362,12 @@ export default class Utils {
       delete Calls[id];
       console.log('AnswerUtils');
       console.log(answer);
+
+      if(answer.assets){
+        console.log("ASSETS")
+       return cback(null, answer, request)
+      }
+
       if (answer.error) {
         return cback(answer);
       }

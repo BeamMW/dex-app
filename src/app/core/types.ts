@@ -41,7 +41,8 @@ export interface IMetadataPairs {
   OPT_COLOR?: string;
 }
 export interface IAsset {
-  aid: number;
+  asset_id?: number;
+  aid?: number
   metadata: string;
   mintedHi: number;
   mintedLo: number;

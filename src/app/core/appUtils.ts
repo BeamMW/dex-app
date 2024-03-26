@@ -41,7 +41,7 @@ export function getOptions(assets: IAsset[]) {
   ];
 
   assets.map((item) => {
-    options = [...options, { value: item.aid, label: `${truncate(item.parsedMetadata.UN)}` }];
+    options = [...options, { value: item.asset_id, label: `${truncate(item.parsedMetadata.UN)}` }];
     return options;
   });
   return options;
@@ -82,7 +82,7 @@ export const parsePoolMetadata = (poolCard, aid1, aid2, assetList: IAsset[]) => 
     data = { ...data, metadata1: ASSET_BEAM };
   } else {
     assetList.filter((item) => {
-      if (aid1 === item.aid) {
+      if (aid1 === item.asset_id) {
         data = { ...data, metadata1: item.parsedMetadata };
       }
       return data;
@@ -92,7 +92,7 @@ export const parsePoolMetadata = (poolCard, aid1, aid2, assetList: IAsset[]) => 
     data = { ...data, metadata2: ASSET_BEAM };
   } else {
     assetList.filter((item) => {
-      if (aid2 === item.aid) {
+      if (aid2 === item.asset_id) {
         data = { ...data, metadata2: item.parsedMetadata };
       }
       return data;
