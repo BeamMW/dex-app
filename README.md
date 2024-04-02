@@ -1,1 +1,1 @@
-# beam-dapp-react
+# Beam DEX
