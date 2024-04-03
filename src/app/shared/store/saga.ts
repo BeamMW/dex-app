@@ -30,7 +30,7 @@ export function remoteEventChannel() {
   Utils.initialize(
     {
       appname: 'DEX',
-      min_api_version: '6.2',
+      min_api_version: '7.2',
       headless: !iFrameDetection || !!Utils.isHeadless(),
       apiResultHandler: (error, result, full) => {
         console.log('api result data: ', result, full);
