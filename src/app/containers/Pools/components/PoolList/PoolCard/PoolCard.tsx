@@ -162,6 +162,12 @@ export const PoolCard = ({ data, isFavorite }: PoolCardType) => {
   const handleFavorite = (card: IPoolCard) => {
     dispatch(mainActions.onFavorites.request(card));
   };
+
+  const formatNumber = (num: string | number): string => {
+    const parsedNum = typeof num === 'number' ? num : Number(num);
+    return parsedNum.toLocaleString('en-US');
+  };
+
   // TODO: break down into components
   return (
     <Section variant="card">
@@ -187,8 +193,8 @@ export const PoolCard = ({ data, isFavorite }: PoolCardType) => {
           <AssetLabel title={nameToken2} assets_id={data.aid2} id variant="predict" />
         </SideLeftWrap>
         <SideRightWrap>
-          <AssetAmount>{fromGroths(data.tok1)}</AssetAmount>
-          <AssetAmount>{fromGroths(data.tok2)}</AssetAmount>
+          <AssetAmount>{formatNumber(fromGroths(data.tok1))}</AssetAmount>
+          <AssetAmount>{formatNumber(fromGroths(data.tok2))}</AssetAmount>
         </SideRightWrap>
       </AmountWrapper>
       <Section variant="exchange">
