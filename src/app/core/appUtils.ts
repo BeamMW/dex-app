@@ -58,6 +58,11 @@ export function numFormatter(num) {
   }
 }
 
+export function formatNumber(num: string | number): string {
+  const parsedNum = typeof num === 'number' ? num : Number(num);
+  return parsedNum.toLocaleString('en-US');
+}
+
 export const getPoolKind = (kind: number) => {
   let kindDesc = null;
 
