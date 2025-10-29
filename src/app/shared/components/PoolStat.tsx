@@ -2,7 +2,7 @@ import React from 'react';
 import { IAsset, IPoolCard } from '@core/types';
 import { Section } from '@app/shared/components/index';
 import AssetLabel from '@app/shared/components/AssetLabel';
-import { fromGroths, truncate } from '@core/appUtils';
+import { fromGroths, truncate, formatNumber } from '@core/appUtils';
 import { styled } from '@linaria/react';
 
 interface PoolStatType {
@@ -53,9 +53,9 @@ const PoolStat = ({ data, lp }: PoolStatType) => {
           <AssetLabel title={nameLPToken} assets_id={lpId} id variant="predict" />
         </SideLeftWrap>
         <SideRightWrap>
-          <AssetAmount>{fromGroths(data.tok1)}</AssetAmount>
-          <AssetAmount>{fromGroths(data.tok2)}</AssetAmount>
-          <AssetAmount>{fromGroths(data.ctl)}</AssetAmount>
+          <AssetAmount>{formatNumber(fromGroths(data.tok1))}</AssetAmount>
+          <AssetAmount>{formatNumber(fromGroths(data.tok2))}</AssetAmount>
+          <AssetAmount>{formatNumber(fromGroths(data.ctl))}</AssetAmount>
         </SideRightWrap>
       </AmountWrapper>
     </Section>
