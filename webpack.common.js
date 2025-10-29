@@ -9,8 +9,16 @@ try {
   beamWasmClientPath = require.resolve('beam-wasm-client');
   beamWasmClientPath = path.dirname(beamWasmClientPath);
 } catch (error) {
-  console.warn('Could not resolve beam-wasm-client path:', error.message);
-  beamWasmClientPath = null;
+  // Fallback for different package managers
+  try {
+    beamWasmClientPath = path.join(__dirname, 'node_modules/beam-wasm-client');
+    if (!require('fs').existsSync(beamWasmClientPath)) {
+      beamWasmClientPath = null;
+    }
+  } catch (fallbackError) {
+    console.warn('Could not resolve beam-wasm-client path:', error.message);
+    beamWasmClientPath = null;
+  }
 }
 
 module.exports = {
