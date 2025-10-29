@@ -3,6 +3,7 @@ import { styled } from '@linaria/react';
 import Button from '@app/shared/components/Button';
 import { IconEye, IconEyeCrossed } from '@app/shared/icons';
 import { css } from '@linaria/core';
+import { REG_AMOUNT } from '@app/shared/constants';
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -107,11 +108,14 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const [inputVisible, setInputVisible] = useState(false);
     const [inputValue, setInputValue] = useState(rest.value ?? '');
 
-    const inputHandler = (e) => {
+    const inputHandler: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+      const { value: raw } = e.target;
+      if (raw !== '' && !REG_AMOUNT.test(raw)) {
+        return;
+      }
       if (rest?.onChange) rest?.onChange(e);
-      setInputValue(e.target.value);
+      setInputValue(raw);
     };
-
     return (
       <ContainerStyled className={className} margin={margin}>
         <InputComponent
@@ -122,6 +126,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           type={inputVisible ? 'text' : rest.type}
           className={!valid ? 'invalid' : ''}
           onChange={inputHandler}
+          pattern="(\d{3})([\.])(\d{2})"
         />
         {!!label && <LabelStyled valid={valid}>{label}</LabelStyled>}
 

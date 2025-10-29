@@ -8,6 +8,12 @@ module.exports = {
   mode: 'development',
   devtool: 'eval-source-map',
   devServer: {
+    historyApiFallback: true,
+    watchFiles: path.join(__dirname, 'src'),
+    headers: {
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+      'Cross-Origin-Opener-Policy': 'same-origin',
+    },
     port: 13666,
   },
   entry: {
@@ -23,6 +29,18 @@ module.exports = {
   },
   module: {
     rules: [
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'assets/fonts/', // the fonts will output in this directory
+            },
+          },
+        ],
+      },
       {
         test: /\.tsx?$/,
         use: ['babel-loader', '@linaria/webpack-loader'],
@@ -91,6 +109,12 @@ module.exports = {
           from: path.join(__dirname, 'src/index.html'),
           to: path.join(__dirname, 'html'),
           context: 'public',
+        },
+        {
+          from: path.join(__dirname, './node_modules/beam-wasm-client/'),
+          globOptions: {
+            ignore: ['**/package.json', '**/README.md'],
+          },
         },
       ],
     }),

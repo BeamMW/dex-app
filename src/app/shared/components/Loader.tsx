@@ -4,7 +4,7 @@ import { IconLoader, IconSearchResult } from '@app/shared/icons';
 import { styled } from '@linaria/react';
 
 interface ILoader {
-  isSearchable? :boolean,
+  isSearchable?: boolean;
 }
 
 const Description = styled.div<ILoader>`
@@ -13,28 +13,25 @@ const Description = styled.div<ILoader>`
   font-size: 14px;
   line-height: 17px;
   text-align: center;
-  color: rgba(255,255,255, 0.5);
+  color: rgba(255, 255, 255, 0.5);
   width: ${({ isSearchable }) => (isSearchable ? '256px' : '281px')} 256px;
   margin-top: ${({ isSearchable }) => (isSearchable ? '40px' : '54px')};
 `;
 
-const Loader = ({ isSearchable }:ILoader) => (
+const Loader = ({ isSearchable }: ILoader) => (
   <Window>
     <Container variant="center" jystify="center">
-      { isSearchable ? (
+      {isSearchable ? (
         <>
           <IconSearchResult />
           <Description isSearchable={isSearchable}>
-            No pools were found.
-            Please check the asset or create the pool.
+            No pools were found. Please check the asset or create the pool.
           </Description>
         </>
       ) : (
         <>
           <IconLoader />
-          <Description isSearchable={isSearchable}>
-            Please wait, BeamX DEX DApp is loading...
-          </Description>
+          <Description isSearchable={isSearchable}>Please wait, BeamX DEX DApp is loading...</Description>
         </>
       )}
     </Container>

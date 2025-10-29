@@ -4,17 +4,20 @@ import {
   emptyPredict, fromGroths, setDataRequest, toGroths, truncate,
 } from '@core/appUtils';
 import {
-  AssetsContainer, AssetsSection, Button, Input, Section, Window, Container,
+  AssetsContainer,
+  AssetsSection,
+  Button,
+  Input,
+  Section,
+  Window,
+  Container,
+  PoolStat,
 } from '@app/shared/components';
 import { useInput } from '@app/shared/hooks';
 import * as mainActions from '@app/containers/Pools/store/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import './index.scss';
-import {
-  selectAssetsList,
-  selectCurrentPool,
-  selectPredirect,
-} from '@app/containers/Pools/store/selectors';
+import { selectAssetsList, selectCurrentPool, selectPredirect } from '@app/containers/Pools/store/selectors';
 import { ROUTES, titleSections } from '@app/shared/constants';
 import AssetLabel from '@app/shared/components/AssetLabel';
 import { ArrowDownIcon, CancelIcon } from '@app/shared/icons';
@@ -26,13 +29,24 @@ const ButtonBlock = styled.div`
   display: flex;
   justify-content: center;
   width: 100%;
-  margin-top:40px;
+  margin-top: 40px;
 `;
 const ButtonWrapper = styled.div`
   display: flex;
   max-width: 363px;
   width: 100%;
-  justify-content: space-evenly; 
+  justify-content: space-evenly;
+`;
+const SectionWrapper = styled.div`
+  margin: 10px 0 40px 0;
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  @media (max-width: 913px) {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 `;
 
 export const WithdrawPool = () => {
@@ -44,7 +58,8 @@ export const WithdrawPool = () => {
   const nameToken1 = truncate(data.metadata1.UN);
   const nameToken2 = truncate(data.metadata2.UN);
   const amountInput = useInput({
-    initialValue: 0, validations: { isEmpty: true, isMax: fromGroths(currentAmountCtl) },
+    initialValue: 0,
+    validations: { isEmpty: true, isMax: fromGroths(currentAmountCtl) },
   });
   const [requestData, setRequestData] = useState(null);
   const dispatch = useDispatch();
@@ -62,7 +77,6 @@ export const WithdrawPool = () => {
       ctl: toGroths(Number(amountInput.value)),
     });
   }, [amountInput.value]);
-  console.log(data);
   useMemo(() => {
     setCurrentAmount(data.ctl);
   }, [data.ctl]);
@@ -84,27 +98,26 @@ export const WithdrawPool = () => {
   const onPreviousClick = () => {
     navigate(ROUTES.POOLS.BASE);
   };
-  // console.log(currentLPToken);
   return (
     <Window title="Withdraw" backButton>
       <Container>
-        <AssetsContainer variant="center">
-          <Section title={titleSections.ADD_LIQUIDITY_SEND}>
-            <AssetsSection>
-              <Input
-                type="number"
-                value={amountInput.value}
-                variant="amount"
-                pallete="blue"
-                onChange={(e) => amountInput.onChange(e)}
-              />
-              <AssetLabel title={assetLabel} assets_id={assetId} />
-            </AssetsSection>
-          </Section>
+        <AssetsContainer variant="space-between">
+          <div style={{ height: '100% !important' }}>
+            <Section title={titleSections.ADD_LIQUIDITY_SEND}>
+              <AssetsSection>
+                <Input
+                  value={amountInput.value}
+                  variant="amount"
+                  pallete="blue"
+                  onChange={(e) => amountInput.onChange(e)}
+                />
+                <AssetLabel title={assetLabel} assets_id={assetId} />
+              </AssetsSection>
+            </Section>
+          </div>
           <Section title={titleSections.TRADE_RECEIVE}>
             <AssetsSection>
               <Input
-                type="number"
                 disabled
                 pallete="purple"
                 variant="amount"
@@ -115,7 +128,6 @@ export const WithdrawPool = () => {
             </AssetsSection>
             <AssetsSection>
               <Input
-                type="number"
                 disabled
                 pallete="purple"
                 variant="amount"
@@ -127,12 +139,23 @@ export const WithdrawPool = () => {
           </Section>
         </AssetsContainer>
 
+        <SectionWrapper>
+          <PoolStat data={data} lp={currentLPToken} />
+        </SectionWrapper>
+
         <ButtonBlock>
           <ButtonWrapper>
             <Button icon={CancelIcon} variant="cancel" onClick={onPreviousClick}>
               Cancel
             </Button>
-            <Button disabled={!amountInput.isValid} icon={ArrowDownIcon} variant="withdraw" onClick={() => onWithdraw(requestData)}>Withdraw</Button>
+            <Button
+              disabled={!amountInput.isValid}
+              icon={ArrowDownIcon}
+              variant="withdraw"
+              onClick={() => onWithdraw(requestData)}
+            >
+              Withdraw
+            </Button>
           </ButtonWrapper>
         </ButtonBlock>
       </Container>

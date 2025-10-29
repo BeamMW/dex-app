@@ -9,7 +9,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const BaseButtonStyled = styled.button<ButtonProps>`
-  font-family: 'SFProDisplay',sans-serif;
+  font-family: 'SFProDisplay', sans-serif;
   &[disabled] {
     opacity: 0.5;
 
@@ -77,7 +77,7 @@ const BlockButtonStyled = styled(GhostButtonStyled)`
 
 const IconButtonStyled = styled(BaseButtonStyled)`
   display: inline-block;
-  font-family: "ProximaNova", 'SFProDisplay' ,sans-serif;
+  font-family: 'ProximaNova', 'SFProDisplay', sans-serif;
   font-style: normal;
   font-weight: 700;
   font-size: 14px;
@@ -93,7 +93,7 @@ const IconButtonStyled = styled(BaseButtonStyled)`
 
   > svg {
     vertical-align: sub;
-    //margin-right: 15px; 
+    //margin-right: 15px;
   }
 `;
 
@@ -104,13 +104,13 @@ const LinkButtonStyled = styled(IconButtonStyled)`
   color: ${({ pallete }) => `var(--color-${pallete})`};
 `;
 const ControlButtonStyled = styled(IconButtonStyled)`
-  font-family: "ProximaNova", 'SFProDisplay' ,sans-serif;
+  font-family: 'ProximaNova', 'SFProDisplay', sans-serif;
   font-style: normal;
   font-weight: 700;
   font-size: 14px;
   line-height: 17px;
   text-transform: lowercase;
-  svg{
+  svg {
     margin-right: 16px;
     vertical-align: middle;
   }
@@ -124,27 +124,27 @@ const TradeButtonStyled = styled(ButtonStyled)`
   background: rgba(0, 246, 210, 0.1);
   color: ${({ pallete }) => `var(--color-${pallete})`};
   border-radius: 20px;
-  border:  ${({ pallete }) => `1px solid var(--color-${pallete})`} ;
+  border: ${({ pallete }) => `1px solid var(--color-${pallete})`};
 `;
 
 const ApproveButtonStyled = styled(ButtonStyled)`
-    width: 182px;
-    background-color: rgba(0,246,210, 1);
+  width: 182px;
+  background-color: rgba(0, 246, 210, 1);
   color: var(--color-dark-blue);
-    text-transform: lowercase;
-  &:disabled{
+  text-transform: lowercase;
+  &:disabled {
     //color: var(--color-dark-blue);
-    background-color: rgba(0,246,210, 0.3);
+    background-color: rgba(0, 246, 210, 0.3);
   }
 `;
 const WithdrawButtonStyled = styled(ApproveButtonStyled)`
-    width: 151px;
-    background: var(--color-blue);
-  
-`;const CancelButtonStyled = styled(ApproveButtonStyled)`
-    width: 151px;
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--color-white);
+  width: 151px;
+  background: var(--color-blue);
+`;
+const CancelButtonStyled = styled(ApproveButtonStyled)`
+  width: 151px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
 `;
 
 const VARIANTS = {
@@ -158,7 +158,6 @@ const VARIANTS = {
   approve: ApproveButtonStyled,
   cancel: CancelButtonStyled,
   withdraw: WithdrawButtonStyled,
-
 };
 
 const Button: React.FC<ButtonProps> = ({

@@ -1,7 +1,7 @@
 import { DexStateType } from '@app/containers/Pools/interfaces/DexStateType';
 import { ActionType, createReducer } from 'typesafe-actions';
 import produce from 'immer';
-import { IPoolCard } from '@core/types';
+import { favorites } from '@app/containers/Pools/store/saga';
 import * as actions from './actions';
 
 type Action = ActionType<typeof actions>;
@@ -15,7 +15,11 @@ const initialState: DexStateType = {
   currentPool: null,
   filter: 'all',
   options: [],
-  favorites: null,
+  favorites: [],
+  currentLPToken: null,
+  isLoading: false,
+  myPools: [],
+  isHeadless: true,
 };
 
 const reducer = createReducer<DexStateType, Action>(initialState)
@@ -24,6 +28,7 @@ const reducer = createReducer<DexStateType, Action>(initialState)
   }))
   .handleAction(actions.setPoolsList, (state, action) => produce(state, (nexState) => {
     nexState.poolsList = action.payload;
+    nexState.isLoading = false;
   }))
   .handleAction(actions.setTxStatus, (state, action) => produce(state, (nexState) => {
     nexState.tx_status = action.payload;
@@ -45,6 +50,17 @@ const reducer = createReducer<DexStateType, Action>(initialState)
   }))
   .handleAction(actions.setFavorites, (state, action) => produce(state, (nexState) => {
     nexState.favorites = action.payload;
+  }))
+  .handleAction(actions.setCurrentLPToken, (state, action) => produce(state, (nexState) => {
+    nexState.currentPool = action.payload;
+  }))
+  .handleAction(actions.setIsLoading, (state, action) => produce(state, (nexState) => {
+    nexState.isLoading = action.payload;
+  }))
+  .handleAction(actions.setMyPools, (state, action) => produce(state, (nexState) => {
+    nexState.myPools = action.payload;
+  }))
+  .handleAction(actions.setIsHeadless, (state, action) => produce(state, (nexState) => {
+    nexState.isHeadless = action.payload;
   }));
-
 export { reducer as MainReducer };

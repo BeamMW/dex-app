@@ -18,10 +18,14 @@ const SectionStyled = styled.div`
   margin: 0;
   padding: 20px;
   text-align: left;
-  background-color: rgba(255,255,255, 0.05);
+  background-color: rgba(255, 255, 255, 0.05);
   max-width: 452px;
   width: 100%;
+  height: 100%;
   border-radius: 10px;
+  @media (max-width: 913px) {
+    margin-bottom: 10px;
+  }
   > .cancel-button {
     position: absolute;
     top: 68px;
@@ -63,10 +67,13 @@ const SectionGrayStyled = styled.div`
 `;
 
 const SectionCardStyled = styled(SectionStyled)`
- 
-  width: 298px;
+  max-width: 430px;
+  width: 100%;
   height: 301px;
   justify-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 const SectionExchangeStyled = styled(SectionStyled)`

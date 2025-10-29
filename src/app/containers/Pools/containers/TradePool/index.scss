@@ -1,24 +1,24 @@
-.amount-wrapper{
+.amount-wrapper {
   display: flex;
-  .amount-title{
+  .amount-title {
     margin-right: 24px;
     max-width: 100px;
     width: 100%;
   }
-  .amount-value{
-    color:var(  --color-green)
+  .amount-value {
+    color: var(--color-green);
   }
 }
-  .assets-selector-wrapper {
-    display: flex;
-    align-items: center;
-    margin-bottom: 24px;
-    justify-content: space-between;
-    width: 100%;
-    height: 56px;
-    border: none;
-    outline: none;
-    border-radius: 10px;
-    padding-right: 15px;
-    background-color: rgba(255, 255, 255, 0.05);
-  }
+.assets-selector-wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  justify-content: space-between;
+  width: 100%;
+  height: 56px;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  padding-right: 15px;
+  background-color: rgba(255, 255, 255, 0.05);
+}

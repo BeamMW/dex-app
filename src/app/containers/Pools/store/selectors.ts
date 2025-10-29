@@ -11,3 +11,7 @@ export const selectCurrentPool = () => createSelector(selectMain, (state) => sta
 export const selectFilter = () => createSelector(selectMain, (state) => state.filter);
 export const selectOptions = () => createSelector(selectMain, (state) => state.options);
 export const selectFavorites = () => createSelector(selectMain, (state) => state.favorites);
+export const selectCurrentLPToken = () => createSelector(selectMain, (state) => state.currentLPToken);
+export const selectIsLoading = () => createSelector(selectMain, (state) => state.isLoading);
+export const selectMyPools = () => createSelector(selectMain, (state) => state.myPools);
+export const selectIsHeadless = () => createSelector(selectMain, (state) => state.isHeadless);

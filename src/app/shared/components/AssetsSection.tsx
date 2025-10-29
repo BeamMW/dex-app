@@ -12,14 +12,8 @@ const SectionStyled = styled.div`
   outline: none;
   border-radius: 10px;
   padding-right: 15px;
-  background-color: rgba(255,255,255,0.05);
+  background-color: rgba(255, 255, 255, 0.05);
 `;
-const AssetsSection: React.FC = ({
-  children,
-}) => (
-  <SectionStyled>
-    {children}
-  </SectionStyled>
-);
+const AssetsSection: React.FC = ({ children }) => <SectionStyled>{children}</SectionStyled>;
 
 export default AssetsSection;

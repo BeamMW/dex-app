@@ -2467,6 +2467,16 @@ batch@0.6.1:
   resolved "https://registry.npmjs.org/batch/-/batch-0.6.1.tgz"
   integrity sha512-x+VAiMRL6UPkx+kudNvxTl6hB2XNNCG2r+7wixVfIYwu/2HKRXimwQyaumLjMveWvT2Hkd/cAJw+QBMfJ/EKVw==
 
+beam-wasm-client-dappnet@^7.3.13673:
+  version "7.3.13673"
+  resolved "https://registry.yarnpkg.com/beam-wasm-client-dappnet/-/beam-wasm-client-dappnet-7.3.13673.tgz#91f1bfd9be1c99be77e4448070e91b4a1c24adf4"
+  integrity sha512-8wfR04zOaDtDOY5RQOE0brRrnyOQI5B0IaAPdLnoC1pFUL7o0vQ2M3+vZ/oH1QF2grL7A27jRGVorRRXYMTDBQ==
+
+beam-wasm-client@^7.3.13709:
+  version "7.3.13709"
+  resolved "https://registry.yarnpkg.com/beam-wasm-client/-/beam-wasm-client-7.3.13709.tgz#9a49419e18079864103189b39d1ad78fdfb240aa"
+  integrity sha512-o/4kXE58+Jdio20a8HxVKZRiqVMz/ov6SYt9abONdAszmJ7Ih4aeN8fM1Nm3uH5vcRzTI/0bXV5MmqTsKSVMDA==
+
 big.js@^5.2.2:
   version "5.2.2"
   resolved "https://registry.npmjs.org/big.js/-/big.js-5.2.2.tgz"
@@ -3796,6 +3806,14 @@ file-entry-cache@^6.0.1:
   integrity sha512-7Gps/XWymbLk2QLYK4NzpMOrYjMhdIxXuIvy2QBsLE6ljuodKvdkWs/cpyJJ3CVIVpH0Oi1Hvg1ovbMzLdFBBg==
   dependencies:
     flat-cache "^3.0.4"
+
+file-loader@^6.2.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/file-loader/-/file-loader-6.2.0.tgz#baef7cf8e1840df325e4390b4484879480eebe4d"
+  integrity sha512-qo3glqyTa61Ytg4u73GultjHGjdRyig3tG6lPtyX/jOEJvHif9uB0/OCI2Kif6ctF3caQTW2G5gym21oAsI4pw==
+  dependencies:
+    loader-utils "^2.0.0"
+    schema-utils "^3.0.0"
 
 fill-range@^7.0.1:
   version "7.0.1"
@@ -6334,6 +6352,11 @@ raw-body@2.5.1:
     iconv-lite "0.4.24"
     unpipe "1.0.0"
 
+react-content-loader@^6.2.1:
+  version "6.2.1"
+  resolved "https://registry.yarnpkg.com/react-content-loader/-/react-content-loader-6.2.1.tgz#8feb733c2d2495002e1b216f13707f2b5f2a8ead"
+  integrity sha512-6ONbFX+Hi3SHuP66JB8CPvJn372pj+qwltJV0J8z/8MFrq98I1cbFdZuhDWeQXu3CFxiiDTXJn7DFxx2ZvrO7g==
+
 react-custom-scrollbars@^4.2.1:
   version "4.2.1"
   resolved "https://registry.npmjs.org/react-custom-scrollbars/-/react-custom-scrollbars-4.2.1.tgz"
@@ -6814,6 +6837,15 @@ schema-utils@^2.6.5:
   dependencies:
     "@types/json-schema" "^7.0.5"
     ajv "^6.12.4"
+    ajv-keywords "^3.5.2"
+
+schema-utils@^3.0.0:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/schema-utils/-/schema-utils-3.1.2.tgz#36c10abca6f7577aeae136c804b0c741edeadc99"
+  integrity sha512-pvjEHOgWc9OWA/f/DE3ohBWTD6EleVLf7iFUkoSwAxttdBhB9QUebQgxER2kWueOvRJXPHNnyrvvh9eZINB8Eg==
+  dependencies:
+    "@types/json-schema" "^7.0.8"
+    ajv "^6.12.5"
     ajv-keywords "^3.5.2"
 
 schema-utils@^3.1.0, schema-utils@^3.1.1:

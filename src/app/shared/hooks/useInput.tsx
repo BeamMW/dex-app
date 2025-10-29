@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import { useValidation } from './useValidation';
 
-export function useInput({
-  initialValue,
-  validations,
-}) {
+export function useInput({ initialValue, validations }) {
   const [value, setValue] = useState<number>(initialValue);
   const [isDirty, setDirty] = useState<boolean>(false);
 
@@ -12,9 +9,6 @@ export function useInput({
 
   const onChange = (e) => {
     setValue(e.target.value);
-  };
-  const onBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    setDirty(true);
   };
 
   const onPredict = (e) => {
