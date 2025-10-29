@@ -20,7 +20,7 @@ const Description = styled.div<ILoader>`
 
 const Loader = ({ isSearchable }: ILoader) => (
   <Window>
-    <Container variant="center" jystify="center">
+    <Container variant="center" jystify="center" main>
       {isSearchable ? (
         <>
           <IconSearchResult />
