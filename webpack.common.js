@@ -3,6 +3,16 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 
+// Resolve beam-wasm-client path
+let beamWasmClientPath;
+try {
+  beamWasmClientPath = require.resolve('beam-wasm-client');
+  beamWasmClientPath = path.dirname(beamWasmClientPath);
+} catch (error) {
+  console.warn('Could not resolve beam-wasm-client path:', error.message);
+  beamWasmClientPath = null;
+}
+
 module.exports = {
   target: 'web',
   mode: 'development',
@@ -111,12 +121,13 @@ module.exports = {
           to: path.join(__dirname, 'html'),
           context: 'public',
         },
-        {
-          from: path.join(__dirname, './node_modules/beam-wasm-client/'),
+        ...(beamWasmClientPath ? [{
+          from: beamWasmClientPath,
+          to: path.join(__dirname, 'html/'),
           globOptions: {
             ignore: ['**/package.json', '**/README.md'],
           },
-        },
+        }] : []),
       ],
     }),
   ],
