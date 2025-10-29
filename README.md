@@ -1,1 +1,1 @@
-# Beam DEX DApp UI
+# Beam DEX

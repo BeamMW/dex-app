@@ -120,7 +120,7 @@ export const PoolsList = () => {
   const handleSort = (filter) => {
     dispatch(mainActions.setFilter(filter));
     // console.log(1)
-    dispatch(mainActions.loadAppParams.request(null));
+    // dispatch(mainActions.loadAppParams.request(null));
     dispatch(mainActions.setIsLoading(true));
   };
   // todo: store
