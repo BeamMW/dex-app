@@ -41,7 +41,8 @@ export interface IMetadataPairs {
   OPT_COLOR?: string;
 }
 export interface IAsset {
-  aid: number;
+  asset_id?: number;
+  aid?: number
   metadata: string;
   mintedHi: number;
   mintedLo: number;
@@ -78,6 +79,7 @@ export interface IAddLiquidity extends ICreatePool {
 }
 export interface ITrade extends ICreatePool {
   val1_buy: number;
+  val2_pay: number;
   bPredictOnly?: number;
 }
 

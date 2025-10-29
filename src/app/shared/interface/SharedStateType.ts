@@ -12,7 +12,7 @@ export interface IValidations {
 }
 
 export interface IUseValidation {
-  value: number;
+  value: number | string;
   validations?: IValidations;
 }
 export interface IUseInput {

@@ -169,7 +169,7 @@ export const PoolsList = () => {
                           key={el.value}
                           active={currentFilter === el.value}
                           onClick={() => handleSort(el.value)}
-                          disabled={!!((el.value === 'fav' && !favorites.length) || (el.value === 'my' && !myPools.length))}
+                          disabled={!!((el.value === 'fav' && !favorites.length) || (el.value === 'created' && !myPools.length))}
                         >
                           {el.name}
                         </SortItemLink>

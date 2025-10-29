@@ -85,6 +85,8 @@ export const AddLiquidity = () => {
   const navigate = useNavigate();
   const tokenName_1 = truncate(data.metadata1.UN);
   const tokenName_2 = truncate(data.metadata2.UN);
+  const [lastChangedInput, setLastChangedInput] = useState<number>(1);
+
   useEffect(() => {
     setPoolIsEmpty(!!(!data.tok1 || !data.tok2));
   }, []);
@@ -117,6 +119,16 @@ export const AddLiquidity = () => {
   }, [amountInput_aid1.value, amountInput_aid2.value, isSwap]);
 
   useEffect(() => {
+    setRequestData({
+      aid1: data.aid1,
+      aid2: data.aid2,
+      kind: data.kind,
+      val1: getValueInput_1(),
+      val2: getValueInput_2(),
+    });
+  }, [amountInput_aid1.value, amountInput_aid2.value, isSwap, lastChangedInput]);
+
+  useEffect(() => {
     if (!poolIsEmpty && predictData) {
       if (currentToken === data.aid1) {
         !emptyPredict(predictData, amountInput_aid1.value)
@@ -136,6 +148,8 @@ export const AddLiquidity = () => {
   const handleChange = () => {
     setIsSwap(!isSwap);
   };
+  const currentSecondInput = isSwap ? amountInput_aid1 : amountInput_aid2;
+
   const checkIsValid = poolIsEmpty
     ? amountInput_aid1.isValid && amountInput_aid2.isValid
     : amountInput_aid1.isValid || amountInput_aid2.isValid;
@@ -144,15 +158,16 @@ export const AddLiquidity = () => {
     if (checkIsValid) {
       dispatch(mainActions.onAddLiquidity.request(requestData));
     }
-  }, [requestData, amountInput_aid1.isValid, amountInput_aid2.isValid]);
-
+  }, [requestData, amountInput_aid1.isValid, amountInput_aid2.isValid, currentSecondInput.value]);
   const onAddLiquidity = (dataLiquid: IAddLiquidity): void => {
     dispatch(mainActions.onAddLiquidity.request(setDataRequest(dataLiquid)));
-  };
 
+  };
   const currentInput = isSwap ? amountInput_aid2 : amountInput_aid1;
 
-  const calculated = onPredictValue(currentInput, isSwap, predictData);
+
+  const calculated = onPredictValue(currentSecondInput, isSwap, predictData);
+  const calculatedSecond = onPredictValue(currentInput, isSwap, predictData);
 
   const onPreviousClick = () => {
     navigate(ROUTES.POOLS.BASE);
@@ -192,10 +207,13 @@ export const AddLiquidity = () => {
             <Section title={titleSections.ADD_LIQUIDITY}>
               <AssetsSection>
                 <Input
-                  value={currentInput.value}
+                  value={calculated || currentInput.value}
                   variant="amount"
                   pallete="blue"
-                  onChange={(e) => currentInput.onChange(e)}
+                  onChange={(e) => {
+                    currentInput.onChange(e)
+                    setLastChangedInput(1)
+                  }}
                 />
                 <AssetLabel title={isSwap ? tokenName_2 : tokenName_1} assets_id={isSwap ? data.aid2 : data.aid1} />
               </AssetsSection>
@@ -206,7 +224,6 @@ export const AddLiquidity = () => {
             <Section title={titleSections.ADD_LIQUIDITY}>
               <AssetsSection>
                 <Input
-                  disabled
                   pallete="purple"
                   variant="amount"
                   style={{
@@ -214,35 +231,17 @@ export const AddLiquidity = () => {
                     color: '--var(color-purple)',
                     opacity: 1,
                   }}
-                  value={calculated}
+                  value={calculatedSecond || currentSecondInput.value}
+                  onChange={(e) => {
+                    currentSecondInput.onChange(e)
+                    setLastChangedInput(2)
+                  }}
                 />
                 <AssetLabel title={isSwap ? tokenName_1 : tokenName_2} assets_id={isSwap ? data.aid1 : data.aid2} />
               </AssetsSection>
             </Section>
           </AssetsContainer>
         )}
-        {/* // Create components for predirect */}
-        {/* <SectionWrapper> */}
-        {/*   <Section> */}
-        {/*     <SectionContainer> */}
-        {/*       <SideLeftWrap> */}
-        {/*         <Title>pool summary</Title> */}
-        {/*         <LeftBlockPredict> */}
-        {/*           <TitleBlock> */}
-        {/*             <TitleSummary>{truncate(data.metadata1.UN)}</TitleSummary> */}
-        {/*             <TitleSummary>{truncate(data.metadata2.UN)}</TitleSummary> */}
-        {/*             <TitleSummary>Liquidity</TitleSummary> */}
-        {/*           </TitleBlock> */}
-        {/*           <AmountBlock> */}
-        {/*             <AmountSummary>{fromGroths(data.tok1)}</AmountSummary> */}
-        {/*             <AmountSummary>{fromGroths(data.tok2)}</AmountSummary> */}
-        {/*             <AmountSummary>{fromGroths(data.ctl)}</AmountSummary> */}
-        {/*           </AmountBlock> */}
-        {/*         </LeftBlockPredict> */}
-        {/*       </SideLeftWrap> */}
-        {/*     </SectionContainer> */}
-        {/*   </Section> */}
-        {/* </SectionWrapper> */}
         <SectionWrapper>
           <PoolStat data={data} lp={currentLPToken} />
         </SectionWrapper>
