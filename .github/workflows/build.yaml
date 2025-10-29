@@ -1,0 +1,24 @@
+name: Build and Package .dapp
+
+on:
+  push:
+    branches:
+      - dappnet
+      - workflow-test
+      - master
+  pull_request:
+    branches:
+      - dappnet
+      - workflow-test
+      - master
+jobs:
+  build:
+    uses: BeamMW/dex-app/.github/workflows/make-dapp.yaml@workflow-test
+    with:
+      manifest_name: 'Beam DEX'
+      manifest_description: 'AMM based decentralized exchange for Confidential Assets'
+      manifest_version_prefix: "1.0"
+      manifest_guid: 'db851322f6674a6da3e84e9953db2ffd'
+      dapp_name: 'dex-app'
+
+
