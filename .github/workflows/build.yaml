@@ -13,7 +13,7 @@ on:
       - master
 jobs:
   build:
-    uses: BeamMW/dao-voting-app/.github/workflows/make-dapp.yaml@workflow-test
+    uses: BeamMW/dex-app/.github/workflows/make-dapp.yaml@workflow-test
     with:
       manifest_name: 'Beam DEX'
       manifest_description: 'AMM based decentralized exchange for Confidential Assets'
