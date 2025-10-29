@@ -3,13 +3,14 @@ name: Build and Package .dapp
 on:
   push:
     branches:
-      - mainnet
+      - dappnet
       - workflow-test
+      - master
   pull_request:
     branches:
-      - mainnet
+      - dappnet
       - workflow-test
-
+      - master
 jobs:
   build:
     uses: BeamMW/dao-voting-app/.github/workflows/make-dapp.yaml@workflow-test
