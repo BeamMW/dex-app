@@ -18,7 +18,7 @@ import {
 } from '@core/appUtils';
 import { AppState } from '@app/shared/interface';
 import * as mainActions from '@app/containers/Pools/store/actions';
-import { selectFilter } from '@app/containers/Pools/store/selectors';
+import { selectCurrentPool, selectFavorites, selectFilter } from '@app/containers/Pools/store/selectors';
 import { toast } from 'react-toastify';
 import { navigate } from '@app/shared/store/actions';
 import { ROUTES } from '@app/shared/constants';
@@ -114,6 +114,14 @@ export function* addLiquidity(action: ReturnType<typeof mainActions.onAddLiquidi
         yield put(mainActions.setPredict(res));
       }
       if (txid) {
+        // Auto-add pool to favorites on successful liquidity add
+        const currentPool = (yield select(selectCurrentPool())) as IPoolCard;
+        const favoritesList = (yield select(selectFavorites())) as IPoolCard[];
+        if (currentPool && !isInArray(currentPool, favoritesList)) {
+          const updated = [...favoritesList, currentPool];
+          yield localStorage.setItem('favorites', JSON.stringify(updated));
+          yield put(mainActions.setFavorites(updated));
+        }
         yield navigateToHome(txid);
         yield getStatus(txid);
       }
