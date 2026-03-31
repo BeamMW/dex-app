@@ -1,6 +1,12 @@
 export const ROUTES = {
+  NAV: {
+    TRADE: '/trade',
+    EXPLORE: '/explore',
+    POOL: '/pool',
+    MY: '/my',
+  },
   POOLS: {
-    BASE: '/',
+    BASE: '/trade',
     CREATE_POOL: '/create',
     ADD_LIQUIDITY: '/add_liquidity',
     TRADE_POOL: '/trade_pool/',
@@ -9,8 +15,14 @@ export const ROUTES = {
 };
 
 export const ROUTES_PATH = {
+  NAV: {
+    TRADE: '/trade',
+    EXPLORE: '/explore',
+    POOL: '/pool',
+    MY: '/my',
+  },
   POOLS: {
-    BASE: '/',
+    BASE: '/trade',
     CREATE_POOL: '/create',
     ADD_LIQUIDITY: '/add_liquidity',
     TRADE_POOL: '/trade_pool/',

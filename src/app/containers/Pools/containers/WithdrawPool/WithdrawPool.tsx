@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ITrade } from '@core/types';
 import {
   emptyPredict, fromGroths, setDataRequest, toGroths, truncate,
@@ -69,25 +69,25 @@ export const WithdrawPool = () => {
       setCurrentLPToken(assets.find((el) => el.aid === data['lp-token']));
     }
   }, [data, assets]);
-  useMemo(() => {
+  useEffect(() => {
     setRequestData({
       aid1: data.aid1,
       aid2: data.aid2,
       kind: data.kind,
       ctl: toGroths(Number(amountInput.value)),
     });
-  }, [amountInput.value]);
-  useMemo(() => {
+  }, [amountInput.value, data.aid1, data.aid2, data.kind]);
+  useEffect(() => {
     setCurrentAmount(data.ctl);
   }, [data.ctl]);
 
-  useMemo(() => {
+  useEffect(() => {
     if (amountInput.isMax) {
       toast('Amount assets > MAX');
     } else if (amountInput.isValid) {
       dispatch(mainActions.onWithdraw.request(requestData));
     }
-  }, [requestData, amountInput.value, amountInput.isValid, amountInput.isMax]);
+  }, [requestData, amountInput.value, amountInput.isValid, amountInput.isMax, dispatch]);
 
   const assetLabel = currentLPToken ? truncate(currentLPToken.parsedMetadata.UN) : 'AMML';
   const assetId = currentLPToken ? currentLPToken.aid : data['lp-token'];

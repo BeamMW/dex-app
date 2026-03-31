@@ -32,7 +32,6 @@ export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.
     const favoritesLocal = JSON.parse(localStorage.getItem('favorites'));
     const filter = yield select(selectFilter());
     const assetsList = (yield call(LoadAssetsList, action.payload ? action.payload : null)) as IAsset[];
-    console.log(assetsList.length);
     assetsList.forEach((asset) => {
       asset.parsedMetadata = parseMetadata(asset.metadata);
     });
@@ -44,7 +43,7 @@ export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.
     const newPoolList: IPoolCard[] = poolsList.map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList));
     const myPools = newPoolList.filter((el) => el.creator);
     yield put(mainActions.setMyPools(myPools));
-    const filteredPools = onFilter(newPoolList, filter, favoritesLocal).map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList)) as IPoolCard[];
+    const filteredPools = onFilter(newPoolList, filter, favoritesLocal) as IPoolCard[];
     yield put(mainActions.setPoolsList(filteredPools));
     yield put(Shared.setIsLoaded(true));
   } catch (e) {
@@ -127,7 +126,6 @@ export function* addLiquidity(action: ReturnType<typeof mainActions.onAddLiquidi
       }
     } catch (e) {
       // @ts-ignore
-      console.log(e);
       yield put(mainActions.onAddLiquidity.failure(e));
       // toast(e.error);
     }
@@ -190,7 +188,9 @@ export function* favorites(action: ReturnType<typeof mainActions.onFavorites.req
     if (storage) {
       const isFav = isInArray(pool, storage);
       if (isFav) {
-        const filtered = storage.filter((e: IPoolCard) => JSON.stringify(e) !== JSON.stringify(pool));
+        const filtered = storage.filter(
+          (e: IPoolCard) => !(e.aid1 === pool.aid1 && e.aid2 === pool.aid2 && e.kind === pool.kind),
+        );
         yield localStorage.setItem('favorites', JSON.stringify(filtered));
         yield put(mainActions.setFavorites(filtered as IPoolCard[]));
         return;

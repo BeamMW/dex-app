@@ -12,10 +12,9 @@ import {
   selectFavorites, selectFilter, selectIsLoading, selectMyPools, selectOptions, selectPoolsList,
 } from '@app/containers/Pools/store/selectors';
 import * as mainActions from '@app/containers/Pools/store/actions';
-import { getFilterPools, isInArray } from '@core/appUtils';
+import { getFilterPools } from '@core/appUtils';
 import { styled } from '@linaria/react';
 import { IPoolCard } from '@core/types';
-import {selectIsLoaded} from '@app/shared/store/selectors';
 
 const Sort = styled.ul`
   position: relative;
@@ -97,8 +96,8 @@ const WrapperSelect = styled.div`
 export const PoolsList = () => {
   const data = useSelector(selectPoolsList());
   const options = useSelector(selectOptions());
-  const favorites = JSON.parse(localStorage.getItem('favorites'));
-  const localFiltered = JSON.parse(sessionStorage.getItem('filtered'));
+  const favorites = useMemo(() => JSON.parse(localStorage.getItem('favorites') || '[]'), []);
+  const localFiltered = useMemo(() => JSON.parse(sessionStorage.getItem('filtered') || 'null'), []);
   const currentFilter = useSelector(selectFilter());
   const isLoading = useSelector(selectIsLoading());
   const [poolsList, setPoolList] = useState(data);
@@ -106,16 +105,15 @@ export const PoolsList = () => {
   const storage = useSelector(selectFavorites());
   const dispatch = useDispatch();
   const myPools = useSelector(selectMyPools());
-  const isLoaded = useSelector(selectIsLoaded);
 
   useEffect(() => {
-    if (!favorites.length) {
+    if (!favorites?.length) {
       dispatch(mainActions.setFilter('all'));
     }
     if (localFiltered) {
       setFiltered(localFiltered);
     }
-  }, []);
+  }, [dispatch, favorites, localFiltered]);
 
   const handleSort = (filter) => {
     dispatch(mainActions.setFilter(filter));
@@ -129,7 +127,7 @@ export const PoolsList = () => {
       setFiltered(value);
       sessionStorage.setItem('filtered', JSON.stringify(value));
     },
-    [data, poolsList],
+    [],
   );
   // useEffect(() => {
   //   if (favorites.length === 0 || favorites.length === undefined || favorites.length === null) {
@@ -137,10 +135,15 @@ export const PoolsList = () => {
   //   }
   // }, []);
 
-  useMemo(() => {
+  useEffect(() => {
     setPoolList(getFilterPools(filtered, data));
   }, [data, filtered]);
-  const checkFavorite = (poolCard: IPoolCard) => isInArray(poolCard, storage);
+
+  const favoritesSet = useMemo(
+    () => new Set((storage || []).map((item) => `${item.aid1}-${item.aid2}-${item.kind}`)),
+    [storage],
+  );
+  const checkFavorite = (poolCard: IPoolCard) => favoritesSet.has(`${poolCard.aid1}-${poolCard.aid2}-${poolCard.kind}`);
 
   return (
     <>
@@ -155,7 +158,7 @@ export const PoolsList = () => {
                       options={options}
                       isClearable
                       onChange={(e) => onFilter(e)}
-                      defaultValue={() => localFiltered}
+                      defaultValue={localFiltered}
                       isIcon
                       placeholder={placeHolder.SEARCH}
                       customPrefix="custom-filter"
@@ -169,7 +172,12 @@ export const PoolsList = () => {
                           key={el.value}
                           active={currentFilter === el.value}
                           onClick={() => handleSort(el.value)}
-                          disabled={!!((el.value === 'fav' && !favorites.length) || (el.value === 'created' && !myPools.length))}
+                          disabled={
+                            !!(
+                              (el.value === 'fav' && !favorites.length)
+                              || (el.value === 'created' && !myPools.length)
+                            )
+                          }
                         >
                           {el.name}
                         </SortItemLink>
@@ -184,9 +192,13 @@ export const PoolsList = () => {
               ) : poolsList.length > 0 ? (
                 <PoolList>
                   {isLoading
-                    ? Array(10).fill(<LoadingSkileton />)
+                    ? Array.from({ length: 10 }, (_, index) => <LoadingSkileton key={`skeleton-${index}`} />)
                     : poolsList.map((item) => (
-                      <PoolCard isFavorite={checkFavorite(item)} data={item} key={`${item.aid1}_${item.aid2}_${item.kind}`} />
+                      <PoolCard
+                        isFavorite={checkFavorite(item)}
+                        data={item}
+                        key={`${item.aid1}_${item.aid2}_${item.kind}`}
+                      />
                     ))}
                 </PoolList>
               ) : (

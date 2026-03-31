@@ -9,19 +9,16 @@ import { setTxStatus } from '@app/containers/Pools/store/actions';
 import store from '../../../index';
 
 const iFrameDetection = window !== window.parent;
-export  async function start() {
+export async function start() {
   Utils.download('./amm.wasm', (err, bytes) => {
-    console.log(1)
     Utils.callApi('ev_subunsub', {
       ev_txs_changed: true,
       ev_system_state: true,
-    }, (error, result, full) => {
-      if (error) {
-        console.log(err);
-      }
+    }, (error, result) => {
+      if (error) return;
       if (result) {
         store.dispatch(mainActions.loadAppParams.request(bytes));
-          store.dispatch(mainActions.loadPoolsList.request(null));
+        store.dispatch(mainActions.loadPoolsList.request(null));
       }
     });
   });
@@ -33,16 +30,13 @@ export function remoteEventChannel() {
       min_api_version: '7.2',
       headless: !iFrameDetection || !!Utils.isHeadless(),
       apiResultHandler: (error, result, full) => {
-        console.log('api result data: ', result, full);
         if (!result) {
           emitter(full);
         }
       },
     },
     (err) => {
-      if (err) {
-        console.log(err);
-      }
+      if (err) return;
       start();
       // store.dispatch(actions.setIsLoaded(true));
       // Utils.downloadAsync('./amm.wasm', (errs, res) => {
@@ -101,7 +95,6 @@ function* sharedSaga() {
       const payload: any = yield take(remoteChannel);
       switch (payload.id) {
         case 'ev_system_state':
-          console.log(1);
           store.dispatch(setSystemState(payload.result));
           store.dispatch(mainActions.loadAppParams.request(null));
           // store.dispatch(mainActions.loadPoolsList.request(null));

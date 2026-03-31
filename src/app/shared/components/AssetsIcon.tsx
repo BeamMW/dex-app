@@ -4,11 +4,13 @@ import {
   BeamIcon as BeamIconSvg,
   BeamXIcon as BeamXIconSvg,
   AssetIcon as AssetIconSvg,
-  IconNPHAsset
+  IconNPHAsset,
 } from '@app/shared/icons';
 
 import { styled } from '@linaria/react';
-import {BEAM_ID, BEAMX_ID, PALLETE_ASSETS, NPH_ID} from '@app/shared/constants';
+import {
+  BEAM_ID, BEAMX_ID, PALLETE_ASSETS, NPH_ID,
+} from '@app/shared/constants';
 
 export interface AssetIconProps {
   asset_id?: number;
@@ -21,7 +23,11 @@ const ContainerStyled = styled.div<AssetIconProps>`
   width: 18px;
   height: 18px;
   margin-right: 10px;
-  color: ${({ asset_id }) => (PALLETE_ASSETS[asset_id] ? PALLETE_ASSETS[asset_id] : PALLETE_ASSETS[asset_id % PALLETE_ASSETS.length])};
+  color: ${({ asset_id }) => (
+    PALLETE_ASSETS[asset_id]
+      ? PALLETE_ASSETS[asset_id]
+      : PALLETE_ASSETS[asset_id % PALLETE_ASSETS.length]
+  )};
 `;
 
 const AssetIcon: React.FC<AssetIconProps> = ({ asset_id = 0, className }) => {

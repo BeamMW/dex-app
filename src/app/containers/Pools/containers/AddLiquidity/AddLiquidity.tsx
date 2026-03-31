@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IAddLiquidity } from '@core/types';
 import {
   AssetsContainer,
@@ -28,7 +28,6 @@ import { CancelIcon, DoneIcon, IconExchange } from '@app/shared/icons';
 import AssetLabel from '@app/shared/components/AssetLabel';
 import { styled } from '@linaria/react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 
 const ExchangeWrapper = styled.div`
   position: absolute;
@@ -89,7 +88,7 @@ export const AddLiquidity = () => {
 
   useEffect(() => {
     setPoolIsEmpty(!!(!data.tok1 || !data.tok2));
-  }, []);
+  }, [data.tok1, data.tok2]);
 
   const getValueInput_1 = () => {
     if (poolIsEmpty) {
@@ -106,7 +105,7 @@ export const AddLiquidity = () => {
 
   useEffect(() => {
     setCurrentToken(!isSwap ? data.aid1 : data.aid2);
-  }, [isSwap]);
+  }, [isSwap, data.aid1, data.aid2]);
 
   useEffect(() => {
     setRequestData({
@@ -116,31 +115,21 @@ export const AddLiquidity = () => {
       val1: getValueInput_1(),
       val2: getValueInput_2(),
     });
-  }, [amountInput_aid1.value, amountInput_aid2.value, isSwap]);
-
-  useEffect(() => {
-    setRequestData({
-      aid1: data.aid1,
-      aid2: data.aid2,
-      kind: data.kind,
-      val1: getValueInput_1(),
-      val2: getValueInput_2(),
-    });
-  }, [amountInput_aid1.value, amountInput_aid2.value, isSwap, lastChangedInput]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [amountInput_aid1.value, amountInput_aid2.value, isSwap, lastChangedInput, data.aid1, data.aid2, data.kind]);
 
   useEffect(() => {
     if (!poolIsEmpty && predictData) {
       if (currentToken === data.aid1) {
-        !emptyPredict(predictData, amountInput_aid1.value)
-          ? amountInput_aid2.onPredict(fromGroths(predictData.tok2))
-          : 0;
-      } else {
-        !emptyPredict(predictData, amountInput_aid2.value)
-          ? amountInput_aid1.onPredict(fromGroths(predictData.tok1))
-          : 0;
+        if (!emptyPredict(predictData, amountInput_aid1.value)) {
+          amountInput_aid2.onPredict(fromGroths(predictData.tok2));
+        }
+      } else if (!emptyPredict(predictData, amountInput_aid2.value)) {
+        amountInput_aid1.onPredict(fromGroths(predictData.tok1));
       }
     }
-  }, [isSwap, amountInput_aid1.value, amountInput_aid2.value]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [poolIsEmpty, predictData, currentToken, data.aid1, amountInput_aid1.value, amountInput_aid2.value]);
 
   useEffect(() => {
     setCurrentLPToken(getLPToken(data, assets));
@@ -154,17 +143,15 @@ export const AddLiquidity = () => {
     ? amountInput_aid1.isValid && amountInput_aid2.isValid
     : amountInput_aid1.isValid || amountInput_aid2.isValid;
 
-  useMemo(() => {
-    if (checkIsValid) {
+  useEffect(() => {
+    if (checkIsValid && requestData) {
       dispatch(mainActions.onAddLiquidity.request(requestData));
     }
-  }, [requestData, amountInput_aid1.isValid, amountInput_aid2.isValid, currentSecondInput.value]);
+  }, [requestData, checkIsValid, dispatch]);
   const onAddLiquidity = (dataLiquid: IAddLiquidity): void => {
     dispatch(mainActions.onAddLiquidity.request(setDataRequest(dataLiquid)));
-
   };
   const currentInput = isSwap ? amountInput_aid2 : amountInput_aid1;
-
 
   const calculated = onPredictValue(currentSecondInput, isSwap, predictData);
   const calculatedSecond = onPredictValue(currentInput, isSwap, predictData);
@@ -211,8 +198,8 @@ export const AddLiquidity = () => {
                   variant="amount"
                   pallete="blue"
                   onChange={(e) => {
-                    currentInput.onChange(e)
-                    setLastChangedInput(1)
+                    currentInput.onChange(e);
+                    setLastChangedInput(1);
                   }}
                 />
                 <AssetLabel title={isSwap ? tokenName_2 : tokenName_1} assets_id={isSwap ? data.aid2 : data.aid1} />
@@ -233,8 +220,8 @@ export const AddLiquidity = () => {
                   }}
                   value={calculatedSecond || currentSecondInput.value}
                   onChange={(e) => {
-                    currentSecondInput.onChange(e)
-                    setLastChangedInput(2)
+                    currentSecondInput.onChange(e);
+                    setLastChangedInput(2);
                   }}
                 />
                 <AssetLabel title={isSwap ? tokenName_1 : tokenName_2} assets_id={isSwap ? data.aid1 : data.aid2} />

@@ -142,5 +142,5 @@ export {
   IconLoader,
   IconFavorite,
   IconFavoriteFilled,
-  IconNPHAsset
+  IconNPHAsset,
 };

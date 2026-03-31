@@ -1,5 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import Utils from '@core/utils.js';
+import React from 'react';
 import { styled } from '@linaria/react';
 import { Button } from '@app/shared/components/index';
 import { ULR_WEB_WALLET } from '@app/shared/constants';

@@ -11,6 +11,7 @@ interface SectionProps {
   variant?: 'regular' | 'gray' | 'card' | 'exchange';
   showAllAction?: () => void;
   defaultCollapseState?: boolean;
+  headerRight?: React.ReactNode;
 }
 
 const SectionStyled = styled.div`
@@ -110,6 +111,7 @@ const ShowAll = styled.div`
 const TitleWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
 `;
 
@@ -121,6 +123,7 @@ const Section: React.FC<SectionProps> = ({
   children,
   showAllAction,
   defaultCollapseState,
+  headerRight,
 }) => {
   const [hidden, setHidden] = useState(defaultCollapseState ?? collapse);
 
@@ -145,7 +148,8 @@ const Section: React.FC<SectionProps> = ({
       {!!title && (
         <TitleWrapper>
           <Title>{title}</Title>
-          {showAllAction && <ShowAll onClick={showAllAction}>Show All</ShowAll>}
+          {!!headerRight && headerRight}
+          {!headerRight && showAllAction && <ShowAll onClick={showAllAction}>Show All</ShowAll>}
         </TitleWrapper>
       )}
       {!!subtitle && <Title variant="subtitle">{subtitle}</Title>}
