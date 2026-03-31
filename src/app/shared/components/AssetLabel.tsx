@@ -1,7 +1,7 @@
 import React from 'react';
 import { styled } from '@linaria/react';
 import AssetIcon from '@app/shared/components/AssetsIcon';
-import { fromGroths } from '@core/appUtils';
+import { fromGroths, formatNumber } from '@core/appUtils';
 
 interface AssetLabeProps {
   title?: string;
@@ -63,7 +63,7 @@ const AssetLabel = ({
   return (
     <AssetStyled variant={variant}>
       <AssetIcon asset_id={assets_id} />
-      {amount >= 0 && <Amount>{fromGroths(amount)}</Amount>}
+      {amount >= 0 && <Amount>{formatNumber(fromGroths(amount))}</Amount>}
       <TitleComponent>{title}</TitleComponent>
       {id && <AssetsId>{`(id:${assets_id})`}</AssetsId>}
     </AssetStyled>

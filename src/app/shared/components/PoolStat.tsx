@@ -2,7 +2,8 @@ import React from 'react';
 import { IAsset, IPoolCard } from '@core/types';
 import { Section } from '@app/shared/components/index';
 import AssetLabel from '@app/shared/components/AssetLabel';
-import { fromGroths, getPoolKind, truncate } from '@core/appUtils';
+import { fromGroths, truncate, formatNumber } from '@core/appUtils';
+import { getPoolKind } from '@core/appUtils';
 import { styled } from '@linaria/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IconFavorite, IconFavoriteFilled } from '@app/shared/icons';
@@ -99,7 +100,6 @@ const PoolStat = ({
   const lpId = lp ? lp.aid : data['lp-token'];
   const favoriteKey = `${data.aid1}-${data.aid2}-${data.kind}`;
   const isFavorite = (favorites || []).some((item) => `${item.aid1}-${item.aid2}-${item.kind}` === favoriteKey);
-  const formatValue = (value: number | string) => Number(value).toLocaleString('en-US', { maximumFractionDigits: 8 });
 
   const content = (
     <>
@@ -110,9 +110,9 @@ const PoolStat = ({
           <AssetLabel title={nameLPToken} assets_id={lpId} id variant="predict" />
         </SideLeftWrap>
         <SideRightWrap>
-          <AssetAmount>{formatValue(fromGroths(data.tok1))}</AssetAmount>
-          <AssetAmount>{formatValue(fromGroths(data.tok2))}</AssetAmount>
-          <AssetAmount>{formatValue(fromGroths(data.ctl))}</AssetAmount>
+          <AssetAmount>{formatNumber(fromGroths(data.tok1))}</AssetAmount>
+          <AssetAmount>{formatNumber(fromGroths(data.tok2))}</AssetAmount>
+          <AssetAmount>{formatNumber(fromGroths(data.ctl))}</AssetAmount>
         </SideRightWrap>
       </AmountWrapper>
     </>

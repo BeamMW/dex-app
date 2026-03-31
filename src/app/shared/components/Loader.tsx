@@ -31,7 +31,7 @@ const Loader = ({ isSearchable }: ILoader) => (
       ) : (
         <>
           <IconLoader />
-          <Description isSearchable={isSearchable}>Please wait, BeamX DEX DApp is loading...</Description>
+          <Description isSearchable={isSearchable}>Please wait, Beam DEX is loading...</Description>
         </>
       )}
     </Container>
