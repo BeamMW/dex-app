@@ -31,7 +31,13 @@ export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.
     yield setStorage();
     const favoritesLocal = JSON.parse(localStorage.getItem('favorites'));
     const filter = yield select(selectFilter());
-    const assetsList = (yield call(LoadAssetsList, action.payload ? action.payload : null)) as IAsset[];
+    let assetsList: IAsset[] = [];
+    try {
+      assetsList = (yield call(LoadAssetsList, action.payload ? action.payload : null)) as IAsset[];
+    } catch (_error) {
+      // Keep loading contract/pool data even if wallet assets endpoint fails.
+      assetsList = [];
+    }
     assetsList.forEach((asset) => {
       asset.parsedMetadata = parseMetadata(asset.metadata);
     });
@@ -49,6 +55,7 @@ export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.
   } catch (e) {
     // @ts-ignore
     yield put(mainActions.loadAppParams.failure(e));
+    yield put(Shared.setIsLoaded(true));
     toast(e.error);
   }
 }

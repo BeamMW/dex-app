@@ -14,8 +14,8 @@ const ContainerStyled = styled.div<ContainerProps>`
   width: 100%;
   min-height: 600px;
   height: 100%;
-  align-items: ${({ variant }) => variant};
-  justify-content: ${({ jystify }) => jystify};
+  align-items: ${({ variant = 'center' }) => variant};
+  justify-content: ${({ jystify = 'center' }) => jystify};
   width: ${({ main }) => (main ? '100%' : '914px')};
   align-content: center;
   @media (max-width: 480px){

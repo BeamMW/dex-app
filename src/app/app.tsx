@@ -35,7 +35,7 @@ const trackStyle = css`
 
 const routes = [
   {
-    path: '/',
+    path: '*',
     element: <Navigate to={ROUTES.NAV.TRADE} replace />,
   },
   {

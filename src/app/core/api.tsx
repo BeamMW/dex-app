@@ -13,12 +13,18 @@ const onMakeTx = (err, _sres, full) => new Promise((resolve) => {
 export function LoadAssetsList<T = any>(payload): Promise<T> {
   return new Promise((resolve, reject) => {
     Utils.callApi(
-      'assets_list', { refresh: true },
+      'assets_list',
+      { refresh: true },
       (error, result) => {
         if (error) {
           reject(error);
+          return;
         }
-        resolve(result.assets);
+        if (Array.isArray(result)) {
+          resolve(result as unknown as T);
+          return;
+        }
+        resolve((result?.assets ?? []) as unknown as T);
       },
       payload || null,
     );

@@ -4,50 +4,42 @@ import {
   emptyPredict, fromGroths, setDataRequest, toGroths, truncate,
 } from '@core/appUtils';
 import {
-  AssetsContainer,
   AssetsSection,
   Button,
   Input,
-  Section,
-  Window,
   Container,
   PoolStat,
+  Window,
 } from '@app/shared/components';
 import { useInput } from '@app/shared/hooks';
 import * as mainActions from '@app/containers/Pools/store/actions';
 import { useDispatch, useSelector } from 'react-redux';
-import './index.scss';
 import { selectAssetsList, selectCurrentPool, selectPredirect } from '@app/containers/Pools/store/selectors';
-import { ROUTES, titleSections } from '@app/shared/constants';
+import { ROUTES } from '@app/shared/constants';
 import AssetLabel from '@app/shared/components/AssetLabel';
 import { ArrowDownIcon, CancelIcon } from '@app/shared/icons';
-import { styled } from '@linaria/react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import {
+  BlockLabel,
+  ButtonWrapper,
+  EmbeddedLayout,
+  EmbeddedTradeButtonWrap,
+  InputRow,
+  RightPanel,
+  SwapBlock,
+  SwapCard,
+} from '@app/containers/Pools/containers/shared/poolFlowLayout';
+import { styled } from '@linaria/react';
 
-const ButtonBlock = styled.div`
+const ActionsRow = styled.div`
   display: flex;
   justify-content: center;
   width: 100%;
-  margin-top: 40px;
+  margin-top: 24px;
 `;
-const ButtonWrapper = styled.div`
-  display: flex;
-  max-width: 363px;
-  width: 100%;
-  justify-content: space-evenly;
-`;
-const SectionWrapper = styled.div`
-  margin: 10px 0 40px 0;
-  display: flex;
-  justify-content: flex-start;
-  width: 100%;
-  @media (max-width: 913px) {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-`;
+
+const purpleDisabled = { cursor: 'default' as const, color: 'var(--color-purple)', opacity: 1 };
 
 export const WithdrawPool = () => {
   const data = useSelector(selectCurrentPool());
@@ -55,8 +47,8 @@ export const WithdrawPool = () => {
   const predictData = useSelector(selectPredirect());
   const [currentLPToken, setCurrentLPToken] = useState(null);
   const [currentAmountCtl, setCurrentAmount] = useState(data.ctl);
-  const nameToken1 = truncate(data.metadata1.UN);
-  const nameToken2 = truncate(data.metadata2.UN);
+  const nameToken1 = truncate(data?.metadata1?.UN || `Token ${data?.aid1 ?? ''}`);
+  const nameToken2 = truncate(data?.metadata2?.UN || `Token ${data?.aid2 ?? ''}`);
   const amountInput = useInput({
     initialValue: 0,
     validations: { isEmpty: true, isMax: fromGroths(currentAmountCtl) },
@@ -89,7 +81,7 @@ export const WithdrawPool = () => {
     }
   }, [requestData, amountInput.value, amountInput.isValid, amountInput.isMax, dispatch]);
 
-  const assetLabel = currentLPToken ? truncate(currentLPToken.parsedMetadata.UN) : 'AMML';
+  const assetLabel = currentLPToken?.parsedMetadata?.UN ? truncate(currentLPToken.parsedMetadata.UN) : 'AMML';
   const assetId = currentLPToken ? currentLPToken.aid : data['lp-token'];
 
   const onWithdraw = (dataReq: ITrade) => {
@@ -98,66 +90,75 @@ export const WithdrawPool = () => {
   const onPreviousClick = () => {
     navigate(ROUTES.POOLS.BASE);
   };
+
   return (
-    <Window title="Withdraw" backButton>
+    <Window hideHeader>
       <Container>
-        <AssetsContainer variant="space-between">
-          <div style={{ height: '100% !important' }}>
-            <Section title={titleSections.ADD_LIQUIDITY_SEND}>
+        <EmbeddedLayout>
+          <SwapCard>
+            <SwapBlock>
+              <BlockLabel>Withdraw LP</BlockLabel>
               <AssetsSection>
-                <Input
-                  value={amountInput.value}
-                  variant="amount"
-                  pallete="blue"
-                  onChange={(e) => amountInput.onChange(e)}
-                />
-                <AssetLabel title={assetLabel} assets_id={assetId} />
+                <InputRow>
+                  <Input
+                    value={amountInput.value}
+                    variant="amount"
+                    pallete="blue"
+                    onChange={(e) => amountInput.onChange(e)}
+                  />
+                  <AssetLabel title={assetLabel} assets_id={assetId} />
+                </InputRow>
               </AssetsSection>
-            </Section>
-          </div>
-          <Section title={titleSections.TRADE_RECEIVE}>
-            <AssetsSection>
-              <Input
-                disabled
-                pallete="purple"
-                variant="amount"
-                style={{ cursor: 'default', color: '--var(color-purple)', opacity: 1 }}
-                value={emptyPredict(predictData, amountInput.value) ? '0' : fromGroths(predictData.tok1)}
-              />
-              <AssetLabel title={nameToken1} assets_id={data.aid1} />
-            </AssetsSection>
-            <AssetsSection>
-              <Input
-                disabled
-                pallete="purple"
-                variant="amount"
-                style={{ cursor: 'default', color: '--var(color-purple)', opacity: 1 }}
-                value={emptyPredict(predictData, amountInput.value) ? '0' : fromGroths(predictData.tok2)}
-              />
-              <AssetLabel title={nameToken2} assets_id={data.aid2} />
-            </AssetsSection>
-          </Section>
-        </AssetsContainer>
-
-        <SectionWrapper>
-          <PoolStat data={data} lp={currentLPToken} />
-        </SectionWrapper>
-
-        <ButtonBlock>
-          <ButtonWrapper>
-            <Button icon={CancelIcon} variant="cancel" onClick={onPreviousClick}>
-              Cancel
-            </Button>
-            <Button
-              disabled={!amountInput.isValid}
-              icon={ArrowDownIcon}
-              variant="withdraw"
-              onClick={() => onWithdraw(requestData)}
-            >
-              Withdraw
-            </Button>
-          </ButtonWrapper>
-        </ButtonBlock>
+            </SwapBlock>
+            <SwapBlock>
+              <BlockLabel>You receive</BlockLabel>
+              <AssetsSection>
+                <InputRow>
+                  <Input
+                    disabled
+                    pallete="purple"
+                    variant="amount"
+                    style={purpleDisabled}
+                    value={emptyPredict(predictData, amountInput.value) ? '0' : fromGroths(predictData.tok1)}
+                  />
+                  <AssetLabel title={nameToken1} assets_id={data.aid1} />
+                </InputRow>
+              </AssetsSection>
+              <AssetsSection>
+                <InputRow>
+                  <Input
+                    disabled
+                    pallete="purple"
+                    variant="amount"
+                    style={purpleDisabled}
+                    value={emptyPredict(predictData, amountInput.value) ? '0' : fromGroths(predictData.tok2)}
+                  />
+                  <AssetLabel title={nameToken2} assets_id={data.aid2} />
+                </InputRow>
+              </AssetsSection>
+            </SwapBlock>
+            <EmbeddedTradeButtonWrap>
+              <ActionsRow>
+                <ButtonWrapper>
+                  <Button icon={CancelIcon} variant="cancel" onClick={onPreviousClick}>
+                    Cancel
+                  </Button>
+                  <Button
+                    disabled={!amountInput.isValid}
+                    icon={ArrowDownIcon}
+                    variant="withdraw"
+                    onClick={() => onWithdraw(requestData)}
+                  >
+                    Withdraw
+                  </Button>
+                </ButtonWrapper>
+              </ActionsRow>
+            </EmbeddedTradeButtonWrap>
+          </SwapCard>
+          <RightPanel>
+            <PoolStat data={data} lp={currentLPToken} showFavorite plain />
+          </RightPanel>
+        </EmbeddedLayout>
       </Container>
     </Window>
   );

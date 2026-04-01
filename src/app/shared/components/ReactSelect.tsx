@@ -36,6 +36,7 @@ const ReactSelect = ({
   ...rest
 }: IReactSelectProps) => {
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const noOptionsText = isFilter ? 'Type to search assets' : 'Select asset';
   const {
     Option, DropdownIndicator, ClearIndicator, SingleValue,
   } = components;

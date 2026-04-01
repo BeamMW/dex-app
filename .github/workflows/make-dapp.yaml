@@ -33,11 +33,11 @@ on:
         type: string
       manifest_api_version:
         description: 'API version of the application'
-        default: '7.0'
+        default: '7.3'
         type: string
       manifest_min_api_version:
         description: 'Minimum API version required'
-        default: '7.0'
+        default: '7.3'
         type: string
       manifest_guid:
         description: 'GUID for the .dapp manifest'

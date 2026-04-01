@@ -124,8 +124,8 @@ const ButtonWrapper = styled.div`
 `;
 
 export const PoolCard = memo(({ data, isFavorite }: PoolCardType) => {
-  const nameToken1 = truncate(data.metadata1.UN);
-  const nameToken2 = truncate(data.metadata2.UN);
+  const nameToken1 = truncate(data?.metadata1?.UN || `Token ${data?.aid1 ?? ''}`);
+  const nameToken2 = truncate(data?.metadata2?.UN || `Token ${data?.aid2 ?? ''}`);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [poolIsEmpty, setPoolIsEmpty] = useState(true);

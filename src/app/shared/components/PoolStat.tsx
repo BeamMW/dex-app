@@ -2,8 +2,9 @@ import React from 'react';
 import { IAsset, IPoolCard } from '@core/types';
 import { Section } from '@app/shared/components/index';
 import AssetLabel from '@app/shared/components/AssetLabel';
-import { fromGroths, truncate, formatNumber } from '@core/appUtils';
-import { getPoolKind } from '@core/appUtils';
+import {
+  fromGroths, truncate, formatNumber, getPoolKind,
+} from '@core/appUtils';
 import { styled } from '@linaria/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { IconFavorite, IconFavoriteFilled } from '@app/shared/icons';
@@ -94,9 +95,9 @@ const PoolStat = ({
 }: PoolStatType) => {
   const dispatch = useDispatch();
   const favorites = useSelector(selectFavorites());
-  const nameToken1 = truncate(data.metadata1.UN);
-  const nameToken2 = truncate(data.metadata2.UN);
-  const nameLPToken = lp ? truncate(lp.parsedMetadata.UN) : 'AMML';
+  const nameToken1 = truncate(data?.metadata1?.UN || `Token ${data?.aid1 ?? ''}`);
+  const nameToken2 = truncate(data?.metadata2?.UN || `Token ${data?.aid2 ?? ''}`);
+  const nameLPToken = lp?.parsedMetadata?.UN ? truncate(lp.parsedMetadata.UN) : 'AMML';
   const lpId = lp ? lp.aid : data['lp-token'];
   const favoriteKey = `${data.aid1}-${data.aid2}-${data.kind}`;
   const isFavorite = (favorites || []).some((item) => `${item.aid1}-${item.aid2}-${item.kind}` === favoriteKey);
