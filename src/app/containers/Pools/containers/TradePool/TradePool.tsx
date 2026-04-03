@@ -533,7 +533,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   <SummaryWrapper style={{ marginTop: 0 }}>
                     <RateRow>
                       <SummaryTitle>Rate</SummaryTitle>
-                      <RateText>{`1 ${rateLeft} = ${shownRate.toFixed(6)} ${rateRight}`}</RateText>
+                      <RateText>{`1 ${rateLeft} = ${shownRate.toLocaleString('en-US', { minimumFractionDigits: 8, maximumFractionDigits: 8 })} ${rateRight}`}</RateText>
                       <Button icon={IconExchange} variant="icon" onClick={() => setFlipRate(!flipRate)} />
                     </RateRow>
                     <SummaryContainer>
