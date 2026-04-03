@@ -62,6 +62,37 @@ export function formatNumber(num: string | number): string {
   return parsedNum.toLocaleString('en-US');
 }
 
+/** Maps selection indices after thousand-separator grouping (see TradePool formatUserInput). */
+function displayIndexForNormalizedPrefix(nextDisplay: string, normPrefix: string): number {
+  if (!normPrefix) return 0;
+  let acc = '';
+  for (let pos = 0; pos <= nextDisplay.length; pos += 1) {
+    if (acc === normPrefix) return pos;
+    if (pos < nextDisplay.length) {
+      const ch = nextDisplay[pos];
+      if (ch !== ',') acc += ch;
+    }
+  }
+  return nextDisplay.length;
+}
+
+export function caretAfterGroupingFormat(
+  prevDisplay: string,
+  nextDisplay: string,
+  caretStart: number | null,
+  caretEnd: number | null,
+): { start: number; end: number } {
+  const n = prevDisplay.length;
+  const s = Math.min(Math.max(caretStart ?? 0, 0), n);
+  const e = Math.min(Math.max(caretEnd ?? s, 0), n);
+  const normStart = prevDisplay.slice(0, s).replace(/,/g, '');
+  const normEnd = prevDisplay.slice(0, e).replace(/,/g, '');
+  return {
+    start: displayIndexForNormalizedPrefix(nextDisplay, normStart),
+    end: displayIndexForNormalizedPrefix(nextDisplay, normEnd),
+  };
+}
+
 export const getPoolKind = (kind: number) => {
   let kindDesc = null;
 

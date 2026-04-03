@@ -1,6 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  useEffect, useLayoutEffect, useMemo, useRef, useState,
+} from 'react';
 import { IOptions, ITrade, IPoolCard } from '@core/types';
 import {
+  caretAfterGroupingFormat,
   emptyPredict, fromGroths, getPoolKind, setDataRequest, toGroths, truncate,
 } from '@core/appUtils';
 import { styled } from '@linaria/react';
@@ -118,6 +121,43 @@ const formatUserInput = (v: string) => {
   return stripped ? formatPredictAmount(stripped) : '';
 };
 
+type CaretRange = { start: number; end: number };
+
+function useAmountInputCaret(
+  formattedValue: string | number,
+  onPredict: (next: string) => void,
+  lastChangedSide: 1 | 2,
+  setLastChangedInput: React.Dispatch<React.SetStateAction<number>>,
+) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const pendingCaretRef = useRef<CaretRange | null>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const el = e.target;
+    const raw = el.value;
+    const next = formatUserInput(raw);
+    pendingCaretRef.current = caretAfterGroupingFormat(
+      raw,
+      next,
+      el.selectionStart,
+      el.selectionEnd,
+    );
+    onPredict(next);
+    setLastChangedInput(lastChangedSide);
+  };
+
+  useLayoutEffect(() => {
+    const pending = pendingCaretRef.current;
+    if (pending === null) return;
+    pendingCaretRef.current = null;
+    const node = inputRef.current;
+    if (!node) return;
+    node.setSelectionRange(pending.start, pending.end);
+  }, [formattedValue]);
+
+  return { inputRef, handleChange };
+}
+
 interface TradePoolProps {
   embedded?: boolean;
 }
@@ -148,6 +188,19 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   const [flipRate, setFlipRate] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { inputRef: amountInputRef, handleChange: handleAmountInputChange } = useAmountInputCaret(
+    amountInput.value,
+    amountInput.onPredict,
+    1,
+    setLastChangedInput,
+  );
+  const { inputRef: amountSendInputRef, handleChange: handleAmountSendInputChange } = useAmountInputCaret(
+    amountSendInput.value,
+    amountSendInput.onPredict,
+    2,
+    setLastChangedInput,
+  );
 
   const matchedPools = useMemo<IPoolCard[]>(() => {
     if (currentToken === null || secondToken === null) return [];
@@ -394,13 +447,11 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   <AssetsSection>
                     <InputRow>
                       <Input
+                        ref={amountInputRef}
                         value={amountInput.value}
                         variant="amount"
                         pallete="blue"
-                        onChange={(e) => {
-                          amountInput.onPredict(formatUserInput(e.target.value));
-                          setLastChangedInput(1);
-                        }}
+                        onChange={handleAmountInputChange}
                         onFocus={() => {
                           if (
                             emptyPredict(predictData, amountSendInput.value)
@@ -440,14 +491,12 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   <AssetsSection>
                     <InputRow>
                       <Input
+                        ref={amountSendInputRef}
                         pallete="purple"
                         variant="amount"
                         style={{ cursor: 'default', color: 'var(--color-purple)', opacity: 1 }}
                         value={amountSendInput.value}
-                        onChange={(e) => {
-                          amountSendInput.onPredict(formatUserInput(e.target.value));
-                          setLastChangedInput(2);
-                        }}
+                        onChange={handleAmountSendInputChange}
                         onFocus={() => {
                           if (
                             emptyPredict(predictData, amountInput.value)
@@ -636,13 +685,11 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
             <AssetsSection>
               <InputRow>
                 <Input
+                  ref={amountInputRef}
                   value={amountInput.value}
                   variant="amount"
                   pallete="blue"
-                  onChange={(e) => {
-                    amountInput.onPredict(formatUserInput(e.target.value));
-                    setLastChangedInput(1);
-                  }}
+                  onChange={handleAmountInputChange}
                   onFocus={() => {
                     if (
                       emptyPredict(predictData, amountSendInput.value)
@@ -680,14 +727,12 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
             <AssetsSection>
               <InputRow>
                 <Input
+                  ref={amountSendInputRef}
                   pallete="purple"
                   variant="amount"
                   style={{ cursor: 'default', color: 'var(--color-purple)', opacity: 1 }}
                   value={amountSendInput.value}
-                  onChange={(e) => {
-                    amountSendInput.onPredict(formatUserInput(e.target.value));
-                    setLastChangedInput(2);
-                  }}
+                  onChange={handleAmountSendInputChange}
                   onFocus={() => {
                     if (
                       emptyPredict(predictData, amountInput.value)
