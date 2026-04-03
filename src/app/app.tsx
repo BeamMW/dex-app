@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import { css } from '@linaria/core';
 
 import { actions as sharedActions, selectors as sharedSelectors } from '@app/shared/store';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { useNavigate, useRoutes } from 'react-router-dom';
+import { Navigate, useNavigate, useRoutes } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ToastContainer } from 'react-toastify';
@@ -12,12 +12,19 @@ import { Scrollbars } from 'react-custom-scrollbars';
 
 import './styles';
 import {
-  PoolsContainer, CreatePool, AddLiquidity, TradePool, WithdrawPool,
+  CreatePool,
+  AddLiquidity,
+  TradePool,
+  WithdrawPool,
+  SwapPoolsHome,
+  ExplorePools,
+  PoolView,
+  MyPools,
 } from '@app/containers';
 import { ROUTES } from '@app/shared/constants';
-import {AlertWallet, Loader} from '@app/shared/components';
+import { AlertWallet, Loader, TopNav } from '@app/shared/components';
 import Utils from '@core/utils.js';
-import { selectIsHeadless, selectOptions } from '@app/containers/Pools/store/selectors';
+import { selectIsHeadless } from '@app/containers/Pools/store/selectors';
 import { selectIsLoaded } from '@app/shared/store/selectors';
 
 const trackStyle = css`
@@ -28,8 +35,24 @@ const trackStyle = css`
 
 const routes = [
   {
-    path: ROUTES.POOLS.BASE,
-    element: <PoolsContainer />,
+    path: '*',
+    element: <Navigate to={ROUTES.NAV.TRADE} replace />,
+  },
+  {
+    path: ROUTES.NAV.TRADE,
+    element: <SwapPoolsHome />,
+  },
+  {
+    path: ROUTES.NAV.EXPLORE,
+    element: <ExplorePools />,
+  },
+  {
+    path: ROUTES.NAV.POOL,
+    element: <PoolView />,
+  },
+  {
+    path: ROUTES.NAV.MY,
+    element: <MyPools />,
   },
   {
     path: ROUTES.POOLS.CREATE_POOL,
@@ -71,6 +94,7 @@ const App = () => {
       {isLoaded ? (
         <Scrollbars renderThumbVertical={(props) => <div {...props} className={trackStyle} />}>
           {isHeadless && isWeb && !iFrameDetection ? <AlertWallet /> : null}
+          <TopNav />
           {content}
           <ToastContainer
             position="bottom-right"

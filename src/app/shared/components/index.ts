@@ -20,3 +20,4 @@ export { default as Loader } from './Loader';
 export { default as PoolStat } from './PoolStat';
 export { default as LoadingSkileton } from './LoadingSkileton';
 export { default as AlertWallet } from './AlertWallet';
+export { default as TopNav } from './TopNav';

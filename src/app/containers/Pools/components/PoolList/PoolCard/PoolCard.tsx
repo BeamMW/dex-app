@@ -1,4 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {
+  memo, useCallback, useEffect, useState,
+} from 'react';
 
 import { IPoolCard } from '@core/types';
 import {
@@ -121,9 +123,9 @@ const ButtonWrapper = styled.div`
   padding: 0 20px;
 `;
 
-export const PoolCard = ({ data, isFavorite }: PoolCardType) => {
-  const nameToken1 = truncate(data.metadata1.UN);
-  const nameToken2 = truncate(data.metadata2.UN);
+export const PoolCard = memo(({ data, isFavorite }: PoolCardType) => {
+  const nameToken1 = truncate(data?.metadata1?.UN || `Token ${data?.aid1 ?? ''}`);
+  const nameToken2 = truncate(data?.metadata2?.UN || `Token ${data?.aid2 ?? ''}`);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [poolIsEmpty, setPoolIsEmpty] = useState(true);
@@ -135,25 +137,25 @@ export const PoolCard = ({ data, isFavorite }: PoolCardType) => {
 
   useEffect(() => {
     setPoolIsEmpty(!!(!data.tok1 || !data.tok2));
-  }, []);
+  }, [data.tok1, data.tok2]);
 
   const addLiquidityNavigation = useCallback(() => {
     dispatch(mainActions.setCurrentPool(data));
     dispatch(mainActions.setPredict(null));
     navigate(ROUTES_PATH.POOLS.ADD_LIQUIDITY);
-  }, [navigate]);
+  }, [dispatch, data, navigate]);
 
   const tradePoolNavigation = useCallback(() => {
     dispatch(mainActions.setCurrentPool(data));
     dispatch(mainActions.setPredict(null));
     navigate(ROUTES_PATH.POOLS.TRADE_POOL);
-  }, [navigate]);
+  }, [dispatch, data, navigate]);
 
   const withdrawPoolNavigation = useCallback(() => {
     dispatch(mainActions.setCurrentPool(data));
     dispatch(mainActions.setPredict(null));
     navigate(ROUTES_PATH.POOLS.WITHDRAW_POOL);
-  }, [navigate]);
+  }, [dispatch, data, navigate]);
 
   const changeCourse = () => {
     setExchange(exchange !== currentCourseMain ? currentCourseMain : currentCourseSecond);
@@ -235,4 +237,4 @@ export const PoolCard = ({ data, isFavorite }: PoolCardType) => {
       </ButtonWrapper>
     </Section>
   );
-};
+});

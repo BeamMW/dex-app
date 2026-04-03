@@ -2,12 +2,20 @@ import React from 'react';
 import { IAsset, IPoolCard } from '@core/types';
 import { Section } from '@app/shared/components/index';
 import AssetLabel from '@app/shared/components/AssetLabel';
-import { fromGroths, truncate, formatNumber } from '@core/appUtils';
+import {
+  fromGroths, truncate, formatNumber, getPoolKind,
+} from '@core/appUtils';
 import { styled } from '@linaria/react';
+import { useDispatch, useSelector } from 'react-redux';
+import { IconFavorite, IconFavoriteFilled } from '@app/shared/icons';
+import * as mainActions from '@app/containers/Pools/store/actions';
+import { selectFavorites } from '@app/containers/Pools/store/selectors';
 
 interface PoolStatType {
   data: IPoolCard;
   lp: IAsset;
+  showFavorite?: boolean;
+  plain?: boolean;
 }
 
 const AmountWrapper = styled.div`
@@ -37,15 +45,65 @@ const SideRightWrap = styled.div`
   align-items: flex-end;
   width: 100%;
 `;
+const HeaderMeta = styled.div`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+`;
+const FeeBadge = styled.div`
+  margin-right: 3px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 14px;
+  color: white;
+`;
+const FavoriteButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+`;
+const PlainWrapper = styled.div`
+  width: 100%;
+`;
+const PlainHeader = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+`;
+const PlainTitle = styled.div`
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 17px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--color-white);
+`;
 
-const PoolStat = ({ data, lp }: PoolStatType) => {
-  const nameToken1 = truncate(data.metadata1.UN);
-  const nameToken2 = truncate(data.metadata2.UN);
-  const nameLPToken = lp ? truncate(lp.parsedMetadata.UN) : 'AMML';
+const PoolStat = ({
+  data, lp, showFavorite = false, plain = false,
+}: PoolStatType) => {
+  const dispatch = useDispatch();
+  const favorites = useSelector(selectFavorites());
+  const nameToken1 = truncate(data?.metadata1?.UN || `Token ${data?.aid1 ?? ''}`);
+  const nameToken2 = truncate(data?.metadata2?.UN || `Token ${data?.aid2 ?? ''}`);
+  const nameLPToken = lp?.parsedMetadata?.UN ? truncate(lp.parsedMetadata.UN) : 'AMML';
   const lpId = lp ? lp.aid : data['lp-token'];
+  const favoriteKey = `${data.aid1}-${data.aid2}-${data.kind}`;
+  const isFavorite = (favorites || []).some((item) => `${item.aid1}-${item.aid2}-${item.kind}` === favoriteKey);
 
-  return (
-    <Section title="Pool info">
+  const content = (
+    <>
       <AmountWrapper>
         <SideLeftWrap>
           <AssetLabel title={nameToken1} assets_id={data.aid1} id variant="predict" />
@@ -58,6 +116,43 @@ const PoolStat = ({ data, lp }: PoolStatType) => {
           <AssetAmount>{formatNumber(fromGroths(data.ctl))}</AssetAmount>
         </SideRightWrap>
       </AmountWrapper>
+    </>
+  );
+
+  if (plain) {
+    return (
+      <PlainWrapper>
+        <PlainHeader>
+          <PlainTitle>Pool info</PlainTitle>
+          <HeaderMeta>
+            <FeeBadge>{getPoolKind(data.kind) || '--'}</FeeBadge>
+            {showFavorite && (
+            <FavoriteButton type="button" onClick={() => dispatch(mainActions.onFavorites.request(data))}>
+              {isFavorite ? <IconFavoriteFilled /> : <IconFavorite />}
+            </FavoriteButton>
+            )}
+          </HeaderMeta>
+        </PlainHeader>
+        {content}
+      </PlainWrapper>
+    );
+  }
+
+  return (
+    <Section
+      title="Pool info"
+      headerRight={(
+        <HeaderMeta>
+          <FeeBadge>{getPoolKind(data.kind) || '--'}</FeeBadge>
+          {showFavorite && (
+            <FavoriteButton type="button" onClick={() => dispatch(mainActions.onFavorites.request(data))}>
+              {isFavorite ? <IconFavoriteFilled /> : <IconFavorite />}
+            </FavoriteButton>
+          )}
+        </HeaderMeta>
+      )}
+    >
+      {content}
     </Section>
   );
 };

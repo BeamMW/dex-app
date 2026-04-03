@@ -4,3 +4,7 @@ export * from './AddLiquidity';
 export * from './TradePool';
 export * from './WithdrawPool';
 export * from './PoolsContainer';
+export * from './SwapPoolsHome';
+export * from './ExplorePools';
+export * from './PoolView';
+export * from './MyPools';

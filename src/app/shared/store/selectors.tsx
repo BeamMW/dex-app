@@ -4,7 +4,12 @@ import { AppState } from '../interface';
 
 const selectShared = (state: AppState) => state.shared;
 
-export const selectRouterLink = () => createSelector(selectShared, (state) => state.routerLink);
-export const selectErrorMessage = () => createSelector(selectShared, (state) => state.errorMessage);
-export const selectSystemState = () => createSelector(selectShared, (state) => state.systemState);
-export const selectIsLoaded = () => createSelector(selectShared, (state) => state.isLoaded);
+const routerLinkSelector = createSelector(selectShared, (state) => state.routerLink);
+const errorMessageSelector = createSelector(selectShared, (state) => state.errorMessage);
+const systemStateSelector = createSelector(selectShared, (state) => state.systemState);
+const isLoadedSelector = createSelector(selectShared, (state) => state.isLoaded);
+
+export const selectRouterLink = () => routerLinkSelector;
+export const selectErrorMessage = () => errorMessageSelector;
+export const selectSystemState = () => systemStateSelector;
+export const selectIsLoaded = () => isLoadedSelector;

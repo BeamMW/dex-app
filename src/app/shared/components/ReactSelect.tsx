@@ -17,9 +17,11 @@ const AssetsId = styled.span`
 interface IReactSelectProps extends Props {
   options: IOptions[];
   onChange: (any) => void;
+  value?: IOptions | null;
   isFilter?: boolean;
   isIcon?: boolean;
   customPrefix?: string;
+  hideValueWhileSearching?: boolean;
   ref?;
 }
 
@@ -28,10 +30,13 @@ const ReactSelect = ({
   onChange,
   isFilter,
   isIcon,
+  hideValueWhileSearching = false,
   ref,
   customPrefix = 'custom-select',
   ...rest
 }: IReactSelectProps) => {
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const noOptionsText = isFilter ? 'Type to search assets' : 'Select asset';
   const {
     Option, DropdownIndicator, ClearIndicator, SingleValue,
   } = components;
@@ -56,7 +61,7 @@ const ReactSelect = ({
     );
   }
   function SingleValues(props) {
-    const { value, data } = props;
+    const { data } = props;
     return (
       // TODO: ADD TYPE
       // @ts-ignore
@@ -105,6 +110,9 @@ const ReactSelect = ({
       isSearchable
       ref={ref}
       onChange={onChange}
+      onMenuOpen={() => setMenuOpen(true)}
+      onMenuClose={() => setMenuOpen(false)}
+      controlShouldRenderValue={!hideValueWhileSearching || !menuOpen}
       noOptionsMessage={({ inputValue }) => (!inputValue ? noOptionsText : 'No assets were found')}
       components={{
         Option: IconOption,

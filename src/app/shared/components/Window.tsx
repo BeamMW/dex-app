@@ -3,7 +3,7 @@ import { styled } from '@linaria/react';
 import Utils from '@core/utils.js';
 import { useNavigate } from 'react-router-dom';
 import Title from '@app/shared/components/Title';
-import { AlertWallet, BackButton, Button } from '@app/shared/components/index';
+import { BackButton, Button } from '@app/shared/components/index';
 import { ROUTES, ROUTES_PATH } from '@app/shared/constants';
 import { IconPlus } from '@app/shared/icons';
 
@@ -11,7 +11,7 @@ interface WindowProps {
   title?: string;
   backButton?: boolean;
   createPool?: boolean;
-  headless?: boolean;
+  hideHeader?: boolean;
 }
 
 const Container = styled.div<{ bgColor: string }>`
@@ -54,7 +54,7 @@ const ButtonStyled = styled.div`
 `;
 
 const Window: React.FC<WindowProps> = ({
-  children, title, backButton, createPool,headless
+  children, title, backButton, createPool, hideHeader,
 }) => {
   const rootRef = useRef();
   const navigate = useNavigate();
@@ -76,10 +76,12 @@ const Window: React.FC<WindowProps> = ({
             </ButtonStyled>
           </ButtonWrapper>
         )}
-        <HeaderWrapper>
-          {backButton && <BackButton title="back" onClick={onPreviousClick} />}
-          {title && <Title variant="heading">{title}</Title>}
-        </HeaderWrapper>
+        {!hideHeader && (
+          <HeaderWrapper>
+            {backButton && <BackButton title="back" onClick={onPreviousClick} />}
+            {title && <Title variant="heading">{title}</Title>}
+          </HeaderWrapper>
+        )}
         {children}
       </Container>
     </>

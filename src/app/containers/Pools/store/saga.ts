@@ -18,7 +18,7 @@ import {
 } from '@core/appUtils';
 import { AppState } from '@app/shared/interface';
 import * as mainActions from '@app/containers/Pools/store/actions';
-import { selectFilter } from '@app/containers/Pools/store/selectors';
+import { selectCurrentPool, selectFavorites, selectFilter } from '@app/containers/Pools/store/selectors';
 import { toast } from 'react-toastify';
 import { navigate } from '@app/shared/store/actions';
 import { ROUTES } from '@app/shared/constants';
@@ -31,8 +31,13 @@ export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.
     yield setStorage();
     const favoritesLocal = JSON.parse(localStorage.getItem('favorites'));
     const filter = yield select(selectFilter());
-    const assetsList = (yield call(LoadAssetsList, action.payload ? action.payload : null)) as IAsset[];
-    console.log(assetsList.length);
+    let assetsList: IAsset[] = [];
+    try {
+      assetsList = (yield call(LoadAssetsList, action.payload ? action.payload : null)) as IAsset[];
+    } catch (_error) {
+      // Keep loading contract/pool data even if wallet assets endpoint fails.
+      assetsList = [];
+    }
     assetsList.forEach((asset) => {
       asset.parsedMetadata = parseMetadata(asset.metadata);
     });
@@ -44,12 +49,13 @@ export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.
     const newPoolList: IPoolCard[] = poolsList.map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList));
     const myPools = newPoolList.filter((el) => el.creator);
     yield put(mainActions.setMyPools(myPools));
-    const filteredPools = onFilter(newPoolList, filter, favoritesLocal).map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList)) as IPoolCard[];
+    const filteredPools = onFilter(newPoolList, filter, favoritesLocal) as IPoolCard[];
     yield put(mainActions.setPoolsList(filteredPools));
     yield put(Shared.setIsLoaded(true));
   } catch (e) {
     // @ts-ignore
     yield put(mainActions.loadAppParams.failure(e));
+    yield put(Shared.setIsLoaded(true));
     toast(e.error);
   }
 }
@@ -114,12 +120,19 @@ export function* addLiquidity(action: ReturnType<typeof mainActions.onAddLiquidi
         yield put(mainActions.setPredict(res));
       }
       if (txid) {
+        // Auto-add pool to favorites on successful liquidity add
+        const currentPool = (yield select(selectCurrentPool())) as IPoolCard;
+        const favoritesList = (yield select(selectFavorites())) as IPoolCard[];
+        if (currentPool && !isInArray(currentPool, favoritesList)) {
+          const updated = [...favoritesList, currentPool];
+          yield localStorage.setItem('favorites', JSON.stringify(updated));
+          yield put(mainActions.setFavorites(updated));
+        }
         yield navigateToHome(txid);
         yield getStatus(txid);
       }
     } catch (e) {
       // @ts-ignore
-      console.log(e);
       yield put(mainActions.onAddLiquidity.failure(e));
       // toast(e.error);
     }
@@ -182,7 +195,9 @@ export function* favorites(action: ReturnType<typeof mainActions.onFavorites.req
     if (storage) {
       const isFav = isInArray(pool, storage);
       if (isFav) {
-        const filtered = storage.filter((e: IPoolCard) => JSON.stringify(e) !== JSON.stringify(pool));
+        const filtered = storage.filter(
+          (e: IPoolCard) => !(e.aid1 === pool.aid1 && e.aid2 === pool.aid2 && e.kind === pool.kind),
+        );
         yield localStorage.setItem('favorites', JSON.stringify(filtered));
         yield put(mainActions.setFavorites(filtered as IPoolCard[]));
         return;

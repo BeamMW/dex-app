@@ -9,83 +9,39 @@ import { setTxStatus } from '@app/containers/Pools/store/actions';
 import store from '../../../index';
 
 const iFrameDetection = window !== window.parent;
-export  async function start() {
+export async function start() {
   Utils.download('./amm.wasm', (err, bytes) => {
-    console.log(1)
     Utils.callApi('ev_subunsub', {
       ev_txs_changed: true,
       ev_system_state: true,
-    }, (error, result, full) => {
-      if (error) {
-        console.log(err);
-      }
+    }, (error, result) => {
+      if (error) return;
       if (result) {
         store.dispatch(mainActions.loadAppParams.request(bytes));
-          store.dispatch(mainActions.loadPoolsList.request(null));
+        store.dispatch(mainActions.loadPoolsList.request(null));
       }
     });
   });
 }
 export function remoteEventChannel() {
-  Utils.initialize(
-    {
-      appname: 'DEX',
-      min_api_version: '7.2',
-      headless: !iFrameDetection || !!Utils.isHeadless(),
-      apiResultHandler: (error, result, full) => {
-        console.log('api result data: ', result, full);
-        if (!result) {
-          emitter(full);
-        }
-      },
-    },
-    (err) => {
-      if (err) {
-        console.log(err);
-      }
-      start();
-      // store.dispatch(actions.setIsLoaded(true));
-      // Utils.downloadAsync('./amm.wasm', (errs, res) => {
-      //   if (errs) {
-      //     const errTemplate = 'Failed to load shader,';
-      //     const errMsg = [errTemplate, errs].join(' ');
-      //     return this.setError(errMsg);
-      //   }
-      //   console.log(res.length);
-      //   store.dispatch(mainActions.loadAppParams.request(res));
-      //   store.dispatch(mainActions.loadPoolsList.request(null));
-      // });
-      // .then((res) => {
-      //     if()
-      //       Utils.callApiAsync('ev_subunsub', { ev_txs_changed: true, ev_system_state: true }).then(() => {
-      //         store.dispatch(mainActions.loadAppParams.request(res));
-      //         store.dispatch(mainActions.loadPoolsList.request(null));
-      //         store.dispatch(actions.setIsLoaded(true));
-      //         console.log('BBBBS');
-      //         console.log(res);
-      //       }).catch((e) => {
-      //         console.log(e);
-      //       });
-      //   }).catch((e) => { console.log(e); });
-      // console.log(res);
-      // await Utils.callApi('ev_subunsub', { ev_txs_changed: true, ev_system_state: true }, (error, result, full) => {
-      //   if (error) {
-      //     console.log(err);
-      //   }
-      //   if (result) {
-      //     console.log(full);
-      //     console.log('result');
-      //     store.dispatch(actions.setIsLoaded(true));
-      //
-      //     store.dispatch(mainActions.loadPoolsList.request(null));
-      //   }
-      // });
-      // // store.dispatch(actions.setIsLoaded(true));
-      // store.dispatch(mainActions.loadAppParams.request(res));
-      // store.dispatch(mainActions.loadPoolsList.request(null));
-    },
-  );
   return eventChannel((emitter) => {
+    Utils.initialize(
+      {
+        appname: 'DEX',
+        min_api_version: '7.3',
+        headless: !iFrameDetection || !!Utils.isHeadless(),
+        apiResultHandler: (_error, result, full) => {
+          if (!result && full) {
+            emitter(full);
+          }
+        },
+      },
+      (err) => {
+        if (err) return;
+        start();
+      },
+    );
+
     const unsubscribe = () => {
       emitter(END);
     };
@@ -101,7 +57,6 @@ function* sharedSaga() {
       const payload: any = yield take(remoteChannel);
       switch (payload.id) {
         case 'ev_system_state':
-          console.log(1);
           store.dispatch(setSystemState(payload.result));
           store.dispatch(mainActions.loadAppParams.request(null));
           // store.dispatch(mainActions.loadPoolsList.request(null));

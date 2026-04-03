@@ -47,7 +47,10 @@ export default class Utils {
   static isDesktop() {
     if (Utils.is_desktop === undefined) {
       const ua = navigator.userAgent;
-      Utils.is_desktop = (/QtWebEngine/i.test(ua));
+      const hasQtBridge = typeof window !== 'undefined'
+        && typeof window.qt !== 'undefined'
+        && !!window.qt.webChannelTransport;
+      Utils.is_desktop = (/QtWebEngine/i.test(ua) || hasQtBridge);
     }
     return Utils.is_desktop;
   }
@@ -270,7 +273,14 @@ export default class Utils {
     }
 
     if (Utils.isDesktop()) {
-      return BEAM.api.callWalletApi(JSON.stringify(request));
+      try {
+        return BEAM.api.callWalletApi(JSON.stringify(request));
+      } catch (e) {
+        console.error('Desktop callWalletApi failed:', e);
+        const cback = Calls[callid]?.cback;
+        delete Calls[callid];
+        if (cback) cback({ error: { code: -1, message: e.toString() } });
+      }
     }
   }
 

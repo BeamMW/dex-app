@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './index.scss';
 import {
-  AssetsContainer, Button, Section, Window, Container, ReactSelect,
+  Button, Window, Container, ReactSelect,
 } from '@app/shared/components';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectOptions } from '@app/containers/Pools/store/selectors';
@@ -10,31 +10,21 @@ import {
   kindSelect, placeHolder, ROUTES, titleSections,
 } from '@app/shared/constants';
 import * as mainActions from '@app/containers/Pools/store/actions';
-import { styled } from '@linaria/react';
 import { CancelIcon, DoneIcon } from '@app/shared/icons';
 import { useNavigate } from 'react-router-dom';
+import {
+  BlockLabel,
+  ButtonBlock,
+  ButtonWrapper,
+  EmbeddedTradeButtonWrap,
+  SelectWrapper,
+  SwapBlock,
+  SwapCard,
+} from '@app/containers/Pools/containers/shared/poolFlowLayout';
+import { styled } from '@linaria/react';
 
-const SectionWrapper = styled.div`
-  margin: 10px 0 40px 0;
-  display: flex;
-  justify-content: flex-start;
-  width: 100%;
-  @media (max-width: 913px) {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-`;
-const ButtonBlock = styled.div`
-  display: flex;
-  justify-content: center;
-  width: 100%;
-`;
-const ButtonWrapper = styled.div`
-  display: flex;
-  max-width: 363px;
-  width: 100%;
-  justify-content: space-between;
+const FeeField = styled.div`
+  max-width: 167px;
 `;
 
 export const CreatePool = () => {
@@ -46,7 +36,8 @@ export const CreatePool = () => {
   const [isValidate, setIsValidate] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  useMemo(() => {
+
+  useEffect(() => {
     setRequestData([
       {
         aid1: currentToken1 && currentToken1.value,
@@ -56,15 +47,14 @@ export const CreatePool = () => {
     ]);
   }, [currentToken1, currentToken2, currentKind]);
 
-  useMemo(() => {
-    if (currentToken1 === null) {
+  useEffect(() => {
+    if (currentToken1 === null || currentToken2 === null || currentKind === null) {
       setIsValidate(false);
-    } else if (currentToken2 === null) {
-      setIsValidate(false);
-    } else if (currentKind === null) {
-      setIsValidate(false);
-    } else setIsValidate(true);
+    } else {
+      setIsValidate(true);
+    }
   }, [currentToken1, currentToken2, currentKind]);
+
   const onPreviousClick = () => {
     navigate(ROUTES.POOLS.BASE);
   };
@@ -74,29 +64,32 @@ export const CreatePool = () => {
   };
 
   return (
-    <Window title="Create pool" backButton>
+    <Window hideHeader>
       <Container variant="center">
-        <AssetsContainer variant="space-between">
-          <Section title={titleSections.CREATE_FIRST}>
-            <ReactSelect
-              options={options}
-              onChange={(e) => setCurrentToken1(e)}
-              isIcon
-              placeholder={placeHolder.ASSETS}
-            />
-          </Section>
-          <Section title={titleSections.CREATE_SECOND}>
-            <ReactSelect
-              options={options}
-              onChange={(e) => setCurrentToken2(e)}
-              isIcon
-              placeholder={placeHolder.ASSETS}
-            />
-          </Section>
-        </AssetsContainer>
-        <SectionWrapper>
-          <Section title={titleSections.FEE}>
-            <div className="fees-wrapper">
+        <SwapCard>
+          <SelectWrapper>
+            <SwapBlock>
+              <BlockLabel>{titleSections.CREATE_FIRST}</BlockLabel>
+              <ReactSelect
+                options={options}
+                onChange={(e) => setCurrentToken1(e)}
+                isIcon
+                placeholder={placeHolder.ASSETS}
+              />
+            </SwapBlock>
+            <SwapBlock>
+              <BlockLabel>{titleSections.CREATE_SECOND}</BlockLabel>
+              <ReactSelect
+                options={options}
+                onChange={(e) => setCurrentToken2(e)}
+                isIcon
+                placeholder={placeHolder.ASSETS}
+              />
+            </SwapBlock>
+          </SelectWrapper>
+          <SwapBlock>
+            <BlockLabel>{titleSections.FEE}</BlockLabel>
+            <FeeField>
               <ReactSelect
                 options={kindSelect}
                 onChange={(e) => setCurrentKind(e)}
@@ -105,20 +98,21 @@ export const CreatePool = () => {
                 customPrefix="custom-kind"
                 isSearchable={false}
               />
-            </div>
-          </Section>
-        </SectionWrapper>
-
-        <ButtonBlock>
-          <ButtonWrapper>
-            <Button icon={CancelIcon} variant="cancel" onClick={onPreviousClick}>
-              Cancel
-            </Button>
-            <Button icon={DoneIcon} variant="approve" onClick={() => createPool(requestData)} disabled={!isValidate}>
-              Create Pool
-            </Button>
-          </ButtonWrapper>
-        </ButtonBlock>
+            </FeeField>
+          </SwapBlock>
+          <EmbeddedTradeButtonWrap>
+            <ButtonBlock>
+              <ButtonWrapper>
+                <Button icon={CancelIcon} variant="cancel" onClick={onPreviousClick}>
+                  Cancel
+                </Button>
+                <Button icon={DoneIcon} variant="approve" onClick={() => createPool(requestData)} disabled={!isValidate}>
+                  Create Pool
+                </Button>
+              </ButtonWrapper>
+            </ButtonBlock>
+          </EmbeddedTradeButtonWrap>
+        </SwapCard>
       </Container>
     </Window>
   );

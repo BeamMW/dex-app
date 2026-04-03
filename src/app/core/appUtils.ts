@@ -33,16 +33,14 @@ export function truncate(value: string, len = LENGTH_MAX): string {
 }
 
 export function getOptions(assets: IAsset[]) {
-  let options = [
+  const options = [
     {
       value: 0,
       label: 'BEAM',
     },
   ];
-
-  assets.map((item) => {
-    options = [...options, { value: item.asset_id, label: `${truncate(item.parsedMetadata.UN)}` }];
-    return options;
+  assets.forEach((item) => {
+    options.push({ value: item.asset_id, label: `${truncate(item.parsedMetadata.UN)}` });
   });
   return options;
 }
@@ -56,6 +54,7 @@ export function numFormatter(num) {
   if (num <= 999) {
     return parseFloat(num.toFixed(2));
   }
+  return num;
 }
 
 export function formatNumber(num: string | number): string {
@@ -86,28 +85,34 @@ export const parsePoolMetadata = (poolCard, aid1, aid2, assetList: IAsset[]) => 
   if (aid1 === 0) {
     data = { ...data, metadata1: ASSET_BEAM };
   } else {
-    assetList.filter((item) => {
-      if (aid1 === item.asset_id) {
-        data = { ...data, metadata1: item.parsedMetadata };
-      }
-      return data;
-    });
+    const firstAsset = assetList.find((item) => aid1 === item.asset_id);
+    if (firstAsset) {
+      data = { ...data, metadata1: firstAsset.parsedMetadata };
+    }
   }
   if (aid2 === 0) {
     data = { ...data, metadata2: ASSET_BEAM };
   } else {
-    assetList.filter((item) => {
-      if (aid2 === item.asset_id) {
-        data = { ...data, metadata2: item.parsedMetadata };
-      }
-      return data;
-    });
+    const secondAsset = assetList.find((item) => aid2 === item.asset_id);
+    if (secondAsset) {
+      data = { ...data, metadata2: secondAsset.parsedMetadata };
+    }
   }
   return data;
 };
 
 export function fromGroths(value: number): string | number {
-  return value && value !== 0 ? value / GROTHS_IN_BEAM : 0;
+  if (!value || value === 0) {
+    return 0;
+  }
+  const sign = Number(value) < 0 ? '-' : '';
+  const absValue = Math.abs(Number(value));
+  const integerPart = Math.floor(absValue / GROTHS_IN_BEAM);
+  const fractionalRaw = Math.floor(absValue % GROTHS_IN_BEAM)
+    .toString()
+    .padStart(8, '0')
+    .replace(/0+$/, '');
+  return `${sign}${integerPart}${fractionalRaw ? `.${fractionalRaw}` : ''}`;
 }
 
 export function toGroths(value: number): number {
@@ -137,14 +142,9 @@ export function setDataRequest(data) {
   return { ...data, bPredictOnly: 0 };
 }
 export function onFilter(data: IPoolCard[], filter = 'all', favorite: IPoolCard[]) {
-  console.log({
-    data,
-    filter,
-    favorite
-  })
   switch (filter) {
     case 'all': {
-      return data.sort((a, b) => b.ctl - a.ctl);
+      return [...data].sort((a, b) => b.ctl - a.ctl);
     }
     case 'created': {
       return data.filter((el) => el.creator);
@@ -156,10 +156,12 @@ export function onFilter(data: IPoolCard[], filter = 'all', favorite: IPoolCard[
       return data.filter((el) => !el.ctl);
     }
     case 'fav': {
-      return data.filter((item) => favorite.some((item2) => item.aid1 === item2.aid1 && item.aid2 === item2.aid2 && item.kind === item2.kind));
+      return data.filter((item) => favorite.some(
+        (item2) => item.aid1 === item2.aid1 && item.aid2 === item2.aid2 && item.kind === item2.kind,
+      ));
     }
     default:
-      return data.sort((a, b) => b.ctl - a.ctl);
+      return [...data].sort((a, b) => b.ctl - a.ctl);
   }
 }
 
@@ -176,7 +178,7 @@ export const onPredictValue = (value, swap: boolean, predict: IPredict) => {
 };
 export const getFilterPools = (value: IOptions, data: IPoolCard[]): IPoolCard[] => {
   let newList = [];
-  if (value !== null || undefined) {
+  if (value !== null && value !== undefined) {
     newList = data.filter((el) => el.aid1 === value.value || el.aid2 === value.value || el['lp-token'] === value.value);
     return newList.length === 0 ? null : newList;
   }
@@ -198,9 +200,9 @@ export function convertLowAmount(explicitNum) {
       z = `${sign}0.`;
       while (!(mag >= 0)) {
         z += '0';
-        ++mag;
+        mag += 1;
       }
-      const num = z + str.replace(/^\-/, '');
+      const num = z + str.replace(/^-/, '');
       if (explicitNum) {
         return parseFloat(num);
       }
@@ -210,7 +212,7 @@ export function convertLowAmount(explicitNum) {
       mag -= str.length;
       while (!(mag <= 0)) {
         z += 0;
-        --mag;
+        mag -= 1;
       }
       const num = str + z;
       if (explicitNum) {
@@ -219,7 +221,7 @@ export function convertLowAmount(explicitNum) {
       return num;
     }
     const leader = parseFloat(data[0]);
-    const multiplier = Math.pow(10, parseInt(data[1]));
+    const multiplier = 10 ** parseInt(data[1], 10);
     return leader * multiplier;
   }
   return 0;
@@ -264,7 +266,7 @@ export async function onSwitchToApi() {
         store.dispatch(mainActions.setIsHeadless(false));
         toast('Your wallet is connected');
       })
-      .catch((e) => {
+      .catch(() => {
         toast('Sorry, wallet not connected');
       });
   }

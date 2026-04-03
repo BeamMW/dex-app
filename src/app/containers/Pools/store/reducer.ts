@@ -1,7 +1,6 @@
 import { DexStateType } from '@app/containers/Pools/interfaces/DexStateType';
 import { ActionType, createReducer } from 'typesafe-actions';
 import produce from 'immer';
-import { favorites } from '@app/containers/Pools/store/saga';
 import * as actions from './actions';
 
 type Action = ActionType<typeof actions>;

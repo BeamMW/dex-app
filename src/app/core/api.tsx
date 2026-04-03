@@ -2,32 +2,29 @@ import Utils from '@core/utils.js';
 import {
   IAddLiquidity, ICreatePool, IError, ITrade, ITxId, IWithdraw,
 } from '@core/types';
-import {CID} from "@app/shared/constants";
+import { CID } from '@app/shared/constants';
 
-
-const onMakeTx = (err, sres, full) => {
-  if (err) {
-    console.log(err, 'Failed to generate transaction request');
-  }
-  return new Promise((resolve) => {
-    Utils.callApi('process_invoke_data', { data: full.result.raw_data }, (error, result) => {
-      resolve(result);
-    });
+const onMakeTx = (err, _sres, full) => new Promise((resolve) => {
+  Utils.callApi('process_invoke_data', { data: full.result.raw_data }, (error, result) => {
+    resolve(result);
   });
-};
+});
 
 export function LoadAssetsList<T = any>(payload): Promise<T> {
   return new Promise((resolve, reject) => {
     Utils.callApi(
-       'assets_list', { refresh: true},
+      'assets_list',
+      { refresh: true },
       (error, result) => {
         if (error) {
           reject(error);
-          console.log('errrrrrr');
+          return;
         }
-        resolve(result.assets);
-        console.log(result);
-        console.log('apiREs');
+        if (Array.isArray(result)) {
+          resolve(result as unknown as T);
+          return;
+        }
+        resolve((result?.assets ?? []) as unknown as T);
       },
       payload || null,
     );
@@ -69,13 +66,9 @@ export function AddLiquidityApi<T = any>({
   bPredictOnly = 1,
 }: IAddLiquidity): Promise<T> | any {
   return new Promise((resolve, reject) => {
-      console.log( aid1,
-          aid2,
-          kind,
-          val1,
-          val2,)
     Utils.invokeContract(
-      `action=pool_add_liquidity,aid1=${aid1},aid2=${aid2},kind=${kind},val1=${val1},val2=${val2},bPredictOnly=${bPredictOnly},cid=${CID}`,
+      `action=pool_add_liquidity,aid1=${aid1},aid2=${aid2},kind=${kind},`
+      + `val1=${val1},val2=${val2},bPredictOnly=${bPredictOnly},cid=${CID}`,
       (error, result, full) => {
         if (error) {
           reject(error);
@@ -95,7 +88,8 @@ export function TradePoolApi<T = any>({
 }: ITrade): Promise<T> | any {
   return new Promise((resolve, reject) => {
     Utils.invokeContract(
-      `action=pool_trade,aid1=${aid1},aid2=${aid2},kind=${kind},val1_buy=${val1_buy || 0}, val2_pay=${val2_pay || 0},bPredictOnly=${bPredictOnly},cid=${CID}`,
+      `action=pool_trade,aid1=${aid1},aid2=${aid2},kind=${kind},val1_buy=${val1_buy || 0},`
+      + ` val2_pay=${val2_pay || 0},bPredictOnly=${bPredictOnly},cid=${CID}`,
       (error, result, full) => {
         if (error) {
           reject(error);

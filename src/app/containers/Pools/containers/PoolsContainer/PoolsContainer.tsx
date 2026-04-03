@@ -1,14 +1,16 @@
 import React from 'react';
 import { useRoutes } from 'react-router-dom';
 import { ROUTES_PATH } from '@app/shared/constants';
-import {
-  CreatePool, PoolsList, AddLiquidity, TradePool, WithdrawPool,
-} from '..';
+import { CreatePool } from '@app/containers/Pools/containers/CreatePool';
+import { AddLiquidity } from '@app/containers/Pools/containers/AddLiquidity';
+import { TradePool } from '@app/containers/Pools/containers/TradePool';
+import { WithdrawPool } from '@app/containers/Pools/containers/WithdrawPool';
+import { SwapPoolsHome } from '@app/containers/Pools/containers/SwapPoolsHome';
 
 const routes = [
   {
     path: ROUTES_PATH.POOLS.BASE,
-    element: <PoolsList />,
+    element: <SwapPoolsHome />,
     exact: true,
   },
   {
