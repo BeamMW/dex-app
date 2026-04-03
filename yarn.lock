@@ -6394,8 +6394,8 @@ __metadata:
   linkType: hard
 
 "follow-redirects@npm:^1.0.0":
-  version: 1.15.1
-  resolution: "follow-redirects@npm:1.15.1"
+  version: 1.15.11
+  resolution: "follow-redirects@npm:1.15.11"
   peerDependenciesMeta:
     debug:
       optional: true
