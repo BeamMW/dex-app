@@ -130,6 +130,10 @@ module.exports = {
           to: path.join(__dirname, 'html'),
           context: 'public',
         },
+        {
+          from: path.join(__dirname, 'src/app/shared/icons/logo-dex.svg'),
+          to: path.join(__dirname, 'html/logo.svg'),
+        },
         ...(beamWasmClientPath ? [{
           from: beamWasmClientPath,
           to: path.join(__dirname, 'html/'),
