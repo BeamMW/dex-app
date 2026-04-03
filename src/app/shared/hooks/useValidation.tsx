@@ -15,7 +15,7 @@ export const useValidation = ({ value, validations }: IUseValidation) => {
           break;
         case 'isMax':
           if (val) {
-            setIsMax(+value >= val);
+            setIsMax(+String(value).replace(/,/g, '') >= val);
           }
           break;
         default:

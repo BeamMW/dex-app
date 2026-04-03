@@ -1,8 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { IOptions, ITrade, IPoolCard } from '@core/types';
 import {
-  emptyPredict, fromGroths, setDataRequest, toGroths, truncate,
+  emptyPredict, fromGroths, getPoolKind, setDataRequest, toGroths, truncate,
 } from '@core/appUtils';
+import { styled } from '@linaria/react';
 import {
   AssetsContainer,
   AssetsSection,
@@ -65,6 +66,58 @@ import {
   TotalTitle,
 } from '@app/containers/Pools/containers/shared/poolFlowLayout';
 
+const FeeTierRow = styled.div`
+  display: flex;
+  align-items: center;
+  margin-top: 12px;
+  flex-wrap: wrap;
+`;
+
+const FeeTierButton = styled.button<{ active: boolean }>`
+  display: flex;
+  align-items: center;
+  padding: 4px 12px;
+  margin-right: 8px;
+  border-radius: 20px;
+  border: 1px solid ${({ active }) => (active ? 'var(--color-purple)' : 'rgba(255,255,255,0.15)')};
+  background: ${({ active }) => (active ? 'rgba(162,98,247,0.15)' : 'transparent')};
+  color: ${({ active }) => (active ? 'var(--color-purple)' : 'rgba(255,255,255,0.5)')};
+  font-size: 13px;
+  cursor: pointer;
+`;
+
+const BestBadge = styled.span`
+  font-size: 10px;
+  font-weight: 700;
+  color: #00e2c2;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-left: 4px;
+`;
+
+const AutoButton = styled.button`
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: transparent;
+  color: rgba(255,255,255,0.4);
+  font-size: 12px;
+  cursor: pointer;
+`;
+
+const parseAmount = (v: string | number) => Number(String(v).replace(/,/g, ''));
+
+const formatPredictAmount = (v: string | number) => {
+  const [int, frac] = String(v).split('.');
+  const intFormatted = Number(int).toLocaleString('en-US');
+  return frac !== undefined ? `${intFormatted}.${frac}` : intFormatted;
+};
+
+const formatUserInput = (v: string) => {
+  const stripped = v.replace(/,/g, '');
+  return stripped ? formatPredictAmount(stripped) : '';
+};
+
 interface TradePoolProps {
   embedded?: boolean;
 }
@@ -78,6 +131,8 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   const [currentToken, setCurrentToken] = useState<number | null>(data?.aid1 ?? null);
   const [secondToken, setSecondToken] = useState<number | null>(data?.aid2 ?? null);
   const [currentLPToken, setCurrentLPToken] = useState(null);
+  const [manualKind, setManualKind] = useState<number | null>(null);
+  const [bestKind, setBestKind] = useState<number | null>(null);
   const [currentTokAmount, setCurrentTokenAmount] = useState<number>(data?.tok1 ?? 0);
   const amountInput = useInput({
     initialValue: 0,
@@ -93,24 +148,26 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const activePool = useMemo<IPoolCard | null>(() => {
-    if (currentToken === null || secondToken === null) {
-      return null;
-    }
-    const matched = pools
+  const matchedPools = useMemo<IPoolCard[]>(() => {
+    if (currentToken === null || secondToken === null) return [];
+    return pools
       .filter((pool) => (
         (pool.aid1 === currentToken && pool.aid2 === secondToken)
         || (pool.aid1 === secondToken && pool.aid2 === currentToken)
       ))
       .sort((a, b) => b.ctl - a.ctl);
-    if (!matched.length) {
-      return null;
+  }, [pools, currentToken, secondToken]);
+
+  const activePool = useMemo<IPoolCard | null>(() => {
+    if (!matchedPools.length) return null;
+    if (manualKind !== null) {
+      return matchedPools.find((p) => p.kind === manualKind) || matchedPools[0];
     }
-    if (data && data.aid1 === currentToken && data.aid2 === secondToken) {
+    if (data && matchedPools.some((p) => p.kind === data.kind)) {
       return data;
     }
-    return matched[0];
-  }, [currentToken, secondToken, pools, data]);
+    return matchedPools[0];
+  }, [matchedPools, data, manualKind]);
 
   const getTokenTitle = (assetId: number | null) => {
     const option = options.find((item) => item.value === assetId);
@@ -159,6 +216,11 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   }, [embedded, data?.aid1, data?.aid2]);
 
   useEffect(() => {
+    setManualKind(null);
+    setBestKind(null);
+  }, [currentToken, secondToken]);
+
+  useEffect(() => {
     if (!activePool || currentToken === null) {
       setCurrentTokenAmount(0);
       return;
@@ -181,8 +243,20 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
         aid1: secondToken,
         aid2: currentToken,
         kind: activePool?.kind ?? 0,
-        val2_pay: toGroths(Number(amountInput.value)),
+        val2_pay: toGroths(parseAmount(amountInput.value)),
       });
+      if (!manualKind && matchedPools.length > 1) {
+        const amount = toGroths(parseAmount(amountInput.value));
+        if (amount > 0) {
+          dispatch(mainActions.onFindBestPool.request({
+            pools: matchedPools,
+            aid1: secondToken,
+            aid2: currentToken,
+            val2_pay: amount,
+            val1_buy: 0,
+          }));
+        }
+      }
     }
   }, [amountInput.value, currentToken, secondToken, lastChangedInput, activePool?.kind]);
 
@@ -192,8 +266,20 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
         aid1: secondToken,
         aid2: currentToken,
         kind: activePool?.kind ?? 0,
-        val1_buy: toGroths(Number(amountSendInput.value)),
+        val1_buy: toGroths(parseAmount(amountSendInput.value)),
       });
+      if (!manualKind && matchedPools.length > 1) {
+        const amount = toGroths(parseAmount(amountSendInput.value));
+        if (amount > 0) {
+          dispatch(mainActions.onFindBestPool.request({
+            pools: matchedPools,
+            aid1: secondToken,
+            aid2: currentToken,
+            val2_pay: 0,
+            val1_buy: amount,
+          }));
+        }
+      }
     }
   }, [amountSendInput.value, currentToken, secondToken, lastChangedInput, activePool?.kind]);
 
@@ -254,7 +340,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   const feeTotal = feeDao + feePool;
   const executionRate = execPay > 0 ? execBuy / execPay : 0;
   const priceImpact = poolRate > 0 && executionRate > 0 ? ((poolRate - executionRate) / poolRate) * 100 : 0;
-  const activeAmount = lastChangedInput === 1 ? Number(amountInput.value) : Number(amountSendInput.value);
+  const activeAmount = lastChangedInput === 1 ? parseAmount(amountInput.value) : parseAmount(amountSendInput.value);
   const hasActiveQuoteInput = Number.isFinite(activeAmount) && activeAmount > 0;
   const displayedBuyRaw = hasActiveQuoteInput ? effectiveBuyRaw : 0;
   const displayedPayRaw = hasActiveQuoteInput ? effectivePayRaw : 0;
@@ -272,19 +358,26 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
       return;
     }
     if (lastChangedInput === 1 && !emptyPredict(predictData, amountInput.value)) {
-      amountSendInput.onPredict(fromGroths(effectiveBuyRaw));
+      amountSendInput.onPredict(formatPredictAmount(fromGroths(effectiveBuyRaw)));
     }
     if (lastChangedInput === 2 && !emptyPredict(predictData, amountSendInput.value)) {
-      amountInput.onPredict(fromGroths(effectivePayRaw));
+      amountInput.onPredict(formatPredictAmount(fromGroths(effectivePayRaw)));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [predictData, lastChangedInput, effectiveBuyRaw, effectivePayRaw]);
 
   useEffect(() => {
-    if (!hasActiveQuoteInput && predictData) {
-      dispatch(mainActions.setPredict(null));
+    if (!hasActiveQuoteInput) {
+      if (predictData) {
+        dispatch(mainActions.setPredict(null));
+      }
+      if (lastChangedInput === 1) {
+        amountSendInput.onPredict('');
+      } else {
+        amountInput.onPredict('');
+      }
     }
-  }, [hasActiveQuoteInput, predictData, dispatch]);
+  }, [hasActiveQuoteInput, predictData, dispatch, lastChangedInput]);
 
   if (embedded) {
     return (
@@ -302,7 +395,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                         variant="amount"
                         pallete="blue"
                         onChange={(e) => {
-                          amountInput.onChange(e);
+                          amountInput.onPredict(formatUserInput(e.target.value));
                           setLastChangedInput(1);
                         }}
                         onFocus={() => {
@@ -349,7 +442,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                         style={{ cursor: 'default', color: 'var(--color-purple)', opacity: 1 }}
                         value={amountSendInput.value}
                         onChange={(e) => {
-                          amountSendInput.onChange(e);
+                          amountSendInput.onPredict(formatUserInput(e.target.value));
                           setLastChangedInput(2);
                         }}
                         onFocus={() => {
@@ -468,6 +561,37 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
               {activePool ? (
                 <>
                   <PoolStat data={activePool} lp={currentLPToken} showFavorite plain />
+                  {matchedPools.length > 1 && (
+                    <FeeTierRow>
+                      {matchedPools.map((pool) => (
+                        <FeeTierButton
+                          key={pool.kind}
+                          active={activePool?.kind === pool.kind}
+                          onClick={() => {
+                            if (manualKind === null) setBestKind(data?.kind ?? null);
+                            setManualKind(pool.kind);
+                            dispatch(mainActions.setCurrentPool(pool));
+                          }}
+                        >
+                          {getPoolKind(pool.kind)}
+                          {(manualKind === null ? data?.kind : bestKind) === pool.kind && (
+                            <BestBadge>Best</BestBadge>
+                          )}
+                        </FeeTierButton>
+                      ))}
+                      {manualKind !== null && (
+                        <AutoButton
+                          onClick={() => {
+                            setManualKind(null);
+                            setBestKind(null);
+                            dispatch(mainActions.setCurrentPool(matchedPools[0]));
+                          }}
+                        >
+                          Auto
+                        </AutoButton>
+                      )}
+                    </FeeTierRow>
+                  )}
                   <EmbeddedActionRow>
                     <Button
                       icon={IconShieldChecked}
@@ -513,7 +637,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   variant="amount"
                   pallete="blue"
                   onChange={(e) => {
-                    amountInput.onChange(e);
+                    amountInput.onPredict(formatUserInput(e.target.value));
                     setLastChangedInput(1);
                   }}
                   onFocus={() => {
@@ -558,7 +682,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   style={{ cursor: 'default', color: 'var(--color-purple)', opacity: 1 }}
                   value={amountSendInput.value}
                   onChange={(e) => {
-                    amountSendInput.onChange(e);
+                    amountSendInput.onPredict(formatUserInput(e.target.value));
                     setLastChangedInput(2);
                   }}
                   onFocus={() => {
@@ -654,7 +778,42 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
               </SummaryContainer>
             </SummaryWrapper>
           </Section>
-          {activePool ? <PoolStat data={activePool} lp={currentLPToken} /> : null}
+          {activePool ? (
+            <>
+              <PoolStat data={activePool} lp={currentLPToken} />
+              {matchedPools.length > 1 && (
+                <FeeTierRow>
+                  {matchedPools.map((pool) => (
+                    <FeeTierButton
+                      key={pool.kind}
+                      active={activePool?.kind === pool.kind}
+                      onClick={() => {
+                        if (manualKind === null) setBestKind(data?.kind ?? null);
+                        setManualKind(pool.kind);
+                        dispatch(mainActions.setCurrentPool(pool));
+                      }}
+                    >
+                      {getPoolKind(pool.kind)}
+                      {(manualKind === null ? data?.kind : bestKind) === pool.kind && (
+                        <BestBadge>Best</BestBadge>
+                      )}
+                    </FeeTierButton>
+                  ))}
+                  {manualKind !== null && (
+                    <AutoButton
+                      onClick={() => {
+                        setManualKind(null);
+                        setBestKind(null);
+                        dispatch(mainActions.setCurrentPool(matchedPools[0]));
+                      }}
+                    >
+                      Auto
+                    </AutoButton>
+                  )}
+                </FeeTierRow>
+              )}
+            </>
+          ) : null}
         </SectionWrapper>
         )}
         <ButtonBlock>

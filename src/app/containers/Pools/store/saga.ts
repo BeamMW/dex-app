@@ -49,7 +49,7 @@ export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.
     const newPoolList: IPoolCard[] = poolsList.map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList));
     const myPools = newPoolList.filter((el) => el.creator);
     yield put(mainActions.setMyPools(myPools));
-    const filteredPools = onFilter(newPoolList, filter, favoritesLocal) as IPoolCard[];
+    const filteredPools = onFilter(newPoolList, filter as string, favoritesLocal) as IPoolCard[];
     yield put(mainActions.setPoolsList(filteredPools));
     yield put(Shared.setIsLoaded(true));
   } catch (e) {
@@ -215,6 +215,36 @@ export function* favorites(action: ReturnType<typeof mainActions.onFavorites.req
   }
 }
 
+export function* findBestPool(action: ReturnType<typeof mainActions.onFindBestPool.request>): Generator {
+  const {
+    pools, aid1, aid2, val2_pay, val1_buy,
+  } = action.payload;
+
+  let bestPool = pools[0];
+  let bestBuy = -1;
+
+  for (const pool of pools) {
+    try {
+      // @ts-ignore
+      const result = (yield call(TradePoolApi, {
+        aid1,
+        aid2,
+        kind: pool.kind,
+        val2_pay: val2_pay || 0,
+        val1_buy: val1_buy || 0,
+        bPredictOnly: 1,
+      })) as ITxResult;
+      const buy = result?.res?.buy ?? 0;
+      if (buy > bestBuy) {
+        bestBuy = buy;
+        bestPool = pool;
+      }
+    } catch (_) {}
+  }
+
+  yield put(mainActions.setCurrentPool(bestPool));
+}
+
 function* mainSaga() {
   yield takeLatest(mainActions.loadAppParams.request, loadParamsSaga);
   yield takeLatest(mainActions.onCreatePool.request, createPool);
@@ -222,6 +252,7 @@ function* mainSaga() {
   yield takeLatest(mainActions.onTradePool.request, tradePool);
   yield takeLatest(mainActions.onWithdraw.request, withdrawPool);
   yield takeLatest(mainActions.onFavorites.request, favorites);
+  yield takeLatest(mainActions.onFindBestPool.request, findBestPool);
 }
 
 export default mainSaga;

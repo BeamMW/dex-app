@@ -69,3 +69,8 @@ export const onFilterz = createAsyncAction(
   MainActionsTypes.FILTERZ_SUCCESS,
   MainActionsTypes.FILTERZ_FAILURE,
 )<IWithdraw, any>();
+export const onFindBestPool = createAsyncAction(
+  MainActionsTypes.FIND_BEST_POOL,
+  MainActionsTypes.FIND_BEST_POOL_SUCCESS,
+  MainActionsTypes.FIND_BEST_POOL_FAILURE,
+)<{ pools: IPoolCard[]; aid1: number; aid2: number; val2_pay?: number; val1_buy?: number }, IPoolCard, any>();

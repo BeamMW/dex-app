@@ -109,12 +109,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const [inputValue, setInputValue] = useState(rest.value ?? '');
 
     const inputHandler: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-      const { value: raw } = e.target;
-      if (raw !== '' && !REG_AMOUNT.test(raw)) {
+      const stripped = e.target.value.replace(/,/g, '');
+      if (stripped !== '' && !REG_AMOUNT.test(stripped)) {
         return;
       }
+      (e.target as HTMLInputElement).value = stripped;
       if (rest?.onChange) rest?.onChange(e);
-      setInputValue(raw);
+      setInputValue(stripped);
     };
     return (
       <ContainerStyled className={className} margin={margin}>

@@ -40,6 +40,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, 'html'),
     filename: '[name].js',
+    clean: true,
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
