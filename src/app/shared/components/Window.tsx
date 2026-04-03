@@ -17,6 +17,10 @@ interface WindowProps {
 const Container = styled.div<{ bgColor: string }>`
   background-color: ${({ bgColor }) => (Utils.isWeb() || Utils.isMobile() ? bgColor : 'transparent')};
   min-height: 100%;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -66,7 +66,8 @@ export const AssetAmount = styled.div`
 export const Line = styled.div`
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 2px;
-  width: 412px;
+  width: 100%;
+  max-width: 412px;
   margin: 20px 0;
 `;
 
@@ -98,8 +99,10 @@ export const SelectWrapper = styled.div`
 export const EmbeddedLayout = styled.div`
   width: 100%;
   max-width: 1230px;
+  min-width: 0;
+  overflow-x: hidden;
   display: grid;
-  grid-template-columns: minmax(0, 540px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 620px) minmax(0, 1fr);
   grid-gap: 20px;
   align-items: flex-start;
   margin-top: 10px;
@@ -129,12 +132,17 @@ export const InputRow = styled.div`
   gap: 8px;
   align-items: center;
   min-width: 0;
+
+  & > *:first-child {
+    flex: 1;
+    min-width: 0;
+  }
 `;
 
 export const InlineSelect = styled.div`
-  width: 170px;
-  max-width: 45%;
-  min-width: 140px;
+  width: 220px;
+  max-width: 52%;
+  min-width: 200px;
   min-height: 41px;
   flex-shrink: 0;
 `;

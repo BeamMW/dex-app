@@ -5,15 +5,42 @@ import AssetIcon from '@app/shared/components/AssetsIcon';
 import { CancelIcon, IconDropdownDown } from '@app/shared/icons';
 import { styled } from '@linaria/react';
 
-const AssetsId = styled.span`
+const AssetOptionRow = styled.div`
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 8px;
+  width: 100%;
+  min-width: 0;
+`;
+
+const Ellipsis = styled.span`
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const AssetIdSuffix = styled.span`
+  max-width: 12ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-weight: 400;
   font-size: 14px;
   line-height: 14px;
-  display: flex;
-  margin-left: 4px;
   color: rgba(255, 255, 255, 0.7);
   text-transform: lowercase;
+  justify-self: end;
 `;
+
+const SingleValueRow = styled.div`
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  width: 100%;
+`;
+
 interface IReactSelectProps extends Props {
   options: IOptions[];
   onChange: (any) => void;
@@ -33,6 +60,7 @@ const ReactSelect = ({
   hideValueWhileSearching = false,
   ref,
   customPrefix = 'custom-select',
+  styles: userStyles,
   ...rest
 }: IReactSelectProps) => {
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -40,58 +68,51 @@ const ReactSelect = ({
   const {
     Option, DropdownIndicator, ClearIndicator, SingleValue,
   } = components;
+
   function IconOption(props) {
     const { value, label } = props;
     return (
-      // TODO: ADD TYPE
       // @ts-ignore
       <Option {...props}>
-        <>
-          {isIcon ? (
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <AssetIcon asset_id={value} />
-              <span>{label}</span>
-              <AssetsId style={{}}>{`(id:${value})`}</AssetsId>
-            </div>
-          ) : (
-            <span>{label}</span>
-          )}
-        </>
+        {isIcon ? (
+          <AssetOptionRow>
+            <AssetIcon asset_id={value} />
+            <Ellipsis>{label}</Ellipsis>
+            <AssetIdSuffix title={`(id:${value})`}>{`(id:${value})`}</AssetIdSuffix>
+          </AssetOptionRow>
+        ) : (
+          <span>{label}</span>
+        )}
       </Option>
     );
   }
+
   function SingleValues(props) {
     const { data } = props;
     return (
-      // TODO: ADD TYPE
       // @ts-ignore
       <SingleValue {...props}>
-        <>
-          {isIcon ? (
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <AssetIcon asset_id={data.value} />
-              <span>{data.label}</span>
-              <AssetsId style={{}}>{`(id:${data.value})`}</AssetsId>
-            </div>
-          ) : (
-            <span>{data.label}</span>
-          )}
-        </>
+        {isIcon ? (
+          <SingleValueRow>
+            <AssetIcon asset_id={data.value} />
+            <Ellipsis>{data.label}</Ellipsis>
+          </SingleValueRow>
+        ) : (
+          <span>{data.label}</span>
+        )}
       </SingleValue>
     );
   }
+
   function IndicatorSVG(props) {
     const { hasValue } = props;
-    return (
-      <>
-        {!hasValue ? (
-          <DropdownIndicator {...props}>
-            <IconDropdownDown />
-          </DropdownIndicator>
-        ) : null}
-      </>
-    );
+    return !hasValue ? (
+      <DropdownIndicator {...props}>
+        <IconDropdownDown />
+      </DropdownIndicator>
+    ) : null;
   }
+
   function IndicatorClear(props) {
     return (
       <ClearIndicator {...props}>
@@ -99,8 +120,6 @@ const ReactSelect = ({
       </ClearIndicator>
     );
   }
-
-  // TODO: Memo indicator ANIMATE
 
   return (
     <Select
@@ -121,7 +140,14 @@ const ReactSelect = ({
         IndicatorSeparator: () => null,
         SingleValue: SingleValues,
       }}
+      styles={userStyles}
       {...rest}
+      {...(customPrefix === 'custom-filter'
+        ? {
+          menuPortalTarget: typeof document !== 'undefined' ? document.body : null,
+          menuPosition: 'fixed' as const,
+        }
+        : {})}
     />
   );
 };

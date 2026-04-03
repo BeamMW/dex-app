@@ -7,6 +7,9 @@ const SectionStyled = styled.div`
   margin-bottom: 10px;
   justify-content: space-between;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: hidden;
   height: 56px;
   border: none;
   outline: none;

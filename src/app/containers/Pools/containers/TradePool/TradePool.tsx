@@ -438,7 +438,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   if (embedded) {
     return (
       <Window hideHeader>
-        <Container>
+        <Container wide>
           <EmbeddedLayout>
             <div>
               <SwapCard>

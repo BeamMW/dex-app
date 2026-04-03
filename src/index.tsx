@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV === "development") {
+  import("react-grab").then((m) => m.init({"activationMode":"toggle","allowActivationInsideInput":false,"maxContextLines":3}));
+}
+
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';

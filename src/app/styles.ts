@@ -30,23 +30,49 @@ css`
       box-sizing: border-box;
       outline: none;
     }
-    html,
+    html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow-x: hidden;
+      overscroll-behavior: none;
+    }
+
     body {
       margin: 0;
       padding: 0;
       height: 100%;
-      min-width: 375px;
+      width: 100%;
+      min-width: 0;
+      overflow-x: hidden;
+      overscroll-behavior: none;
+      touch-action: pan-y pinch-zoom;
       font-family: 'ProximaNova', 'SFProDisplay', sans-serif;
       font-weight: 600;
+      font-size: 14px;
+      color: white;
+    }
+
+    /* Same shell as Window (Utils.isWeb() || Utils.isMobile()); fills viewport behind TopNav */
+    body.web,
+    body.mobile {
+      background-color: var(--color-dark-blue);
+      min-height: 100vh;
+    }
+
+    html:has(body.web),
+    html:has(body.mobile) {
+      background-color: var(--color-dark-blue);
     }
 
     #root {
-      display: inline;
-    }
-
-    body {
-      font-size: 14px;
-      color: white;
+      display: block;
+      height: 100%;
+      min-height: 100%;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
     }
 
     p {

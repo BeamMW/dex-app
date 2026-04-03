@@ -92,7 +92,23 @@ const App = () => {
   return (
     <>
       {isLoaded ? (
-        <Scrollbars renderThumbVertical={(props) => <div {...props} className={trackStyle} />}>
+        <Scrollbars
+          style={{ width: '100%', height: '100%' }}
+          hideTracksWhenNotNeeded
+          renderThumbVertical={(props) => <div {...props} className={trackStyle} />}
+          renderView={({ style, ...viewProps }) => (
+            <div
+              {...viewProps}
+              style={{
+                ...style,
+                overflowX: 'hidden',
+                overflowY: 'scroll',
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'none',
+              }}
+            />
+          )}
+        >
           {isHeadless && isWeb && !iFrameDetection ? <AlertWallet /> : null}
           <TopNav />
           {content}

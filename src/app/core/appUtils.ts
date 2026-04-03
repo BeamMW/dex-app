@@ -1,5 +1,5 @@
 import {
-  IAsset, IOptions, IPoolCard, IPredict, ITxStatus, Kind,
+  IAsset, IMetadataPairs, IOptions, IPoolCard, IPredict, ITxStatus, Kind,
 } from '@core/types';
 import { ASSET_BEAM, GROTHS_IN_BEAM } from '@app/shared/constants';
 // eslint-disable-next-line import/extensions
@@ -32,6 +32,12 @@ export function truncate(value: string, len = LENGTH_MAX): string {
   return `${value.slice(0, len)}…`;
 }
 
+/** Short ticker from STD metadata (e.g. SN=TQR), else UN / N. */
+export function assetShortLabel(m: IMetadataPairs | undefined): string {
+  if (!m) return '';
+  return (m.SN || m.UN || m.N || '').trim();
+}
+
 export function getOptions(assets: IAsset[]) {
   const options = [
     {
@@ -40,7 +46,7 @@ export function getOptions(assets: IAsset[]) {
     },
   ];
   assets.forEach((item) => {
-    options.push({ value: item.asset_id, label: `${truncate(item.parsedMetadata.UN)}` });
+    options.push({ value: item.asset_id, label: `${truncate(assetShortLabel(item.parsedMetadata))}` });
   });
   return options;
 }

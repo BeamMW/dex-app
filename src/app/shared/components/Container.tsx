@@ -5,6 +5,8 @@ interface ContainerProps {
   variant?: 'center' | 'space-between';
   jystify?: 'center' | 'space-between';
   main?: boolean;
+  /** Wider content cap (e.g. trade grid with asset selectors) */
+  wide?: boolean;
 }
 const ContainerStyled = styled.div<ContainerProps>`
   display: flex;
@@ -16,20 +18,21 @@ const ContainerStyled = styled.div<ContainerProps>`
   height: 100%;
   align-items: ${({ variant = 'center' }) => variant};
   justify-content: ${({ jystify = 'flex-start' }) => jystify};
-  width: ${({ main }) => (main ? '100%' : '914px')};
+  max-width: ${({ main, wide }) => {
+    if (main) return 'none';
+    if (wide) return '980px';
+    return '914px';
+  }};
   align-content: center;
-  @media (max-width: 480px){
+  @media (max-width: 480px) {
     padding: 5px;
-    max-width: 914px;
-    width: 100%;
-  }
   }
 `;
 
 const Container: React.FC<ContainerProps> = ({
-  children, variant, main, jystify,
+  children, variant, main, jystify, wide,
 }) => (
-  <ContainerStyled variant={variant} jystify={jystify} main={main}>
+  <ContainerStyled variant={variant} jystify={jystify} main={main} wide={wide}>
     {children}
   </ContainerStyled>
 );
