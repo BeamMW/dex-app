@@ -134,13 +134,14 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   const [manualKind, setManualKind] = useState<number | null>(null);
   const [bestKind, setBestKind] = useState<number | null>(null);
   const [currentTokAmount, setCurrentTokenAmount] = useState<number>(data?.tok1 ?? 0);
+  const [secondTokAmount, setSecondTokenAmount] = useState<number>(data?.tok2 ?? 0);
   const amountInput = useInput({
     initialValue: 0,
     validations: { isEmpty: true, isMax: fromGroths(currentTokAmount) },
   });
   const amountSendInput = useInput({
     initialValue: 0,
-    validations: { isEmpty: true, isMax: fromGroths(currentTokAmount) },
+    validations: { isEmpty: true, isMax: fromGroths(secondTokAmount) },
   });
   const [requestData, setRequestData] = useState(null);
   const [lastChangedInput, setLastChangedInput] = useState<number>(1);
@@ -223,9 +224,11 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   useEffect(() => {
     if (!activePool || currentToken === null) {
       setCurrentTokenAmount(0);
+    setSecondTokenAmount(0);
       return;
     }
     setCurrentTokenAmount(currentToken === activePool.aid1 ? activePool.tok1 : activePool.tok2);
+    setSecondTokenAmount(currentToken === activePool.aid1 ? activePool.tok2 : activePool.tok1);
   }, [activePool, currentToken]);
 
   useEffect(() => {
@@ -288,7 +291,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
       return;
     }
     if (amountInput.isMax) {
-      toast('Amount assets > MAX');
+      toast('Amount assets > MAX', { toastId: 'amount-max-input' });
     } else if (amountInput.isValid && lastChangedInput === 1) {
       dispatch(mainActions.onTradePool.request(requestData));
     }
@@ -299,7 +302,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
       return;
     }
     if (amountSendInput.isMax) {
-      toast('Amount assets > MAX');
+      toast('Amount assets > MAX', { toastId: 'amount-max-send' });
     } else if (amountSendInput.isValid && lastChangedInput === 2) {
       dispatch(mainActions.onTradePool.request(requestData));
     }

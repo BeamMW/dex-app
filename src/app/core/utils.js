@@ -1,7 +1,7 @@
 import {CURRENT_NETWORK, NETWORK} from "@app/shared/constants";
 
 const MIN_AMOUNT = 0.00000001;
-const MAX_AMOUNT = 254000000;
+const MAX_AMOUNT = Number.MAX_SAFE_INTEGER;
 
 let BEAM = null;
 let CallID = 0;

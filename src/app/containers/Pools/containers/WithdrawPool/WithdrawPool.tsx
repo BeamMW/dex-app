@@ -75,7 +75,7 @@ export const WithdrawPool = () => {
 
   useEffect(() => {
     if (amountInput.isMax) {
-      toast('Amount assets > MAX');
+      toast('Amount assets > MAX', { toastId: 'amount-max-withdraw' });
     } else if (amountInput.isValid) {
       dispatch(mainActions.onWithdraw.request(requestData));
     }
