@@ -65,7 +65,7 @@ export function numFormatter(num) {
 
 export function formatNumber(num: string | number): string {
   const parsedNum = typeof num === 'number' ? num : Number(num);
-  return parsedNum.toLocaleString('en-US');
+  return parsedNum.toLocaleString('en-US', { maximumFractionDigits: 8 });
 }
 
 /** Maps selection indices after thousand-separator grouping (see TradePool formatUserInput). */

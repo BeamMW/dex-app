@@ -607,8 +607,8 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                       <SummaryAsset>
                         <AssetLabel
                           variant="predict"
-                          title={tokenName_2}
-                          assets_id={secondToken ?? 0}
+                          title={tokenName_1}
+                          assets_id={currentToken ?? 0}
                           amount={displayedFeeDao}
                         />
                       </SummaryAsset>
@@ -618,8 +618,8 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                       <SummaryAsset>
                         <AssetLabel
                           variant="predict"
-                          title={tokenName_2}
-                          assets_id={secondToken ?? 0}
+                          title={tokenName_1}
+                          assets_id={currentToken ?? 0}
                           amount={displayedFeePool}
                         />
                       </SummaryAsset>
@@ -629,8 +629,8 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                       <SummaryAsset>
                         <AssetLabel
                           variant="predict"
-                          title={tokenName_2}
-                          assets_id={secondToken ?? 0}
+                          title={tokenName_1}
+                          assets_id={currentToken ?? 0}
                           amount={displayedFeeTotal}
                         />
                       </SummaryAsset>
@@ -774,8 +774,8 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   <AssetAmount>
                     <AssetLabel
                       variant="predict"
-                      title={tokenName_1}
-                      assets_id={currentToken ?? 0}
+                      title={tokenName_2}
+                      assets_id={secondToken ?? 0}
                       amount={predictData ? predictData.buy : 0}
                     />
                   </AssetAmount>
@@ -787,8 +787,8 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   <AssetAmount>
                     <AssetLabel
                       variant="predict"
-                      title={tokenName_2}
-                      assets_id={secondToken ?? 0}
+                      title={tokenName_1}
+                      assets_id={currentToken ?? 0}
                       amount={predictData ? predictData.fee_dao : 0}
                     />
                   </AssetAmount>
@@ -800,8 +800,8 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   <AssetAmount>
                     <AssetLabel
                       variant="predict"
-                      title={tokenName_2}
-                      assets_id={secondToken ?? 0}
+                      title={tokenName_1}
+                      assets_id={currentToken ?? 0}
                       amount={predictData ? predictData.fee_pool : 0}
                     />
                   </AssetAmount>
@@ -815,8 +815,8 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                     <div>
                       <AssetLabel
                         variant="predict"
-                        title={tokenName_2}
-                        assets_id={secondToken ?? 0}
+                        title={tokenName_1}
+                        assets_id={currentToken ?? 0}
                         amount={predictData ? predictData.pay : 0}
                         id={false}
                       />
