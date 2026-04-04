@@ -1,5 +1,5 @@
 import React, {
-  useEffect, useLayoutEffect, useMemo, useRef, useState,
+  useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState,
 } from 'react';
 import { IOptions, ITrade, IPoolCard } from '@core/types';
 import {
@@ -109,6 +109,10 @@ const AutoButton = styled.button`
 `;
 
 const parseAmount = (v: string | number) => Number(String(v).replace(/,/g, ''));
+
+const isAmountInputEmpty = (value: string | number) => (
+  String(value).replace(/,/g, '').trim() === ''
+);
 
 const formatPredictAmount = (v: string | number) => {
   const [int, frac] = String(v).split('.');
@@ -277,7 +281,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   useEffect(() => {
     if (!activePool || currentToken === null) {
       setCurrentTokenAmount(0);
-    setSecondTokenAmount(0);
+      setSecondTokenAmount(0);
       return;
     }
     setCurrentTokenAmount(currentToken === activePool.aid1 ? activePool.tok1 : activePool.tok2);
@@ -435,6 +439,81 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
     }
   }, [hasActiveQuoteInput, predictData, dispatch, lastChangedInput]);
 
+  function createAmountFieldHandlers(
+    input: { value: number | string; onPredict: (v: number | string) => void },
+    peerValue: number | string,
+  ) {
+    return {
+      onFocus: () => {
+        if (
+          emptyPredict(predictData, peerValue)
+          && (input.value === 0 || input.value === '0')
+        ) {
+          input.onPredict('');
+        }
+      },
+      onBlur: () => {
+        if (isAmountInputEmpty(input.value)) {
+          input.onPredict(0);
+        }
+      },
+    };
+  }
+
+  const fromAmountFieldHandlers = createAmountFieldHandlers(amountInput, amountSendInput.value);
+  const toAmountFieldHandlers = createAmountFieldHandlers(amountSendInput, amountInput.value);
+
+  const onSelectFromToken = useCallback((value: IOptions) => {
+    setCurrentToken(value?.value ?? null);
+    if (value?.value === secondToken) {
+      setSecondToken(currentToken);
+    }
+    dispatch(mainActions.setPredict(null));
+  }, [secondToken, currentToken, dispatch]);
+
+  const onSelectToToken = useCallback((value: IOptions) => {
+    setSecondToken(value?.value ?? null);
+    if (value?.value === currentToken) {
+      setCurrentToken(secondToken);
+    }
+    dispatch(mainActions.setPredict(null));
+  }, [currentToken, secondToken, dispatch]);
+
+  function renderFeeTierRow() {
+    if (matchedPools.length <= 1) return null;
+    return (
+      <FeeTierRow>
+        {matchedPools.map((pool) => (
+          <FeeTierButton
+            key={pool.kind}
+            active={activePool?.kind === pool.kind}
+            onClick={() => {
+              if (manualKind === null) setBestKind(data?.kind ?? null);
+              setManualKind(pool.kind);
+              dispatch(mainActions.setCurrentPool(pool));
+            }}
+          >
+            {getPoolKind(pool.kind)}
+            {(manualKind === null ? data?.kind : bestKind) === pool.kind && (
+              <BestBadge>Best</BestBadge>
+            )}
+          </FeeTierButton>
+        ))}
+        {manualKind !== null && (
+          <AutoButton
+            onClick={() => {
+              setManualKind(null);
+              setBestKind(null);
+              dispatch(mainActions.setCurrentPool(matchedPools[0]));
+            }}
+          >
+            Auto
+          </AutoButton>
+        )}
+      </FeeTierRow>
+    );
+  }
+
   if (embedded) {
     return (
       <Window hideHeader>
@@ -452,27 +531,15 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                         variant="amount"
                         pallete="blue"
                         onChange={handleAmountInputChange}
-                        onFocus={() => {
-                          if (
-                            emptyPredict(predictData, amountSendInput.value)
-                            && (amountInput.value === 0 || amountInput.value === '0')
-                          ) {
-                            amountInput.onPredict('');
-                          }
-                        }}
+                        onFocus={fromAmountFieldHandlers.onFocus}
+                        onBlur={fromAmountFieldHandlers.onBlur}
                       />
                       <InlineSelect>
                         <ReactSelect
                           key={`embedded-buy-${currentToken}`}
                           options={options}
                           defaultValue={selectValue(currentToken)}
-                          onChange={(value: IOptions) => {
-                            setCurrentToken(value?.value ?? null);
-                            if (value?.value === secondToken) {
-                              setSecondToken(currentToken);
-                            }
-                            dispatch(mainActions.setPredict(null));
-                          }}
+                          onChange={onSelectFromToken}
                           isIcon
                           hideValueWhileSearching
                           placeholder="Search..."
@@ -497,27 +564,15 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                         style={{ cursor: 'default', color: 'var(--color-purple)', opacity: 1 }}
                         value={amountSendInput.value}
                         onChange={handleAmountSendInputChange}
-                        onFocus={() => {
-                          if (
-                            emptyPredict(predictData, amountInput.value)
-                            && (amountSendInput.value === 0 || amountSendInput.value === '0')
-                          ) {
-                            amountSendInput.onPredict('');
-                          }
-                        }}
+                        onFocus={toAmountFieldHandlers.onFocus}
+                        onBlur={toAmountFieldHandlers.onBlur}
                       />
                       <InlineSelect>
                         <ReactSelect
                           key={`embedded-pay-${secondToken}`}
                           options={options}
                           defaultValue={selectValue(secondToken)}
-                          onChange={(value: IOptions) => {
-                            setSecondToken(value?.value ?? null);
-                            if (value?.value === currentToken) {
-                              setCurrentToken(secondToken);
-                            }
-                            dispatch(mainActions.setPredict(null));
-                          }}
+                          onChange={onSelectToToken}
                           isIcon
                           hideValueWhileSearching
                           placeholder="Search..."
@@ -613,37 +668,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
               {activePool ? (
                 <>
                   <PoolStat data={activePool} lp={currentLPToken} showFavorite plain />
-                  {matchedPools.length > 1 && (
-                    <FeeTierRow>
-                      {matchedPools.map((pool) => (
-                        <FeeTierButton
-                          key={pool.kind}
-                          active={activePool?.kind === pool.kind}
-                          onClick={() => {
-                            if (manualKind === null) setBestKind(data?.kind ?? null);
-                            setManualKind(pool.kind);
-                            dispatch(mainActions.setCurrentPool(pool));
-                          }}
-                        >
-                          {getPoolKind(pool.kind)}
-                          {(manualKind === null ? data?.kind : bestKind) === pool.kind && (
-                            <BestBadge>Best</BestBadge>
-                          )}
-                        </FeeTierButton>
-                      ))}
-                      {manualKind !== null && (
-                        <AutoButton
-                          onClick={() => {
-                            setManualKind(null);
-                            setBestKind(null);
-                            dispatch(mainActions.setCurrentPool(matchedPools[0]));
-                          }}
-                        >
-                          Auto
-                        </AutoButton>
-                      )}
-                    </FeeTierRow>
-                  )}
+                  {renderFeeTierRow()}
                   <EmbeddedActionRow>
                     <Button
                       icon={IconShieldChecked}
@@ -690,27 +715,15 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   variant="amount"
                   pallete="blue"
                   onChange={handleAmountInputChange}
-                  onFocus={() => {
-                    if (
-                      emptyPredict(predictData, amountSendInput.value)
-                      && (amountInput.value === 0 || amountInput.value === '0')
-                    ) {
-                      amountInput.onPredict('');
-                    }
-                  }}
+                  onFocus={fromAmountFieldHandlers.onFocus}
+                  onBlur={fromAmountFieldHandlers.onBlur}
                 />
                 <InlineSelect>
                   <ReactSelect
                     key={`buy-${currentToken}`}
                     options={options}
                     defaultValue={selectValue(currentToken)}
-                    onChange={(value: IOptions) => {
-                      setCurrentToken(value?.value ?? null);
-                      if (value?.value === secondToken) {
-                        setSecondToken(currentToken);
-                      }
-                      dispatch(mainActions.setPredict(null));
-                    }}
+                    onChange={onSelectFromToken}
                     isIcon
                     hideValueWhileSearching
                     placeholder="Search..."
@@ -733,27 +746,15 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   style={{ cursor: 'default', color: 'var(--color-purple)', opacity: 1 }}
                   value={amountSendInput.value}
                   onChange={handleAmountSendInputChange}
-                  onFocus={() => {
-                    if (
-                      emptyPredict(predictData, amountInput.value)
-                      && (amountSendInput.value === 0 || amountSendInput.value === '0')
-                    ) {
-                      amountSendInput.onPredict('');
-                    }
-                  }}
+                  onFocus={toAmountFieldHandlers.onFocus}
+                  onBlur={toAmountFieldHandlers.onBlur}
                 />
                 <InlineSelect>
                   <ReactSelect
                     key={`pay-${secondToken}`}
                     options={options}
                     defaultValue={selectValue(secondToken)}
-                    onChange={(value: IOptions) => {
-                      setSecondToken(value?.value ?? null);
-                      if (value?.value === currentToken) {
-                        setCurrentToken(secondToken);
-                      }
-                      dispatch(mainActions.setPredict(null));
-                    }}
+                    onChange={onSelectToToken}
                     isIcon
                     hideValueWhileSearching
                     placeholder="Search..."
@@ -764,7 +765,6 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
             </AssetsSection>
           </Section>
         </AssetsContainer>
-        {!embedded && (
         <SectionWrapper>
           <Section title="trade summary">
             <SummaryWrapper>
@@ -829,48 +829,15 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
           {activePool ? (
             <>
               <PoolStat data={activePool} lp={currentLPToken} />
-              {matchedPools.length > 1 && (
-                <FeeTierRow>
-                  {matchedPools.map((pool) => (
-                    <FeeTierButton
-                      key={pool.kind}
-                      active={activePool?.kind === pool.kind}
-                      onClick={() => {
-                        if (manualKind === null) setBestKind(data?.kind ?? null);
-                        setManualKind(pool.kind);
-                        dispatch(mainActions.setCurrentPool(pool));
-                      }}
-                    >
-                      {getPoolKind(pool.kind)}
-                      {(manualKind === null ? data?.kind : bestKind) === pool.kind && (
-                        <BestBadge>Best</BestBadge>
-                      )}
-                    </FeeTierButton>
-                  ))}
-                  {manualKind !== null && (
-                    <AutoButton
-                      onClick={() => {
-                        setManualKind(null);
-                        setBestKind(null);
-                        dispatch(mainActions.setCurrentPool(matchedPools[0]));
-                      }}
-                    >
-                      Auto
-                    </AutoButton>
-                  )}
-                </FeeTierRow>
-              )}
+              {renderFeeTierRow()}
             </>
           ) : null}
         </SectionWrapper>
-        )}
         <ButtonBlock>
           <ButtonWrapper>
-            {!embedded && (
-              <Button icon={CancelIcon} variant="cancel" onClick={onPreviousClick}>
-                Cancel
-              </Button>
-            )}
+            <Button icon={CancelIcon} variant="cancel" onClick={onPreviousClick}>
+              Cancel
+            </Button>
             <Button
               disabled={isTradeDisabled}
               icon={DoneIcon}
