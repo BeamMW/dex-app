@@ -235,7 +235,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
     setCurrentToken(secondToken);
     setSecondToken(currentToken);
     setLastChangedInput(1);
-    amountSendInput.onPredict('');
+    amountSendInput.onPredict(0);
   };
 
   useEffect(() => {
@@ -428,9 +428,9 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
         dispatch(mainActions.setPredict(null));
       }
       if (lastChangedInput === 1) {
-        amountSendInput.onPredict('');
+        amountSendInput.onPredict(0);
       } else {
-        amountInput.onPredict('');
+        amountInput.onPredict(0);
       }
     }
   }, [hasActiveQuoteInput, predictData, dispatch, lastChangedInput]);
