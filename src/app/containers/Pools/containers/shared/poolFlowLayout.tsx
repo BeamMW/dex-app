@@ -153,6 +153,20 @@ export const SearchHint = styled.div`
   margin-top: 6px;
 `;
 
+export const HintRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+`;
+
+export const ErrorHint = styled.span`
+  color: #ff625c;
+  font-size: 11px;
+`;
+
 export const BlockLabel = styled.div`
   font-size: 12px;
   text-transform: uppercase;

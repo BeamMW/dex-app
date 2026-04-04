@@ -61,7 +61,6 @@ const InputStyled = styled.input<InputProps>`
   }
 
   &.invalid {
-    background-color: rgba(255, 116, 107, 0.15);
     color: #ff625c;
   }
 `;
@@ -77,6 +76,10 @@ const InputGrayStyled = styled(InputStyled)`
 
 const InputAmountStyled = styled(InputGrayStyled)<{ pallete: string }>`
   color: ${({ pallete }) => `var(--color-${pallete})`};
+
+  &.invalid {
+    color: #ff625c;
+  }
 `;
 
 const LabelStyled = styled.div<InputProps>`

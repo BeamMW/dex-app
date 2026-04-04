@@ -36,7 +36,6 @@ import {
 } from '@app/shared/constants';
 import AssetLabel from '@app/shared/components/AssetLabel';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 import {
   AssetAmount,
   BlockLabel,
@@ -47,7 +46,9 @@ import {
   EmbeddedLayout,
   EmbeddedTradeButtonWrap,
   EmptyPoolState,
+  ErrorHint,
   ExchangeWrapper,
+  HintRow,
   InlineSelect,
   InputRow,
   Line,
@@ -180,6 +181,24 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
     return matchedPools[0];
   }, [matchedPools, data, manualKind]);
 
+  const [anyPoolCoversFromAmount, anyPoolCoversToAmount] = useMemo<[boolean, boolean]>(() => {
+    if (manualKind !== null || matchedPools.length <= 1) return [false, false];
+    const checkCovers = (amountValue: string | number, fromToken: boolean) => {
+      const parsed = parseAmount(amountValue);
+      if (!parsed || parsed <= 0) return false;
+      return matchedPools.some((pool) => {
+        const reserve = fromGroths(fromToken
+          ? (currentToken === pool.aid1 ? pool.tok1 : pool.tok2)
+          : (currentToken === pool.aid1 ? pool.tok2 : pool.tok1));
+        return parsed < Number(reserve);
+      });
+    };
+    return [
+      checkCovers(amountInput.value, true),
+      checkCovers(amountSendInput.value, false),
+    ];
+  }, [manualKind, matchedPools, currentToken, amountInput.value, amountSendInput.value]);
+
   const getTokenTitle = (assetId: number | null) => {
     const option = options.find((item) => item.value === assetId);
     return truncate(option?.label || 'Asset');
@@ -290,9 +309,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
     if (!requestData || !activePool) {
       return;
     }
-    if (amountInput.isMax) {
-      toast('Amount assets > MAX', { toastId: 'amount-max-input' });
-    } else if (amountInput.isValid && lastChangedInput === 1) {
+    if (!amountInput.isMax && amountInput.isValid && lastChangedInput === 1) {
       dispatch(mainActions.onTradePool.request(requestData));
     }
   }, [requestData, amountInput.isMax, amountInput.isValid, lastChangedInput, activePool, dispatch]);
@@ -301,9 +318,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
     if (!requestData || !activePool) {
       return;
     }
-    if (amountSendInput.isMax) {
-      toast('Amount assets > MAX', { toastId: 'amount-max-send' });
-    } else if (amountSendInput.isValid && lastChangedInput === 2) {
+    if (!amountSendInput.isMax && amountSendInput.isValid && lastChangedInput === 2) {
       dispatch(mainActions.onTradePool.request(requestData));
     }
   }, [requestData, amountSendInput.isMax, amountSendInput.isValid, lastChangedInput, activePool, dispatch]);
@@ -323,6 +338,9 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   };
 
   const isTradeDisabled = !activePool || (!amountInput.isValid && !amountSendInput.isValid);
+
+  const fromAmountError = Boolean(amountInput.isMax && lastChangedInput === 1 && !anyPoolCoversFromAmount);
+  const toAmountError = Boolean(amountSendInput.isMax && lastChangedInput === 2 && !anyPoolCoversToAmount);
 
   const selectValue = (assetId: number | null): IOptions | null => (
     options.find((item) => item.value === assetId) || null
@@ -445,13 +463,14 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
               <SwapCard>
                 <SwapBlock>
                   <BlockLabel>From</BlockLabel>
-                  <AssetsSection>
+                  <AssetsSection error={fromAmountError}>
                     <InputRow>
                       <Input
                         ref={amountInputRef}
                         value={amountInput.value}
                         variant="amount"
                         pallete="blue"
+                        valid={!fromAmountError}
                         onChange={handleAmountInputChange}
                         onFocus={fromAmountFieldHandlers.onFocus}
                         onBlur={fromAmountFieldHandlers.onBlur}
@@ -470,21 +489,25 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                       </InlineSelect>
                     </InputRow>
                   </AssetsSection>
-                  <SearchHint>Click asset selector to search.</SearchHint>
+                  <HintRow>
+                    <span>Click asset selector to search.</span>
+                    {fromAmountError && <ErrorHint>amount exceeds pool reserves</ErrorHint>}
+                  </HintRow>
                 </SwapBlock>
                 <EmbeddedExchangeWrap>
                   <Button icon={IconExchange} variant="icon" onClick={swapTokensAndResetSend} />
                 </EmbeddedExchangeWrap>
                 <SwapBlock>
                   <BlockLabel>To</BlockLabel>
-                  <AssetsSection>
+                  <AssetsSection error={toAmountError}>
                     <InputRow>
                       <Input
                         ref={amountSendInputRef}
                         pallete="purple"
                         variant="amount"
-                        style={receiveAmountInputStyle}
+                        style={toAmountError ? { cursor: 'default', opacity: 1 } : receiveAmountInputStyle}
                         value={amountSendInput.value}
+                        valid={!toAmountError}
                         onChange={handleAmountSendInputChange}
                         onFocus={toAmountFieldHandlers.onFocus}
                         onBlur={toAmountFieldHandlers.onBlur}
@@ -503,7 +526,10 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                       </InlineSelect>
                     </InputRow>
                   </AssetsSection>
-                  <SearchHint>Click asset selector to search.</SearchHint>
+                  <HintRow>
+                    <span>Click asset selector to search.</span>
+                    {toAmountError && <ErrorHint>amount exceeds pool reserves</ErrorHint>}
+                  </HintRow>
                 </SwapBlock>
                 <SummaryPanel>
                   <SummaryHeader>trade summary</SummaryHeader>
@@ -629,13 +655,14 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
         </SelectWrapper>
         <AssetsContainer>
           <Section title={titleSections.TRADE_RECEIVE}>
-            <AssetsSection>
+            <AssetsSection error={fromAmountError}>
               <InputRow>
                 <Input
                   ref={amountInputRef}
                   value={amountInput.value}
                   variant="amount"
                   pallete="blue"
+                  valid={!fromAmountError}
                   onChange={handleAmountInputChange}
                   onFocus={fromAmountFieldHandlers.onFocus}
                   onBlur={fromAmountFieldHandlers.onBlur}
@@ -654,12 +681,13 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                 </InlineSelect>
               </InputRow>
             </AssetsSection>
+            {fromAmountError && <HintRow><ErrorHint>amount exceeds pool reserves</ErrorHint></HintRow>}
             <ExchangeWrapper>
               <Button icon={IconExchange} variant="icon" onClick={swapTokensAndResetSend} />
             </ExchangeWrapper>
           </Section>
           <Section title={titleSections.TRADE_SEND}>
-            <AssetsSection>
+            <AssetsSection error={toAmountError}>
               <InputRow>
                 <Input
                   ref={amountSendInputRef}
@@ -667,6 +695,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   variant="amount"
                   style={receiveAmountInputStyle}
                   value={amountSendInput.value}
+                  valid={!toAmountError}
                   onChange={handleAmountSendInputChange}
                   onFocus={toAmountFieldHandlers.onFocus}
                   onBlur={toAmountFieldHandlers.onBlur}
@@ -685,6 +714,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                 </InlineSelect>
               </InputRow>
             </AssetsSection>
+            {toAmountError && <HintRow><ErrorHint>amount exceeds pool reserves</ErrorHint></HintRow>}
           </Section>
         </AssetsContainer>
         <SectionWrapper>

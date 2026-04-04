@@ -242,7 +242,9 @@ export function* findBestPool(action: ReturnType<typeof mainActions.onFindBestPo
     } catch (_) {}
   }
 
-  yield put(mainActions.setCurrentPool(bestPool));
+  if (bestBuy > 0) {
+    yield put(mainActions.setCurrentPool(bestPool));
+  }
 }
 
 function* mainSaga() {
