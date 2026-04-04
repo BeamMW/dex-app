@@ -1,21 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { IAddLiquidity } from '@core/types';
 import {
-  AssetsSection,
-  Button,
-  Container,
-  Input,
-  PoolStat,
-  Window,
-} from '@app/shared/components';
-import {
-  emptyPredict,
-  fromGroths,
-  getLPToken,
-  setDataRequest,
-  toGroths,
-  truncate,
+  emptyPredict, fromGroths, getLPToken, setDataRequest, toGroths, truncate,
 } from '@core/appUtils';
+import {
+  AssetsSection, Button, Container, Input, PoolStat, Window,
+} from '@app/shared/components';
 import { useDispatch, useSelector } from 'react-redux';
 import * as mainActions from '@app/containers/Pools/store/actions';
 import { selectAssetsList, selectCurrentPool, selectPredirect } from '@app/containers/Pools/store/selectors';
@@ -25,17 +15,12 @@ import { CancelIcon, DoneIcon, IconExchange } from '@app/shared/icons';
 import AssetLabel from '@app/shared/components/AssetLabel';
 import { useNavigate } from 'react-router-dom';
 import {
-  BlockLabel,
-  ButtonBlock,
-  ButtonWrapper,
-  EmbeddedExchangeWrap,
-  EmbeddedLayout,
-  EmbeddedTradeButtonWrap,
-  InputRow,
-  RightPanel,
-  SwapBlock,
-  SwapCard,
+  BlockLabel, ButtonBlock, ButtonWrapper, EmbeddedExchangeWrap, EmbeddedLayout,
+  EmbeddedTradeButtonWrap, InputRow, RightPanel, SwapBlock, SwapCard,
 } from '@app/containers/Pools/containers/shared/poolFlowLayout';
+import {
+  createAmountFieldHandlers, formatPredictAmount, parseAmount, useAmountInputCaret,
+} from '@app/containers/Pools/containers/shared/poolAmountInput';
 
 const purpleReadonly = { cursor: 'default' as const, color: 'var(--color-purple)', opacity: 1 };
 
@@ -43,228 +28,151 @@ export const AddLiquidity = () => {
   const data = useSelector(selectCurrentPool());
   const predictData = useSelector(selectPredirect());
   const assets = useSelector(selectAssetsList());
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [currentLPToken, setCurrentLPToken] = useState(null);
   const [currentToken, setCurrentToken] = useState(data.aid1);
   const [requestData, setRequestData] = useState(null);
-  const [isSwap, setIsSwap] = useState<boolean>(false);
+  const [isSwap, setIsSwap] = useState(false);
   const [poolIsEmpty, setPoolIsEmpty] = useState(true);
-  const amountInput_aid1 = useInput({
-    initialValue: 0,
-    validations: { isEmpty: true },
-  });
-  const amountInput_aid2 = useInput({
-    initialValue: 0,
-    validations: { isEmpty: true },
-  });
+  const amount1 = useInput({ initialValue: 0, validations: { isEmpty: true } });
+  const amount2 = useInput({ initialValue: 0, validations: { isEmpty: true } });
+  const caret1 = useAmountInputCaret(amount1.value, amount1.onPredict);
+  const caret2 = useAmountInputCaret(amount2.value, amount2.onPredict);
+  const t1 = truncate(data?.metadata1?.UN || `Token ${data?.aid1 ?? ''}`);
+  const t2 = truncate(data?.metadata2?.UN || `Token ${data?.aid2 ?? ''}`);
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const tokenName_1 = truncate(data?.metadata1?.UN || `Token ${data?.aid1 ?? ''}`);
-  const tokenName_2 = truncate(data?.metadata2?.UN || `Token ${data?.aid2 ?? ''}`);
+  useEffect(() => setPoolIsEmpty(!data.tok1 || !data.tok2), [data.tok1, data.tok2]);
+  useEffect(() => setCurrentToken(isSwap ? data.aid2 : data.aid1), [isSwap, data.aid1, data.aid2]);
+  useEffect(() => setCurrentLPToken(getLPToken(data, assets)), [data, assets]);
 
   useEffect(() => {
-    setPoolIsEmpty(!!(!data.tok1 || !data.tok2));
-  }, [data.tok1, data.tok2]);
-
-  const getValueInput_1 = () => {
-    if (poolIsEmpty) {
-      return toGroths(Number(amountInput_aid1.value));
-    }
-    return currentToken === data.aid2 ? '0' : toGroths(Number(amountInput_aid1.value));
-  };
-  const getValueInput_2 = () => {
-    if (poolIsEmpty) {
-      return toGroths(Number(amountInput_aid2.value));
-    }
-    return currentToken === data.aid1 ? '0' : toGroths(Number(amountInput_aid2.value));
-  };
-
-  useEffect(() => {
-    setCurrentToken(!isSwap ? data.aid1 : data.aid2);
-  }, [isSwap, data.aid1, data.aid2]);
-
-  useEffect(() => {
+    const v1 = toGroths(parseAmount(amount1.value));
+    const v2 = toGroths(parseAmount(amount2.value));
     setRequestData({
-      aid1: data.aid1,
-      aid2: data.aid2,
-      kind: data.kind,
-      val1: getValueInput_1(),
-      val2: getValueInput_2(),
+      aid1: data.aid1, aid2: data.aid2, kind: data.kind,
+      val1: poolIsEmpty ? v1 : (currentToken === data.aid2 ? '0' : v1),
+      val2: poolIsEmpty ? v2 : (currentToken === data.aid1 ? '0' : v2),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [amountInput_aid1.value, amountInput_aid2.value, isSwap, data.aid1, data.aid2, data.kind]);
+  }, [amount1.value, amount2.value, poolIsEmpty, currentToken, data.aid1, data.aid2, data.kind]);
 
   useEffect(() => {
-    if (!poolIsEmpty && predictData) {
-      if (currentToken === data.aid1) {
-        if (!emptyPredict(predictData, amountInput_aid1.value)) {
-          amountInput_aid2.onPredict(fromGroths(predictData.tok2));
-        }
-      } else if (!emptyPredict(predictData, amountInput_aid2.value)) {
-        amountInput_aid1.onPredict(fromGroths(predictData.tok1));
+    if (poolIsEmpty || !predictData) return;
+    if (currentToken === data.aid1) {
+      if (!emptyPredict(predictData, amount1.value)) {
+        amount2.onPredict(formatPredictAmount(fromGroths(predictData.tok2)));
       }
+    } else if (!emptyPredict(predictData, amount2.value)) {
+      amount1.onPredict(formatPredictAmount(fromGroths(predictData.tok1)));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [poolIsEmpty, predictData, currentToken, data.aid1, amountInput_aid1.value, amountInput_aid2.value]);
+  }, [poolIsEmpty, predictData, currentToken, data.aid1, amount1.value, amount2.value]);
+
+  const checkOk = poolIsEmpty ? (amount1.isValid && amount2.isValid) : (amount1.isValid || amount2.isValid);
+  const hasQuote = poolIsEmpty || (currentToken === data.aid1
+    ? !emptyPredict(predictData, amount1.value)
+    : !emptyPredict(predictData, amount2.value));
+  const canSubmit = checkOk && amount1.value && amount2.value && hasQuote;
 
   useEffect(() => {
-    setCurrentLPToken(getLPToken(data, assets));
-  }, [data, assets]);
+    if (checkOk && requestData) dispatch(mainActions.onAddLiquidity.request(requestData));
+  }, [requestData, checkOk, dispatch]);
 
-  const handleChange = () => {
-    setIsSwap(!isSwap);
-    dispatch(mainActions.setPredict(null));
-  };
+  const submit = (payload: IAddLiquidity) => dispatch(mainActions.onAddLiquidity.request(setDataRequest(payload)));
+  const cur = isSwap ? amount2 : amount1;
+  const peer = isSwap ? amount1 : amount2;
+  const hEmpty1 = createAmountFieldHandlers(predictData, amount1, amount2.value);
+  const hEmpty2 = createAmountFieldHandlers(predictData, amount2, amount1.value);
+  const hFirst = createAmountFieldHandlers(predictData, cur, peer.value);
+  const hSecond = createAmountFieldHandlers(predictData, peer, cur.value);
 
-  const checkIsValid = poolIsEmpty
-    ? amountInput_aid1.isValid && amountInput_aid2.isValid
-    : amountInput_aid1.isValid || amountInput_aid2.isValid;
-
-  const hasLiquidityQuote = poolIsEmpty
-    ? true
-    : (currentToken === data.aid1
-      ? !emptyPredict(predictData, amountInput_aid1.value)
-      : !emptyPredict(predictData, amountInput_aid2.value));
-
-  const canSubmitAdd = checkIsValid
-    && amountInput_aid1.value
-    && amountInput_aid2.value
-    && hasLiquidityQuote;
-
-  useEffect(() => {
-    if (checkIsValid && requestData) {
-      dispatch(mainActions.onAddLiquidity.request(requestData));
-    }
-  }, [requestData, checkIsValid, dispatch]);
-
-  const onAddLiquidity = (dataLiquid: IAddLiquidity): void => {
-    dispatch(mainActions.onAddLiquidity.request(setDataRequest(dataLiquid)));
-  };
-
-  const onPreviousClick = () => {
-    navigate(ROUTES.POOLS.BASE);
-  };
-
-  const currentInput = isSwap ? amountInput_aid2 : amountInput_aid1;
-  const currentSecondInput = isSwap ? amountInput_aid1 : amountInput_aid2;
-
-  const emptyPoolForm = (
-    <SwapCard>
-      <SwapBlock>
-        <BlockLabel>{tokenName_1}</BlockLabel>
-        <AssetsSection>
-          <InputRow>
-            <Input
-              variant="amount"
-              pallete="purple"
-              value={amountInput_aid1.value}
-              onChange={(e) => amountInput_aid1.onChange(e)}
-            />
-            <AssetLabel title={tokenName_1} assets_id={data.aid1} />
-          </InputRow>
-        </AssetsSection>
-      </SwapBlock>
-      <SwapBlock>
-        <BlockLabel>{tokenName_2}</BlockLabel>
-        <AssetsSection>
-          <InputRow>
-            <Input
-              variant="amount"
-              pallete="purple"
-              value={amountInput_aid2.value}
-              onChange={(e) => amountInput_aid2.onChange(e)}
-            />
-            <AssetLabel title={tokenName_2} assets_id={data.aid2} />
-          </InputRow>
-        </AssetsSection>
-      </SwapBlock>
-      <EmbeddedTradeButtonWrap>
-        <ButtonBlock>
-          <ButtonWrapper>
-            <Button icon={CancelIcon} variant="cancel" onClick={() => onPreviousClick()}>
-              Cancel
-            </Button>
-            <Button
-              icon={DoneIcon}
-              variant="approve"
-              onClick={() => onAddLiquidity(requestData)}
-              disabled={!canSubmitAdd}
-            >
-              Add liquidity
-            </Button>
-          </ButtonWrapper>
-        </ButtonBlock>
-      </EmbeddedTradeButtonWrap>
-    </SwapCard>
+  const footer = (
+    <EmbeddedTradeButtonWrap>
+      <ButtonBlock>
+        <ButtonWrapper>
+          <Button icon={CancelIcon} variant="cancel" onClick={() => navigate(ROUTES.POOLS.BASE)}>Cancel</Button>
+          <Button icon={DoneIcon} variant="approve" disabled={!canSubmit} onClick={() => submit(requestData)}>
+            Add liquidity
+          </Button>
+        </ButtonWrapper>
+      </ButtonBlock>
+    </EmbeddedTradeButtonWrap>
   );
 
-  const nonEmptyForm = (
+  const emptyRows = [
+    { title: t1, aid: data.aid1, v: amount1, caret: caret1, h: hEmpty1 },
+    { title: t2, aid: data.aid2, v: amount2, caret: caret2, h: hEmpty2 },
+  ];
+
+  const form = poolIsEmpty ? (
+    <SwapCard>
+      {emptyRows.map((row) => (
+        <SwapBlock key={row.aid}>
+          <BlockLabel>{row.title}</BlockLabel>
+          <AssetsSection>
+            <InputRow>
+              <Input
+                ref={row.caret.inputRef}
+                variant="amount"
+                pallete="purple"
+                value={row.v.value}
+                onChange={row.caret.handleChange}
+                onFocus={row.h.onFocus}
+                onBlur={row.h.onBlur}
+              />
+              <AssetLabel title={row.title} assets_id={row.aid} />
+            </InputRow>
+          </AssetsSection>
+        </SwapBlock>
+      ))}
+      {footer}
+    </SwapCard>
+  ) : (
     <SwapCard>
       <SwapBlock>
-        <BlockLabel>{isSwap ? tokenName_2 : tokenName_1}</BlockLabel>
+        <BlockLabel>{isSwap ? t2 : t1}</BlockLabel>
         <AssetsSection>
           <InputRow>
             <Input
-              value={currentInput.value}
+              ref={isSwap ? caret2.inputRef : caret1.inputRef}
               variant="amount"
               pallete="blue"
-              onChange={(e) => currentInput.onChange(e)}
-              onFocus={() => {
-                if (
-                  emptyPredict(predictData, currentSecondInput.value)
-                  && (currentInput.value === 0 || currentInput.value === '0')
-                ) {
-                  currentInput.onPredict('');
-                }
-              }}
+              value={cur.value}
+              onChange={isSwap ? caret2.handleChange : caret1.handleChange}
+              onFocus={hFirst.onFocus}
+              onBlur={hFirst.onBlur}
             />
-            <AssetLabel title={isSwap ? tokenName_2 : tokenName_1} assets_id={isSwap ? data.aid2 : data.aid1} />
+            <AssetLabel title={isSwap ? t2 : t1} assets_id={isSwap ? data.aid2 : data.aid1} />
           </InputRow>
         </AssetsSection>
       </SwapBlock>
       <EmbeddedExchangeWrap>
-        <Button icon={IconExchange} variant="icon" onClick={() => handleChange()} />
+        <Button
+          icon={IconExchange}
+          variant="icon"
+          onClick={() => { setIsSwap((s) => !s); dispatch(mainActions.setPredict(null)); }}
+        />
       </EmbeddedExchangeWrap>
       <SwapBlock>
-        <BlockLabel>{isSwap ? tokenName_1 : tokenName_2}</BlockLabel>
+        <BlockLabel>{isSwap ? t1 : t2}</BlockLabel>
         <AssetsSection>
           <InputRow>
             <Input
+              ref={isSwap ? caret1.inputRef : caret2.inputRef}
               pallete="purple"
               variant="amount"
               style={purpleReadonly}
-              value={currentSecondInput.value}
-              onChange={(e) => currentSecondInput.onChange(e)}
-              onFocus={() => {
-                if (
-                  emptyPredict(predictData, currentInput.value)
-                  && (currentSecondInput.value === 0 || currentSecondInput.value === '0')
-                ) {
-                  currentSecondInput.onPredict('');
-                }
-              }}
+              value={peer.value}
+              onChange={isSwap ? caret1.handleChange : caret2.handleChange}
+              onFocus={hSecond.onFocus}
+              onBlur={hSecond.onBlur}
             />
-            <AssetLabel title={isSwap ? tokenName_1 : tokenName_2} assets_id={isSwap ? data.aid1 : data.aid2} />
+            <AssetLabel title={isSwap ? t1 : t2} assets_id={isSwap ? data.aid1 : data.aid2} />
           </InputRow>
         </AssetsSection>
       </SwapBlock>
-      <EmbeddedTradeButtonWrap>
-        <ButtonBlock>
-          <ButtonWrapper>
-            <Button icon={CancelIcon} variant="cancel" onClick={() => onPreviousClick()}>
-              Cancel
-            </Button>
-            <Button
-              icon={DoneIcon}
-              variant="approve"
-              onClick={() => onAddLiquidity(requestData)}
-              disabled={!canSubmitAdd}
-            >
-              Add liquidity
-            </Button>
-          </ButtonWrapper>
-        </ButtonBlock>
-      </EmbeddedTradeButtonWrap>
+      {footer}
     </SwapCard>
   );
 
@@ -272,9 +180,7 @@ export const AddLiquidity = () => {
     <Window hideHeader>
       <Container>
         <EmbeddedLayout>
-          <div>
-            {poolIsEmpty ? emptyPoolForm : nonEmptyForm}
-          </div>
+          <div>{form}</div>
           <RightPanel>
             <PoolStat data={data} lp={currentLPToken} showFavorite plain />
           </RightPanel>

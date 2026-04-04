@@ -1,15 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { ITrade } from '@core/types';
+import { fromGroths, setDataRequest, toGroths, truncate } from '@core/appUtils';
 import {
-  emptyPredict, fromGroths, setDataRequest, toGroths, truncate,
-} from '@core/appUtils';
-import {
-  AssetsSection,
-  Button,
-  Input,
-  Container,
-  PoolStat,
-  Window,
+  AssetsSection, Button, Container, Input, PoolStat, Window,
 } from '@app/shared/components';
 import { useInput } from '@app/shared/hooks';
 import * as mainActions from '@app/containers/Pools/store/actions';
@@ -21,75 +13,46 @@ import { ArrowDownIcon, CancelIcon } from '@app/shared/icons';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
-  BlockLabel,
-  ButtonWrapper,
-  EmbeddedLayout,
-  EmbeddedTradeButtonWrap,
-  InputRow,
-  RightPanel,
-  SwapBlock,
-  SwapCard,
+  BlockLabel, ButtonWrapper, EmbeddedLayout, EmbeddedTradeButtonWrap, InputRow, RightPanel, SwapBlock, SwapCard,
 } from '@app/containers/Pools/containers/shared/poolFlowLayout';
-import { styled } from '@linaria/react';
+import {
+  createAmountFieldHandlers, formatPredictedFieldDisplay, parseAmount, useAmountInputCaret,
+} from '@app/containers/Pools/containers/shared/poolAmountInput';
 
-const ActionsRow = styled.div`
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  margin-top: 24px;
-`;
-
-const purpleDisabled = { cursor: 'default' as const, color: 'var(--color-purple)', opacity: 1 };
+const purpleIn = { cursor: 'default' as const, color: 'var(--color-purple)', opacity: 1 };
+const actionsRow = { display: 'flex', justifyContent: 'center', width: '100%', marginTop: 24 } as const;
 
 export const WithdrawPool = () => {
   const data = useSelector(selectCurrentPool());
   const assets = useSelector(selectAssetsList());
   const predictData = useSelector(selectPredirect());
-  const [currentLPToken, setCurrentLPToken] = useState(null);
-  const [currentAmountCtl, setCurrentAmount] = useState(data.ctl);
-  const nameToken1 = truncate(data?.metadata1?.UN || `Token ${data?.aid1 ?? ''}`);
-  const nameToken2 = truncate(data?.metadata2?.UN || `Token ${data?.aid2 ?? ''}`);
-  const amountInput = useInput({
-    initialValue: 0,
-    validations: { isEmpty: true, isMax: fromGroths(currentAmountCtl) },
-  });
-  const [requestData, setRequestData] = useState(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  useEffect(() => {
-    if (data && assets) {
-      setCurrentLPToken(assets.find((el) => el.aid === data['lp-token']));
-    }
-  }, [data, assets]);
-  useEffect(() => {
-    setRequestData({
-      aid1: data.aid1,
-      aid2: data.aid2,
-      kind: data.kind,
-      ctl: toGroths(Number(amountInput.value)),
-    });
-  }, [amountInput.value, data.aid1, data.aid2, data.kind]);
-  useEffect(() => {
-    setCurrentAmount(data.ctl);
-  }, [data.ctl]);
+  const [lp, setLp] = useState(null);
+  const [maxCtl, setMaxCtl] = useState(data.ctl);
+  const amt = useInput({ initialValue: 0, validations: { isEmpty: true, isMax: fromGroths(maxCtl) } });
+  const caret = useAmountInputCaret(amt.value, amt.onPredict);
+  const [req, setReq] = useState(null);
+  const n1 = truncate(data?.metadata1?.UN || `Token ${data?.aid1 ?? ''}`);
+  const n2 = truncate(data?.metadata2?.UN || `Token ${data?.aid2 ?? ''}`);
+  const lpLabel = lp?.parsedMetadata?.UN ? truncate(lp.parsedMetadata.UN) : 'AMML';
+  const lpAid = lp?.aid ?? data['lp-token'];
+  const h = createAmountFieldHandlers(predictData, amt, amt.value);
 
+  useEffect(() => { if (data && assets) setLp(assets.find((x) => x.aid === data['lp-token'])); }, [data, assets]);
   useEffect(() => {
-    if (amountInput.isMax) {
-      toast('Amount assets > MAX', { toastId: 'amount-max-withdraw' });
-    } else if (amountInput.isValid) {
-      dispatch(mainActions.onWithdraw.request(requestData));
-    }
-  }, [requestData, amountInput.value, amountInput.isValid, amountInput.isMax, dispatch]);
+    setReq({ aid1: data.aid1, aid2: data.aid2, kind: data.kind, ctl: toGroths(parseAmount(amt.value)) });
+  }, [amt.value, data.aid1, data.aid2, data.kind]);
+  useEffect(() => setMaxCtl(data.ctl), [data.ctl]);
+  useEffect(() => {
+    if (amt.isMax) toast('Amount assets > MAX', { toastId: 'amount-max-withdraw' });
+    else if (amt.isValid) dispatch(mainActions.onWithdraw.request(req));
+  }, [req, amt.value, amt.isValid, amt.isMax, dispatch]);
 
-  const assetLabel = currentLPToken?.parsedMetadata?.UN ? truncate(currentLPToken.parsedMetadata.UN) : 'AMML';
-  const assetId = currentLPToken ? currentLPToken.aid : data['lp-token'];
-
-  const onWithdraw = (dataReq: ITrade) => {
-    dispatch(mainActions.onWithdraw.request(setDataRequest(dataReq)));
-  };
-  const onPreviousClick = () => {
-    navigate(ROUTES.POOLS.BASE);
-  };
+  const receive = [
+    { field: 'tok1' as const, name: n1, aid: data.aid1 },
+    { field: 'tok2' as const, name: n2, aid: data.aid2 },
+  ];
 
   return (
     <Window hideHeader>
@@ -101,62 +64,53 @@ export const WithdrawPool = () => {
               <AssetsSection>
                 <InputRow>
                   <Input
-                    value={amountInput.value}
+                    ref={caret.inputRef}
+                    value={amt.value}
                     variant="amount"
                     pallete="blue"
-                    onChange={(e) => amountInput.onChange(e)}
+                    onChange={caret.handleChange}
+                    onFocus={h.onFocus}
+                    onBlur={h.onBlur}
                   />
-                  <AssetLabel title={assetLabel} assets_id={assetId} />
+                  <AssetLabel title={lpLabel} assets_id={lpAid} />
                 </InputRow>
               </AssetsSection>
             </SwapBlock>
             <SwapBlock>
               <BlockLabel>You receive</BlockLabel>
-              <AssetsSection>
-                <InputRow>
-                  <Input
-                    disabled
-                    pallete="purple"
-                    variant="amount"
-                    style={purpleDisabled}
-                    value={emptyPredict(predictData, amountInput.value) ? '0' : fromGroths(predictData.tok1)}
-                  />
-                  <AssetLabel title={nameToken1} assets_id={data.aid1} />
-                </InputRow>
-              </AssetsSection>
-              <AssetsSection>
-                <InputRow>
-                  <Input
-                    disabled
-                    pallete="purple"
-                    variant="amount"
-                    style={purpleDisabled}
-                    value={emptyPredict(predictData, amountInput.value) ? '0' : fromGroths(predictData.tok2)}
-                  />
-                  <AssetLabel title={nameToken2} assets_id={data.aid2} />
-                </InputRow>
-              </AssetsSection>
+              {receive.map((r) => (
+                <AssetsSection key={r.field}>
+                  <InputRow>
+                    <Input
+                      disabled
+                      pallete="purple"
+                      variant="amount"
+                      style={purpleIn}
+                      value={formatPredictedFieldDisplay(predictData, amt.value, r.field)}
+                    />
+                    <AssetLabel title={r.name} assets_id={r.aid} />
+                  </InputRow>
+                </AssetsSection>
+              ))}
             </SwapBlock>
             <EmbeddedTradeButtonWrap>
-              <ActionsRow>
+              <div style={actionsRow}>
                 <ButtonWrapper>
-                  <Button icon={CancelIcon} variant="cancel" onClick={onPreviousClick}>
-                    Cancel
-                  </Button>
+                  <Button icon={CancelIcon} variant="cancel" onClick={() => navigate(ROUTES.POOLS.BASE)}>Cancel</Button>
                   <Button
-                    disabled={!amountInput.isValid}
+                    disabled={!amt.isValid}
                     icon={ArrowDownIcon}
                     variant="withdraw"
-                    onClick={() => onWithdraw(requestData)}
+                    onClick={() => dispatch(mainActions.onWithdraw.request(setDataRequest(req)))}
                   >
                     Withdraw
                   </Button>
                 </ButtonWrapper>
-              </ActionsRow>
+              </div>
             </EmbeddedTradeButtonWrap>
           </SwapCard>
           <RightPanel>
-            <PoolStat data={data} lp={currentLPToken} showFavorite plain />
+            <PoolStat data={data} lp={lp} showFavorite plain />
           </RightPanel>
         </EmbeddedLayout>
       </Container>

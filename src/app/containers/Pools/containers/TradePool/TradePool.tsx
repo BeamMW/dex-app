@@ -1,9 +1,8 @@
 import React, {
-  useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState,
+  useCallback, useEffect, useMemo, useState,
 } from 'react';
 import { IOptions, ITrade, IPoolCard } from '@core/types';
 import {
-  caretAfterGroupingFormat,
   emptyPredict, fromGroths, getPoolKind, setDataRequest, toGroths, truncate,
 } from '@core/appUtils';
 import { styled } from '@linaria/react';
@@ -68,6 +67,14 @@ import {
   SwapCard,
   TotalTitle,
 } from '@app/containers/Pools/containers/shared/poolFlowLayout';
+import {
+  createAmountFieldHandlers,
+  formatPredictAmount,
+  parseAmount,
+  useAmountInputCaret,
+} from '@app/containers/Pools/containers/shared/poolAmountInput';
+
+const receiveAmountInputStyle = { cursor: 'default', color: 'var(--color-purple)', opacity: 1 } as const;
 
 const FeeTierRow = styled.div`
   display: flex;
@@ -107,60 +114,6 @@ const AutoButton = styled.button`
   font-size: 12px;
   cursor: pointer;
 `;
-
-const parseAmount = (v: string | number) => Number(String(v).replace(/,/g, ''));
-
-const isAmountInputEmpty = (value: string | number) => (
-  String(value).replace(/,/g, '').trim() === ''
-);
-
-const formatPredictAmount = (v: string | number) => {
-  const [int, frac] = String(v).split('.');
-  const intFormatted = Number(int).toLocaleString('en-US');
-  return frac !== undefined ? `${intFormatted}.${frac}` : intFormatted;
-};
-
-const formatUserInput = (v: string) => {
-  const stripped = v.replace(/,/g, '');
-  return stripped ? formatPredictAmount(stripped) : '';
-};
-
-type CaretRange = { start: number; end: number };
-
-function useAmountInputCaret(
-  formattedValue: string | number,
-  onPredict: (next: string) => void,
-  lastChangedSide: 1 | 2,
-  setLastChangedInput: React.Dispatch<React.SetStateAction<number>>,
-) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const pendingCaretRef = useRef<CaretRange | null>(null);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const el = e.target;
-    const raw = el.value;
-    const next = formatUserInput(raw);
-    pendingCaretRef.current = caretAfterGroupingFormat(
-      raw,
-      next,
-      el.selectionStart,
-      el.selectionEnd,
-    );
-    onPredict(next);
-    setLastChangedInput(lastChangedSide);
-  };
-
-  useLayoutEffect(() => {
-    const pending = pendingCaretRef.current;
-    if (pending === null) return;
-    pendingCaretRef.current = null;
-    const node = inputRef.current;
-    if (!node) return;
-    node.setSelectionRange(pending.start, pending.end);
-  }, [formattedValue]);
-
-  return { inputRef, handleChange };
-}
 
 interface TradePoolProps {
   embedded?: boolean;
@@ -235,12 +188,24 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   const tokenName_1 = getTokenTitle(currentToken);
   const tokenName_2 = getTokenTitle(secondToken);
 
-  const handleChange = () => {
+  function swapTokensAndResetSend() {
     setCurrentToken(secondToken);
     setSecondToken(currentToken);
     setLastChangedInput(1);
     amountSendInput.onPredict(0);
-  };
+  }
+
+  function findBestPoolIfNeeded(val2Pay: number, val1Buy: number) {
+    if (manualKind || matchedPools.length <= 1) return;
+    if (val2Pay <= 0 && val1Buy <= 0) return;
+    dispatch(mainActions.onFindBestPool.request({
+      pools: matchedPools,
+      aid1: secondToken,
+      aid2: currentToken,
+      val2_pay: val2Pay,
+      val1_buy: val1Buy,
+    }));
+  }
 
   useEffect(() => {
     if (!embedded) {
@@ -298,49 +263,27 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   }, [activePool, data, dispatch]);
 
   useEffect(() => {
-    if (lastChangedInput === 1) {
-      setRequestData({
-        aid1: secondToken,
-        aid2: currentToken,
-        kind: activePool?.kind ?? 0,
-        val2_pay: toGroths(parseAmount(amountInput.value)),
-      });
-      if (!manualKind && matchedPools.length > 1) {
-        const amount = toGroths(parseAmount(amountInput.value));
-        if (amount > 0) {
-          dispatch(mainActions.onFindBestPool.request({
-            pools: matchedPools,
-            aid1: secondToken,
-            aid2: currentToken,
-            val2_pay: amount,
-            val1_buy: 0,
-          }));
-        }
-      }
-    }
+    if (lastChangedInput !== 1) return;
+    const payGroths = toGroths(parseAmount(amountInput.value));
+    setRequestData({
+      aid1: secondToken,
+      aid2: currentToken,
+      kind: activePool?.kind ?? 0,
+      val2_pay: payGroths,
+    });
+    findBestPoolIfNeeded(payGroths, 0);
   }, [amountInput.value, currentToken, secondToken, lastChangedInput, activePool?.kind]);
 
   useEffect(() => {
-    if (lastChangedInput === 2) {
-      setRequestData({
-        aid1: secondToken,
-        aid2: currentToken,
-        kind: activePool?.kind ?? 0,
-        val1_buy: toGroths(parseAmount(amountSendInput.value)),
-      });
-      if (!manualKind && matchedPools.length > 1) {
-        const amount = toGroths(parseAmount(amountSendInput.value));
-        if (amount > 0) {
-          dispatch(mainActions.onFindBestPool.request({
-            pools: matchedPools,
-            aid1: secondToken,
-            aid2: currentToken,
-            val2_pay: 0,
-            val1_buy: amount,
-          }));
-        }
-      }
-    }
+    if (lastChangedInput !== 2) return;
+    const buyGroths = toGroths(parseAmount(amountSendInput.value));
+    setRequestData({
+      aid1: secondToken,
+      aid2: currentToken,
+      kind: activePool?.kind ?? 0,
+      val1_buy: buyGroths,
+    });
+    findBestPoolIfNeeded(0, buyGroths);
   }, [amountSendInput.value, currentToken, secondToken, lastChangedInput, activePool?.kind]);
 
   useEffect(() => {
@@ -439,29 +382,8 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
     }
   }, [hasActiveQuoteInput, predictData, dispatch, lastChangedInput]);
 
-  function createAmountFieldHandlers(
-    input: { value: number | string; onPredict: (v: number | string) => void },
-    peerValue: number | string,
-  ) {
-    return {
-      onFocus: () => {
-        if (
-          emptyPredict(predictData, peerValue)
-          && (input.value === 0 || input.value === '0')
-        ) {
-          input.onPredict('');
-        }
-      },
-      onBlur: () => {
-        if (isAmountInputEmpty(input.value)) {
-          input.onPredict(0);
-        }
-      },
-    };
-  }
-
-  const fromAmountFieldHandlers = createAmountFieldHandlers(amountInput, amountSendInput.value);
-  const toAmountFieldHandlers = createAmountFieldHandlers(amountSendInput, amountInput.value);
+  const fromAmountFieldHandlers = createAmountFieldHandlers(predictData, amountInput, amountSendInput.value);
+  const toAmountFieldHandlers = createAmountFieldHandlers(predictData, amountSendInput, amountInput.value);
 
   const onSelectFromToken = useCallback((value: IOptions) => {
     setCurrentToken(value?.value ?? null);
@@ -551,7 +473,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   <SearchHint>Click asset selector to search.</SearchHint>
                 </SwapBlock>
                 <EmbeddedExchangeWrap>
-                  <Button icon={IconExchange} variant="icon" onClick={() => handleChange()} />
+                  <Button icon={IconExchange} variant="icon" onClick={swapTokensAndResetSend} />
                 </EmbeddedExchangeWrap>
                 <SwapBlock>
                   <BlockLabel>To</BlockLabel>
@@ -561,7 +483,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                         ref={amountSendInputRef}
                         pallete="purple"
                         variant="amount"
-                        style={{ cursor: 'default', color: 'var(--color-purple)', opacity: 1 }}
+                        style={receiveAmountInputStyle}
                         value={amountSendInput.value}
                         onChange={handleAmountSendInputChange}
                         onFocus={toAmountFieldHandlers.onFocus}
@@ -589,7 +511,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                     <RateRow>
                       <SummaryTitle>Rate</SummaryTitle>
                       <RateText>{`1 ${rateLeft} = ${shownRate.toLocaleString('en-US', { minimumFractionDigits: 8, maximumFractionDigits: 8 })} ${rateRight}`}</RateText>
-                      <Button icon={IconExchange} variant="icon" onClick={() => setFlipRate(!flipRate)} />
+                      <Button icon={IconExchange} variant="icon" onClick={() => setFlipRate((f) => !f)} />
                     </RateRow>
                     <SummaryContainer>
                       <SummaryTitle>You buy</SummaryTitle>
@@ -733,7 +655,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
               </InputRow>
             </AssetsSection>
             <ExchangeWrapper>
-              <Button icon={IconExchange} variant="icon" onClick={() => handleChange()} />
+              <Button icon={IconExchange} variant="icon" onClick={swapTokensAndResetSend} />
             </ExchangeWrapper>
           </Section>
           <Section title={titleSections.TRADE_SEND}>
@@ -743,7 +665,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   ref={amountSendInputRef}
                   pallete="purple"
                   variant="amount"
-                  style={{ cursor: 'default', color: 'var(--color-purple)', opacity: 1 }}
+                  style={receiveAmountInputStyle}
                   value={amountSendInput.value}
                   onChange={handleAmountSendInputChange}
                   onFocus={toAmountFieldHandlers.onFocus}
