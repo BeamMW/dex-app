@@ -67,7 +67,13 @@ module.exports = {
       },
       {
         test: /\.svg$/,
-        use: ['@svgr/webpack', 'svgo-loader'],
+        use: [
+          {
+            loader: '@svgr/webpack',
+            // SVGO breaks BeamX-style nested transforms; keep svgo disabled.
+            options: { svgo: false },
+          },
+        ],
       },
       {
         test: /\.css$/,

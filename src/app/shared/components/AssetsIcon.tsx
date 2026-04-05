@@ -17,8 +17,16 @@ export interface AssetIconProps {
   className?: string;
 }
 
+const ICON_BY_ASSET_ID: Partial<Record<number, typeof BeamIconSvg>> = {
+  [BEAM_ID]: BeamIconSvg,
+  [BEAMX_ID]: BeamXIconSvg,
+  [NPH_ID]: IconNPHAsset,
+};
+
 const ContainerStyled = styled.div<AssetIconProps>`
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   vertical-align: middle;
   width: 18px;
   height: 18px;
@@ -31,12 +39,7 @@ const ContainerStyled = styled.div<AssetIconProps>`
 `;
 
 const AssetIcon: React.FC<AssetIconProps> = ({ asset_id = 0, className }) => {
-  let IconComponent: any;
-  if (asset_id === BEAM_ID) {
-    IconComponent = BeamIconSvg;
-  } else {
-    IconComponent = asset_id === BEAMX_ID ? BeamXIconSvg : asset_id === NPH_ID ? IconNPHAsset : AssetIconSvg;
-  }
+  const IconComponent = ICON_BY_ASSET_ID[asset_id] ?? AssetIconSvg;
   return (
     <ContainerStyled asset_id={asset_id} className={className}>
       <IconComponent />

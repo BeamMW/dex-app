@@ -65,20 +65,19 @@ const IconWrap = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 50%;
-  flex-shrink: 0;
 `;
 
-const CircleIcon = styled(AssetIcon)`
+/** 32×32 glyph in the 48px circle (default AssetIcon is 18×18). */
+const HeaderAssetIcon = styled(AssetIcon)`
   width: 32px;
   height: 32px;
   margin-right: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 
   & svg {
+    display: block;
     width: 32px;
     height: 32px;
   }
@@ -279,7 +278,7 @@ export const AssetInfo = () => {
             <AssetCard>
               <AssetHeader>
                 <IconWrap>
-                  <CircleIcon asset_id={assetId} />
+                  <HeaderAssetIcon asset_id={assetId} />
                 </IconWrap>
                 <AssetHeaderText>
                   <AssetFullName>{fullName}</AssetFullName>
