@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { styled } from '@linaria/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -269,6 +269,7 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
   const [tab, setTab] = useState<SearchTab>('ALL');
   const [favTab, setFavTab] = useState<AssetFavTab>('ALL');
   const [filterOpen, setFilterOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
   const assetsList = useSelector(selectAssetsList());
   const poolsList = useSelector(selectPoolsList());
   const favoriteAssets = useSelector(selectFavoriteAssets());
@@ -369,6 +370,17 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
   }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (!filterOpen) return undefined;
+    const handler = (e: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
+        setFilterOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [filterOpen]);
 
   useEffect(() => {
     if (isOpen) {
@@ -521,35 +533,47 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
         />
 
         <TabBar>
-          {mode === 'explore' && (['ALL', 'ASSET', 'POOL'] as SearchTab[]).map((t) => (
-            <TabButton key={t} active={tab === t} onClick={() => setTab(t)}>
-              {t}
-            </TabButton>
-          ))}
-          <FilterWrap>
-            <FilterBtn
-              type="button"
-              active={favTab === 'FAV'}
-              onClick={() => setFilterOpen((o) => !o)}
-            >
-              {favTab === 'FAV' ? '★ Favorite' : 'All'}
-              {' ▾'}
-            </FilterBtn>
-            {filterOpen && (
-              <FilterDropdown>
-                {(['ALL', 'FAV'] as AssetFavTab[]).map((t) => (
-                  <FilterOption
-                    key={t}
-                    type="button"
-                    selected={favTab === t}
-                    onClick={() => { setFavTab(t); setFilterOpen(false); }}
-                  >
-                    {t === 'FAV' ? '★ Favorite' : 'All'}
-                  </FilterOption>
-                ))}
-              </FilterDropdown>
-            )}
-          </FilterWrap>
+          {mode === 'explore' ? (
+            <>
+              {(['ALL', 'ASSET', 'POOL'] as SearchTab[]).map((t) => (
+                <TabButton key={t} active={tab === t} onClick={() => setTab(t)}>
+                  {t}
+                </TabButton>
+              ))}
+              <FilterWrap ref={filterRef}>
+                <FilterBtn
+                  type="button"
+                  active={favTab === 'FAV'}
+                  onClick={() => setFilterOpen((o) => !o)}
+                >
+                  {favTab === 'FAV' ? '★ Favorite' : 'All'}
+                  {' ▾'}
+                </FilterBtn>
+                {filterOpen && (
+                  <FilterDropdown>
+                    {(['ALL', 'FAV'] as AssetFavTab[]).map((t) => (
+                      <FilterOption
+                        key={t}
+                        type="button"
+                        selected={favTab === t}
+                        onClick={() => { setFavTab(t); setFilterOpen(false); }}
+                      >
+                        {t === 'FAV' ? '★ Favorite' : 'All'}
+                      </FilterOption>
+                    ))}
+                  </FilterDropdown>
+                )}
+              </FilterWrap>
+            </>
+          ) : (
+            <>
+              {(['ALL', 'FAV'] as AssetFavTab[]).map((t) => (
+                <TabButton key={t} active={favTab === t} onClick={() => setFavTab(t)}>
+                  {t === 'FAV' ? 'Favorite' : 'All'}
+                </TabButton>
+              ))}
+            </>
+          )}
         </TabBar>
 
         <ResultList>
