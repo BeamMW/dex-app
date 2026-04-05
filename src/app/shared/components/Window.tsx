@@ -1,6 +1,7 @@
 import React, { useCallback, useRef } from 'react';
 import { styled } from '@linaria/react';
-import Utils from '@core/utils.js';
+import BeamDappConnector from '@core/BeamDappConnector.js';
+import connector from '@core/connector';
 import { useNavigate } from 'react-router-dom';
 import Title from '@app/shared/components/Title';
 import { BackButton, Button } from '@app/shared/components/index';
@@ -15,7 +16,7 @@ interface WindowProps {
 }
 
 const Container = styled.div<{ bgColor: string }>`
-  background-color: ${({ bgColor }) => (Utils.isWeb() || Utils.isMobile() ? bgColor : 'transparent')};
+  background-color: ${({ bgColor }) => (BeamDappConnector.isWeb() || BeamDappConnector.isMobile() ? bgColor : 'transparent')};
   min-height: 100%;
   width: 100%;
   max-width: 100%;
@@ -31,7 +32,7 @@ const Container = styled.div<{ bgColor: string }>`
 `;
 
 const HeaderWrapper = styled.div`
-  margin-top: ${() => (Utils.isWeb() ? '20px' : '0')};
+  margin-top: ${() => (BeamDappConnector.isWeb() ? '20px' : '0')};
   max-width: 914px;
   width: 100%;
   position: relative;
@@ -43,7 +44,7 @@ const ButtonWrapper = styled.div<{ margin: string }>`
     display: flex;
     justify-content: flex-end;
     max-width: 1310px;
-    margin-top: ${() => (Utils.isWeb() ? '20px' : '0')} ;
+    margin-top: ${() => (BeamDappConnector.isWeb() ? '20px' : '0')} ;
      @media (max-width: 913px) {
        justify-content: center;
      }
@@ -70,9 +71,9 @@ const Window: React.FC<WindowProps> = ({
   }, [navigate]);
   return (
     <>
-      <Container bgColor={Utils.getStyles().background_main} ref={rootRef}>
+      <Container bgColor={connector.getStyles().background_main} ref={rootRef}>
         {createPool && (
-          <ButtonWrapper margin={Utils.isWeb()}>
+          <ButtonWrapper margin={BeamDappConnector.isWeb()}>
             <ButtonStyled>
               <Button onClick={createPoolNavigation} variant="ghost" icon={IconPlus}>
                 Create Pool

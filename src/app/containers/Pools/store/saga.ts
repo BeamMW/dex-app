@@ -22,7 +22,7 @@ import { selectCurrentPool, selectFavorites, selectFilter } from '@app/container
 import { toast } from 'react-toastify';
 import { navigate } from '@app/shared/store/actions';
 import { ROUTES } from '@app/shared/constants';
-import Utils from '@core/utils.js';
+import connector from '@core/connector';
 import { actions as Shared } from '@app/shared/store/index';
 import { actions } from '.';
 
@@ -90,7 +90,7 @@ function* getStatus(txid: string) {
   }
 }
 export function* createPool(action: ReturnType<typeof mainActions.onCreatePool.request>): Generator {
-  if (yield Utils.isHeadless()) {
+  if (connector.isHeadless()) {
     yield onSwitchToApi();
   } else {
     try {
@@ -109,7 +109,7 @@ export function* createPool(action: ReturnType<typeof mainActions.onCreatePool.r
 }
 
 export function* addLiquidity(action: ReturnType<typeof mainActions.onAddLiquidity.request>): Generator {
-  if (yield Utils.isHeadless()) {
+  if (connector.isHeadless()) {
     yield onSwitchToApi();
   } else {
     try {
@@ -141,7 +141,7 @@ export function* addLiquidity(action: ReturnType<typeof mainActions.onAddLiquidi
   }
 }
 export function* tradePool(action: ReturnType<typeof mainActions.onTradePool.request>): Generator {
-  if (yield Utils.isHeadless()) {
+  if (connector.isHeadless()) {
     yield onSwitchToApi();
   } else {
     try {
@@ -166,7 +166,7 @@ export function* tradePool(action: ReturnType<typeof mainActions.onTradePool.req
   }
 }
 export function* withdrawPool(action: ReturnType<typeof mainActions.onWithdraw.request>): Generator {
-  if (yield Utils.isHeadless()) {
+  if (connector.isHeadless()) {
     yield onSwitchToApi();
   } else {
     try {
@@ -240,6 +240,7 @@ export function* findBestPool(action: ReturnType<typeof mainActions.onFindBestPo
   let bestPool = pools[0];
   let bestBuy = -1;
 
+  // eslint-disable-next-line no-restricted-syntax
   for (const pool of pools) {
     try {
       // @ts-ignore
@@ -256,6 +257,7 @@ export function* findBestPool(action: ReturnType<typeof mainActions.onFindBestPo
         bestBuy = buy;
         bestPool = pool;
       }
+    // eslint-disable-next-line no-empty
     } catch (_) {}
   }
 

@@ -2,8 +2,7 @@ import {
   IAsset, IMetadataPairs, IOptions, IPoolCard, IPredict, ITxStatus, Kind,
 } from '@core/types';
 import { ASSET_BEAM, GROTHS_IN_BEAM } from '@app/shared/constants';
-// eslint-disable-next-line import/extensions
-import Utils from '@app/core/utils.js';
+import connector from '@app/core/connector';
 import { start } from '@app/shared/store/saga';
 import { toast } from 'react-toastify';
 import { actions as mainActions } from '@app/containers/Pools/store';
@@ -301,7 +300,7 @@ export function setStorage() {
 }
 
 export async function onSwitchToApi() {
-  if (await Utils.switchToWebAPI()) {
+  if (await connector.switchToWebAPI()) {
     await start()
       .then(() => {
         store.dispatch(mainActions.setIsHeadless(false));

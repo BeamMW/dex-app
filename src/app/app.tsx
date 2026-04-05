@@ -24,7 +24,7 @@ import {
 } from '@app/containers';
 import { ROUTES } from '@app/shared/constants';
 import { AlertWallet, Loader, TopNav } from '@app/shared/components';
-import Utils from '@core/utils.js';
+import BeamDappConnector from '@core/BeamDappConnector.js';
 import { selectIsHeadless } from '@app/containers/Pools/store/selectors';
 import { selectIsLoaded } from '@app/shared/store/selectors';
 
@@ -85,7 +85,7 @@ const App = () => {
   const isHeadless = useSelector(selectIsHeadless());
   const isLoaded = useSelector(selectIsLoaded());
   const iFrameDetection = window !== window.parent;
-  const isWeb = Utils.isWeb();
+  const isWeb = BeamDappConnector.isWeb();
 
   useEffect(() => {
     if (navigateURL) {

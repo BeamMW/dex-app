@@ -4,48 +4,38 @@ import { eventChannel, END } from 'redux-saga';
 import { setSystemState } from '@app/shared/store/actions';
 import { actions as mainActions } from '@app/containers/Pools/store/index';
 
-import Utils from '@core/utils.js';
+import connector from '@core/connector';
 import { setTxStatus } from '@app/containers/Pools/store/actions';
 import store from '../../../index';
 
 const iFrameDetection = window !== window.parent;
+
 export async function start() {
-  Utils.download('./amm.wasm', (err, bytes) => {
-    Utils.callApi('ev_subunsub', {
-      ev_txs_changed: true,
-      ev_system_state: true,
-    }, (error, result) => {
-      if (error) return;
-      if (result) {
-        store.dispatch(mainActions.loadAppParams.request(bytes));
-        store.dispatch(mainActions.loadPoolsList.request(null));
-      }
-    });
+  const bytes = await connector.downloadShader('./amm.wasm');
+  await connector.callApi('ev_subunsub', {
+    ev_txs_changed: true,
+    ev_system_state: true,
   });
+ 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  store.dispatch(mainActions.loadAppParams.request(Array.from(bytes) as any));
+  store.dispatch(mainActions.loadPoolsList.request(null));
 }
+
 export function remoteEventChannel() {
   return eventChannel((emitter) => {
-    Utils.initialize(
-      {
-        appname: 'DEX',
-        min_api_version: '7.3',
-        headless: !iFrameDetection || !!Utils.isHeadless(),
-        apiResultHandler: (_error, result, full) => {
-          if (!result && full) {
-            emitter(full);
-          }
-        },
-      },
-      (err) => {
-        if (err) return;
-        start();
-      },
-    );
+    connector.on('apiEvent', (response: any) => {
+      if (response) {
+        emitter(response);
+      }
+    });
 
-    const unsubscribe = () => {
-      emitter(END);
-    };
-    return unsubscribe;
+    const headless = !iFrameDetection || connector.isHeadless();
+    connector.connect({ headless })
+      .then(() => start())
+      .catch(() => {});
+
+    return () => emitter(END);
   });
 }
 
@@ -59,7 +49,6 @@ function* sharedSaga() {
         case 'ev_system_state':
           store.dispatch(setSystemState(payload.result));
           store.dispatch(mainActions.loadAppParams.request(null));
-          // store.dispatch(mainActions.loadPoolsList.request(null));
           break;
 
         case 'ev_txs_changed':
