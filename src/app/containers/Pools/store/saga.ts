@@ -29,7 +29,8 @@ import { actions } from '.';
 export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.request>): Generator {
   try {
     yield setStorage();
-    const favoritesLocal = JSON.parse(localStorage.getItem('favorites'));
+    const favoritesLocal = JSON.parse(localStorage.getItem('favorites')) || [];
+    const favoriteAssetsLocal: number[] = JSON.parse(localStorage.getItem('favoriteAssets')) || [];
     const filter = yield select(selectFilter());
     let assetsList: IAsset[] = [];
     try {
@@ -42,6 +43,7 @@ export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.
       asset.parsedMetadata = parseMetadata(asset.metadata);
     });
     yield put(mainActions.setFavorites(favoritesLocal));
+    yield put(mainActions.setFavoriteAssets(favoriteAssetsLocal));
     yield put(mainActions.setAssetsList(assetsList));
     const options = getOptions(assetsList);
     yield put(mainActions.setOptions(options));
@@ -215,6 +217,21 @@ export function* favorites(action: ReturnType<typeof mainActions.onFavorites.req
   }
 }
 
+export function* favoriteAsset(action: ReturnType<typeof mainActions.onToggleFavoriteAsset.request>): Generator {
+  try {
+    const assetId = action.payload as number;
+    const current = (yield select((state: AppState) => state.main.favoriteAssets)) as number[];
+    const list = current || [];
+    const updated = list.includes(assetId)
+      ? list.filter((id) => id !== assetId)
+      : [...list, assetId];
+    yield localStorage.setItem('favoriteAssets', JSON.stringify(updated));
+    yield put(mainActions.setFavoriteAssets(updated));
+  } catch (e) {
+    toast(e.error);
+  }
+}
+
 export function* findBestPool(action: ReturnType<typeof mainActions.onFindBestPool.request>): Generator {
   const {
     pools, aid1, aid2, val2_pay, val1_buy,
@@ -254,6 +271,7 @@ function* mainSaga() {
   yield takeLatest(mainActions.onTradePool.request, tradePool);
   yield takeLatest(mainActions.onWithdraw.request, withdrawPool);
   yield takeLatest(mainActions.onFavorites.request, favorites);
+  yield takeLatest(mainActions.onToggleFavoriteAsset.request, favoriteAsset);
   yield takeLatest(mainActions.onFindBestPool.request, findBestPool);
 }
 

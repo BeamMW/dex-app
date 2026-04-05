@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { fromGroths, setDataRequest, toGroths, truncate } from '@core/appUtils';
+import {
+  fromGroths, setDataRequest, toGroths, truncate,
+} from '@core/appUtils';
 import {
   AssetsSection, Button, Container, Input, PoolStat, Window,
 } from '@app/shared/components';
@@ -20,7 +22,9 @@ import {
 } from '@app/containers/Pools/containers/shared/poolAmountInput';
 
 const purpleIn = { cursor: 'default' as const, color: 'var(--color-purple)', opacity: 1 };
-const actionsRow = { display: 'flex', justifyContent: 'center', width: '100%', marginTop: 24 } as const;
+const actionsRow = {
+  display: 'flex', justifyContent: 'center', width: '100%', marginTop: 24,
+} as const;
 
 export const WithdrawPool = () => {
   const data = useSelector(selectCurrentPool());
@@ -41,7 +45,9 @@ export const WithdrawPool = () => {
 
   useEffect(() => { if (data && assets) setLp(assets.find((x) => x.aid === data['lp-token'])); }, [data, assets]);
   useEffect(() => {
-    setReq({ aid1: data.aid1, aid2: data.aid2, kind: data.kind, ctl: toGroths(parseAmount(amt.value)) });
+    setReq({
+      aid1: data.aid1, aid2: data.aid2, kind: data.kind, ctl: toGroths(parseAmount(amt.value)),
+    });
   }, [amt.value, data.aid1, data.aid2, data.kind]);
   useEffect(() => setMaxCtl(data.ctl), [data.ctl]);
   useEffect(() => {

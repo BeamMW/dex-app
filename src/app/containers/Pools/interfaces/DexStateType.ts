@@ -12,6 +12,7 @@ export interface DexStateType {
   filter: string;
   options: IOptions[];
   favorites: IPoolCard[];
+  favoriteAssets: number[];
   currentLPToken: IPoolCard;
   isLoading: boolean;
   myPools: IPoolCard[];

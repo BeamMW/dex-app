@@ -22,6 +22,12 @@ export const setCurrentPool = createAction(MainActionsTypes.SET_CURRENT_POOL)<IP
 export const setFilter = createAction(MainActionsTypes.SET_FILTER)<string>();
 export const setOptions = createAction(MainActionsTypes.SET_OPTIONS)<IOptions[]>();
 export const setFavorites = createAction(MainActionsTypes.SET_FAVORITES)<IPoolCard[]>();
+export const setFavoriteAssets = createAction(MainActionsTypes.SET_FAVORITE_ASSETS)<number[]>();
+export const onToggleFavoriteAsset = createAsyncAction(
+  MainActionsTypes.TOGGLE_FAVORITE_ASSET,
+  MainActionsTypes.TOGGLE_FAVORITE_ASSET_SUCCESS,
+  MainActionsTypes.TOGGLE_FAVORITE_ASSET_FAILURE,
+)<number, number[], any>();
 export const setCurrentLPToken = createAction(MainActionsTypes.SET_CURRENT_LP_TOKEN)<IPoolCard>();
 export const setIsLoading = createAction(MainActionsTypes.SET_IS_LOADING)<boolean>();
 export const setMyPools = createAction(MainActionsTypes.SET_MY_POOLS)<IPoolCard[]>();

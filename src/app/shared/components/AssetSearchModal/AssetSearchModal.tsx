@@ -1,13 +1,14 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { styled } from '@linaria/react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { IAsset, IOptions } from '@core/types';
 import { assetShortLabel } from '@core/appUtils';
-import { selectAssetsList, selectPoolsList } from '@app/containers/Pools/store/selectors';
+import { selectAssetsList, selectFavoriteAssets, selectPoolsList } from '@app/containers/Pools/store/selectors';
+import * as mainActions from '@app/containers/Pools/store/actions';
 import { ASSET_BEAM } from '@app/shared/constants';
 import AssetIcon from '@app/shared/components/AssetsIcon';
-import { CancelIcon } from '@app/shared/icons';
+import { CancelIcon, IconFavorite, IconFavoriteFilled } from '@app/shared/icons';
 import { AssetSearchModalProps } from './AssetSearchModal.types';
 
 const BEAM_ASSET: IAsset = {
@@ -18,6 +19,7 @@ const BEAM_ASSET: IAsset = {
 };
 
 type SearchTab = 'ALL' | 'ASSET' | 'POOL';
+type AssetFavTab = 'ALL' | 'FAV';
 
 const ModalBackdrop = styled.div`
   position: fixed;
@@ -92,6 +94,7 @@ const SearchInput = styled.input`
 
 const TabBar = styled.div`
   display: flex;
+  align-items: center;
   gap: 0;
   padding: 10px 16px 0;
   flex-shrink: 0;
@@ -184,6 +187,68 @@ const RowAction = styled.span`
   margin-left: 4px;
 `;
 
+const StarButton = styled.button`
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  opacity: 0.6;
+  &:hover { opacity: 1; }
+`;
+
+const FilterWrap = styled.div`
+  position: relative;
+  flex-shrink: 0;
+  margin-left: auto;
+  padding-bottom: 8px;
+`;
+
+const FilterBtn = styled.button<{ active: boolean }>`
+  background: ${({ active }) => (active ? 'rgba(0, 246, 170, 0.12)' : 'rgba(255, 255, 255, 0.06)')};
+  border: 1px solid ${({ active }) => (active ? 'var(--color-green)' : 'rgba(255, 255, 255, 0.1)')};
+  border-radius: 8px;
+  color: ${({ active }) => (active ? 'var(--color-green)' : 'rgba(255, 255, 255, 0.6)')};
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+`;
+
+const FilterDropdown = styled.div`
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  background: var(--color-dark-blue);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  overflow: hidden;
+  z-index: 10;
+  min-width: 130px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+`;
+
+const FilterOption = styled.button<{ selected: boolean }>`
+  display: block;
+  width: 100%;
+  padding: 9px 14px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  color: ${({ selected }) => (selected ? 'var(--color-green)' : 'rgba(255, 255, 255, 0.7)')};
+  font-size: 12px;
+  font-weight: ${({ selected }) => (selected ? 700 : 400)};
+  cursor: pointer;
+  &:hover { background: rgba(255, 255, 255, 0.06); }
+`;
+
 const NoResults = styled.div`
   padding: 24px 16px;
   color: rgba(255, 255, 255, 0.35);
@@ -202,9 +267,15 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
 }) => {
   const [query, setQuery] = useState('');
   const [tab, setTab] = useState<SearchTab>('ALL');
+  const [favTab, setFavTab] = useState<AssetFavTab>('ALL');
+  const [filterOpen, setFilterOpen] = useState(false);
   const assetsList = useSelector(selectAssetsList());
   const poolsList = useSelector(selectPoolsList());
+  const favoriteAssets = useSelector(selectFavoriteAssets());
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const favoriteSet = useMemo(() => new Set(favoriteAssets || []), [favoriteAssets]);
 
   const getAssetId = (asset: IAsset) => asset.asset_id ?? (asset as any).aid ?? 0;
 
@@ -224,6 +295,11 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
       );
     });
   }, [allAssets, query]);
+
+  const displayedAssets = useMemo(() => {
+    if (favTab === 'FAV') return filteredAssets.filter((a) => favoriteSet.has(getAssetId(a)));
+    return filteredAssets;
+  }, [filteredAssets, favTab, favoriteSet]);
 
   const poolPairResults = useMemo(() => {
     if (mode !== 'explore' || !query.includes('/')) return [];
@@ -298,6 +374,8 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
     if (isOpen) {
       setQuery('');
       setTab('ALL');
+      setFavTab('ALL');
+      setFilterOpen(false);
     }
   }, [isOpen]);
 
@@ -380,16 +458,25 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
         </AssetRowText>
         <AssetIdBadge>{`id:${id}`}</AssetIdBadge>
         {actionLabel && <RowAction>{actionLabel}</RowAction>}
+        <StarButton
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            dispatch(mainActions.onToggleFavoriteAsset.request(id));
+          }}
+        >
+          {favoriteSet.has(id) ? <IconFavoriteFilled /> : <IconFavorite />}
+        </StarButton>
       </AssetRow>
     );
   };
 
-  const noResults = filteredAssets.length === 0;
+  const noResults = displayedAssets.length === 0;
 
   const renderAssetList = (onClick: (a: IAsset) => void, action?: string, prefix = '', emptyMsg = 'No assets found') => (
     noResults
-      ? <NoResults>{emptyMsg}</NoResults>
-      : filteredAssets.map((a) => renderAssetRow(a, onClick, action, prefix))
+      ? <NoResults>{favTab === 'FAV' ? 'No favorite assets yet. Click ★ to add.' : emptyMsg}</NoResults>
+      : displayedAssets.map((a) => renderAssetRow(a, onClick, action, prefix))
   );
 
   const renderContent = () => {
@@ -433,22 +520,54 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
           onChange={(e) => setQuery(e.target.value)}
         />
 
-        {mode === 'explore' && (
-          <TabBar>
-            {(['ALL', 'ASSET', 'POOL'] as SearchTab[]).map((t) => (
-              <TabButton key={t} active={tab === t} onClick={() => setTab(t)}>
-                {t}
-              </TabButton>
-            ))}
-          </TabBar>
-        )}
+        <TabBar>
+          {mode === 'explore' && (['ALL', 'ASSET', 'POOL'] as SearchTab[]).map((t) => (
+            <TabButton key={t} active={tab === t} onClick={() => setTab(t)}>
+              {t}
+            </TabButton>
+          ))}
+          <FilterWrap>
+            <FilterBtn
+              type="button"
+              active={favTab === 'FAV'}
+              onClick={() => setFilterOpen((o) => !o)}
+            >
+              {favTab === 'FAV' ? '★ Favorite' : 'All'}
+              {' ▾'}
+            </FilterBtn>
+            {filterOpen && (
+              <FilterDropdown>
+                {(['ALL', 'FAV'] as AssetFavTab[]).map((t) => (
+                  <FilterOption
+                    key={t}
+                    type="button"
+                    selected={favTab === t}
+                    onClick={() => { setFavTab(t); setFilterOpen(false); }}
+                  >
+                    {t === 'FAV' ? '★ Favorite' : 'All'}
+                  </FilterOption>
+                ))}
+              </FilterDropdown>
+            )}
+          </FilterWrap>
+        </TabBar>
 
         <ResultList>
-          {query.includes('/') && tab !== 'ASSET' ? (
-            poolPairResults.length > 0 ? (
+          {query.includes('/') && tab !== 'ASSET' ? (() => {
+            const displayedPairs = favTab === 'FAV'
+              ? poolPairResults.filter((p) => favoriteSet.has(p.aid1) && favoriteSet.has(p.aid2))
+              : poolPairResults;
+            if (displayedPairs.length === 0) {
+              return (
+                <NoResults>
+                  {favTab === 'FAV' ? 'No pool matches your favorite assets.' : 'No pools found'}
+                </NoResults>
+              );
+            }
+            return (
               <>
                 <SectionLabel>Pools</SectionLabel>
-                {poolPairResults.map((pair) => (
+                {displayedPairs.map((pair) => (
                   <AssetRow
                     key={`pair-${pair.aid1}-${pair.aid2}`}
                     type="button"
@@ -466,8 +585,8 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
                   </AssetRow>
                 ))}
               </>
-            ) : <NoResults>No pools found</NoResults>
-          ) : renderContent()}
+            );
+          })() : renderContent()}
         </ResultList>
       </ModalPanel>
     </ModalBackdrop>

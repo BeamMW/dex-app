@@ -46,7 +46,9 @@ export const AddLiquidity = () => {
     const v1 = toGroths(parseAmount(amount1.value));
     const v2 = toGroths(parseAmount(amount2.value));
     setRequestData({
-      aid1: data.aid1, aid2: data.aid2, kind: data.kind,
+      aid1: data.aid1,
+      aid2: data.aid2,
+      kind: data.kind,
       val1: poolIsEmpty ? v1 : (currentToken === data.aid2 ? '0' : v1),
       val2: poolIsEmpty ? v2 : (currentToken === data.aid1 ? '0' : v2),
     });

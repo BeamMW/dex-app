@@ -146,6 +146,7 @@ export const ExplorePools = () => {
                   {item.name}
                 </SortButton>
               ))}
+
             </Sort>
           </Center>
           <Right>

@@ -293,6 +293,10 @@ export function setStorage() {
   if (!fav) {
     localStorage.setItem('favorites', JSON.stringify([]));
   }
+  const favAssets = JSON.parse(localStorage.getItem('favoriteAssets'));
+  if (!favAssets) {
+    localStorage.setItem('favoriteAssets', JSON.stringify([]));
+  }
   return fav;
 }
 
