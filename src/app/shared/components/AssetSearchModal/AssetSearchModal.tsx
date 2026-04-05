@@ -22,6 +22,8 @@ const BEAM_ASSET: IAsset = {
 
 type SearchTab = 'ALL' | 'ASSET' | 'POOL';
 type AssetFavTab = 'ALL' | 'FAV';
+const KIND_PCT: Record<number, string> = { 0: '0.05%', 1: '0.3%', 2: '1%' };
+const AMM_META_REGEX = /Amm Liquidity Token (\d+)-(\d+)-(\d+)/;
 
 const ModalBackdrop = styled.div`
   position: fixed;
@@ -283,21 +285,95 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
   const getAssetId = (asset: IAsset) => asset.asset_id ?? (asset as any).aid ?? 0;
 
   const allAssets = useMemo<IAsset[]>(() => [BEAM_ASSET, ...(assetsList || [])], [assetsList]);
+  const assetsById = useMemo<Map<number, IAsset>>(
+    () => new Map(allAssets.map((asset) => [getAssetId(asset), asset])),
+    [allAssets],
+  );
+
+  const getAmmMeta = (asset: IAsset) => {
+    const metadata = asset.parsedMetadata as any;
+    if (metadata?.SN !== 'AmmL') return null;
+    const match = (metadata?.N || '').match(AMM_META_REGEX);
+    if (!match) return null;
+    return {
+      aid1: parseInt(match[1], 10),
+      aid2: parseInt(match[2], 10),
+      kind: parseInt(match[3], 10),
+    };
+  };
+
+  const getAmmTokenLabel = (assetId: number) => {
+    const token = assetsById.get(assetId);
+    return token ? assetShortLabel(token.parsedMetadata) : String(assetId);
+  };
+
+  const normalizeToken = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const isAmmSearchQuery = (value: string) => value.trim().toLowerCase().startsWith('amml');
+
+  const getAmmLabel = (asset: IAsset): string | null => {
+    const ammMeta = getAmmMeta(asset);
+    if (!ammMeta) return null;
+    const t1 = getAmmTokenLabel(ammMeta.aid1);
+    const t2 = getAmmTokenLabel(ammMeta.aid2);
+    return `AMML (${t1}(${ammMeta.aid1})/${t2}(${ammMeta.aid2}) - ${KIND_PCT[ammMeta.kind] ?? `${ammMeta.kind}`})`;
+  };
+
+  const getAmmSearchTokens = (asset: IAsset): string[] => {
+    const ammMeta = getAmmMeta(asset);
+    if (!ammMeta) return [];
+
+    const t1 = getAmmTokenLabel(ammMeta.aid1);
+    const t2 = getAmmTokenLabel(ammMeta.aid2);
+    const fee = KIND_PCT[ammMeta.kind] ?? `${ammMeta.kind}`;
+    const pairWithIds = `${t1}(${ammMeta.aid1})/${t2}(${ammMeta.aid2})`;
+    const pairNoIds = `${t1}/${t2}`;
+    const pairIdsOnly = `${ammMeta.aid1}/${ammMeta.aid2}`;
+    const pairIdsWithKind = `${ammMeta.aid1}/${ammMeta.aid2}/${ammMeta.kind}`;
+    const fullLabel = `AMML (${pairWithIds} - ${fee})`;
+    const noFeeLabel = `AMML (${pairWithIds})`;
+    const compactLabel = `AMML ${pairWithIds}`;
+
+    return [
+      fullLabel.toLowerCase(),
+      noFeeLabel.toLowerCase(),
+      compactLabel.toLowerCase(),
+      pairWithIds.toLowerCase(),
+      pairNoIds.toLowerCase(),
+      pairIdsOnly.toLowerCase(),
+      pairIdsWithKind.toLowerCase(),
+      `amml ${pairNoIds}`.toLowerCase(),
+      `amml ${pairIdsOnly}`.toLowerCase(),
+      `amml ${pairIdsWithKind}`.toLowerCase(),
+      `amml ${fee}`.toLowerCase(),
+      `amml ${pairNoIds} ${fee}`.toLowerCase(),
+      normalizeToken(fullLabel),
+      normalizeToken(noFeeLabel),
+      normalizeToken(pairWithIds),
+      normalizeToken(pairNoIds),
+      normalizeToken(pairIdsOnly),
+      normalizeToken(pairIdsWithKind),
+      normalizeToken(`amml ${pairNoIds} ${fee}`),
+    ];
+  };
 
   const filteredAssets = useMemo(() => {
     const q = query.trim().toLowerCase();
+    const normalizedQ = normalizeToken(q);
     if (!q) return allAssets;
     return allAssets.filter((asset) => {
       const id = String(asset.asset_id ?? (asset as any).aid ?? '');
       const m = asset.parsedMetadata;
+      const ammTokens = getAmmSearchTokens(asset);
       return (
         id === q
         || (m?.SN || '').toLowerCase().includes(q)
         || (m?.UN || '').toLowerCase().includes(q)
         || (m?.N || '').toLowerCase().includes(q)
+        || ammTokens.some((token) => token.includes(q))
+        || (normalizedQ.length > 0 && ammTokens.some((token) => normalizeToken(token).includes(normalizedQ)))
       );
     });
-  }, [allAssets, query]);
+  }, [allAssets, query, assetsById]);
 
   const displayedAssets = useMemo(() => {
     if (favTab === 'FAV') return filteredAssets.filter((a) => favoriteSet.has(getAssetId(a)));
@@ -394,7 +470,7 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
   }, [isOpen]);
 
   useEffect(() => {
-    if (mode === 'explore' && query.includes('/')) setTab('POOL');
+    if (mode === 'explore' && query.includes('/') && !isAmmSearchQuery(query)) setTab('POOL');
   }, [mode, query]);
 
   if (!isOpen) return null;
@@ -426,23 +502,6 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
   };
 
   const defaultTitle = mode === 'explore' ? 'Search' : 'Select a token';
-
-  const KIND_PCT: Record<number, string> = { 0: '0.05%', 1: '0.3%', 2: '1%' };
-
-  const getAmmLabel = (asset: IAsset): string | null => {
-    const m = asset.parsedMetadata;
-    if ((m as any)?.SN !== 'AmmL') return null;
-    const match = ((m as any)?.N || '').match(/Amm Liquidity Token (\d+)-(\d+)-(\d+)/);
-    if (!match) return null;
-    const aid1 = parseInt(match[1], 10);
-    const aid2 = parseInt(match[2], 10);
-    const kind = parseInt(match[3], 10);
-    const a1 = allAssets.find((a) => getAssetId(a) === aid1);
-    const a2 = allAssets.find((a) => getAssetId(a) === aid2);
-    const t1 = a1 ? assetShortLabel(a1.parsedMetadata) : String(aid1);
-    const t2 = a2 ? assetShortLabel(a2.parsedMetadata) : String(aid2);
-    return `AMML (${t1}/${t2} - ${KIND_PCT[kind] ?? `${kind}`})`;
-  };
 
   const renderAssetRow = (
     asset: IAsset,
@@ -579,7 +638,7 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
         </TabBar>
 
         <ResultList>
-          {query.includes('/') && tab !== 'ASSET' ? (() => {
+          {query.includes('/') && tab !== 'ASSET' && !isAmmSearchQuery(query) ? (() => {
             const displayedPairs = favTab === 'FAV'
               ? poolPairResults.filter((p) => favoriteSet.has(p.aid1) && favoriteSet.has(p.aid2))
               : poolPairResults;
