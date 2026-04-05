@@ -17,7 +17,8 @@ import {
   Window,
 } from '@app/shared/components';
 import { AssetSelectorButton } from '@app/shared/components/AssetSearchModal';
-import { useInput } from '@app/shared/hooks';
+import { useInput, useDebounce } from '@app/shared/hooks';
+import BeamDappConnector from '@core/BeamDappConnector.js';
 import * as mainActions from '@app/containers/Pools/store/actions';
 import { useDispatch, useSelector } from 'react-redux';
 import './index.scss';
@@ -44,6 +45,9 @@ import {
   EmbeddedActionRow,
   EmbeddedExchangeWrap,
   EmbeddedLayout,
+  EmbeddedSwapColumn,
+  EmbeddedRightStack,
+  EmbeddedTradeSummaryBelowPool,
   EmbeddedTradeButtonWrap,
   EmptyPoolState,
   ErrorHint,
@@ -76,6 +80,53 @@ import {
 } from '@app/containers/Pools/containers/shared/poolAmountInput';
 
 const receiveAmountInputStyle = { cursor: 'default', color: 'var(--color-purple)', opacity: 1 } as const;
+
+/** Mirrors Totals::Trade + FeeSettings::Get from amm/contract.h exactly. */
+function tradeForward(
+  tok1: bigint, tok2: bigint, kind: number, vBuy1: bigint,
+): { buy: bigint; totalPay: bigint } | null {
+  if (vBuy1 <= 0n || vBuy1 >= tok1 || tok2 <= 0n) return null;
+  const rawPay = tok1 * tok2 / (tok1 - vBuy1) - tok2;
+  let fee: bigint;
+  switch (kind) {
+    case 0: fee = rawPay / 2000n; break;
+    case 1: fee = rawPay / 1000n * 3n; break;
+    default: fee = rawPay / 100n; break;
+  }
+  fee += 1n;
+  return { buy: vBuy1, totalPay: rawPay + fee };
+}
+
+/** Given total pay, binary-search for buy amount (mirrors app.cpp pool_trade). */
+function tradeReverse(
+  tok1: bigint, tok2: bigint, kind: number, totalPay: bigint,
+): { buy: bigint; totalPay: bigint } | null {
+  if (totalPay <= 0n || tok1 <= 1n || tok2 <= 0n) return null;
+  let rawEst: bigint;
+  switch (kind) {
+    case 0: rawEst = totalPay * 2000n / 2001n; break;
+    case 1: rawEst = totalPay * 1000n / 1003n; break;
+    default: rawEst = totalPay * 100n / 101n; break;
+  }
+  const denom = tok2 + rawEst;
+  if (denom <= 0n) return null;
+  let guess = tok1 - tok1 * tok2 / denom;
+  if (guess <= 0n) guess = 1n;
+  if (guess >= tok1) guess = tok1 - 1n;
+
+  let lo = guess > 10000n ? guess - guess / 10000n - 1n : 0n;
+  let hi = guess + guess / 1000n + 1n;
+  if (hi >= tok1) hi = tok1 - 1n;
+
+  let best: { buy: bigint; totalPay: bigint } | null = null;
+  while (lo <= hi) {
+    const mid = (lo + hi) / 2n;
+    const r = tradeForward(tok1, tok2, kind, mid);
+    if (!r) { hi = mid - 1n; continue; }
+    if (r.totalPay <= totalPay) { best = r; lo = mid + 1n; } else { hi = mid - 1n; }
+  }
+  return best;
+}
 
 const FeeTierRow = styled.div`
   display: flex;
@@ -135,13 +186,15 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   const [secondTokAmount, setSecondTokenAmount] = useState<number>(data?.tok2 ?? 0);
   const amountInput = useInput({
     initialValue: 0,
-    validations: { isEmpty: true, isMax: fromGroths(currentTokAmount) },
+    validations: { isEmpty: true, isMax: Number.MAX_SAFE_INTEGER },
   });
   const amountSendInput = useInput({
     initialValue: 0,
     validations: { isEmpty: true, isMax: fromGroths(secondTokAmount) },
   });
   const [requestData, setRequestData] = useState(null);
+  const debouncedRequestData = useDebounce(requestData, 300);
+  const walletRequestData = BeamDappConnector.isDesktop() ? requestData : debouncedRequestData;
   const [lastChangedInput, setLastChangedInput] = useState<number>(1);
   const [flipRate, setFlipRate] = useState(false);
   const dispatch = useDispatch();
@@ -181,7 +234,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
     return matchedPools[0];
   }, [matchedPools, data, manualKind]);
 
-  const [anyPoolCoversFromAmount, anyPoolCoversToAmount] = useMemo<[boolean, boolean]>(() => {
+  const [, anyPoolCoversToAmount] = useMemo<[boolean, boolean]>(() => {
     if (manualKind !== null || matchedPools.length <= 1) return [false, false];
     const checkCovers = (amountValue: string | number, fromToken: boolean) => {
       const parsed = parseAmount(amountValue);
@@ -212,18 +265,6 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
     setSecondToken(currentToken);
     setLastChangedInput(1);
     amountSendInput.onPredict(0);
-  }
-
-  function findBestPoolIfNeeded(val2Pay: number, val1Buy: number) {
-    if (manualKind || matchedPools.length <= 1) return;
-    if (val2Pay <= 0 && val1Buy <= 0) return;
-    dispatch(mainActions.onFindBestPool.request({
-      pools: matchedPools,
-      aid1: secondToken,
-      aid2: currentToken,
-      val2_pay: val2Pay,
-      val1_buy: val1Buy,
-    }));
   }
 
   useEffect(() => {
@@ -290,8 +331,19 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
       kind: activePool?.kind ?? 0,
       val2_pay: payGroths,
     });
-    findBestPoolIfNeeded(payGroths, 0);
-  }, [amountInput.value, currentToken, secondToken, lastChangedInput, activePool?.kind]);
+    try {
+      if (payGroths > 0 && secondTokAmount > 0 && currentTokAmount > 0) {
+        const r = tradeReverse(
+          BigInt(Math.round(secondTokAmount)), BigInt(Math.round(currentTokAmount)),
+          activePool?.kind ?? 0, BigInt(Math.round(payGroths)),
+        );
+        if (r) amountSendInput.onPredict(formatPredictAmount(fromGroths(Number(r.buy))));
+      }
+    } catch (_) { /* wallet prediction will correct */ }
+    // manualKind instead of activePool?.kind: re-trigger on user fee-tier
+    // selection but NOT when findBestPool auto-switches the pool (cascade).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [amountInput.value, currentToken, secondToken, lastChangedInput, manualKind]);
 
   useEffect(() => {
     if (lastChangedInput !== 2) return;
@@ -302,26 +354,61 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
       kind: activePool?.kind ?? 0,
       val1_buy: buyGroths,
     });
-    findBestPoolIfNeeded(0, buyGroths);
-  }, [amountSendInput.value, currentToken, secondToken, lastChangedInput, activePool?.kind]);
+    try {
+      if (buyGroths > 0 && secondTokAmount > 0 && currentTokAmount > 0) {
+        const r = tradeForward(
+          BigInt(Math.round(secondTokAmount)), BigInt(Math.round(currentTokAmount)),
+          activePool?.kind ?? 0, BigInt(Math.round(buyGroths)),
+        );
+        if (r) amountInput.onPredict(formatPredictAmount(fromGroths(Number(r.totalPay))));
+      }
+    } catch (_) { /* wallet prediction will correct */ }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [amountSendInput.value, currentToken, secondToken, lastChangedInput, manualKind]);
 
+  const hasActivePool = !!activePool;
   useEffect(() => {
-    if (!requestData || !activePool) {
+    if (!walletRequestData || !hasActivePool || lastChangedInput !== 1) return;
+    const willFindBest = !manualKind && matchedPools.length > 1;
+    const val2Pay = walletRequestData.val2_pay ?? 0;
+    if (willFindBest) {
+      if (val2Pay > 0) {
+        dispatch(mainActions.onFindBestPool.request({
+          pools: matchedPools,
+          aid1: secondToken,
+          aid2: currentToken,
+          val2_pay: val2Pay,
+          val1_buy: 0,
+        }));
+      }
       return;
     }
-    if (!amountInput.isMax && amountInput.isValid && lastChangedInput === 1) {
-      dispatch(mainActions.onTradePool.request(requestData));
-    }
-  }, [requestData, amountInput.isMax, amountInput.isValid, lastChangedInput, activePool, dispatch]);
-
+    if (amountInput.isMax || !amountInput.isValid) return;
+    dispatch(mainActions.onPredictTrade.request(walletRequestData));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [walletRequestData, lastChangedInput, amountInput.isMax, amountInput.isValid,
+    hasActivePool, dispatch]);
   useEffect(() => {
-    if (!requestData || !activePool) {
+    if (!walletRequestData || !hasActivePool || lastChangedInput !== 2) return;
+    const willFindBest = !manualKind && matchedPools.length > 1;
+    const val1Buy = walletRequestData.val1_buy ?? 0;
+    if (willFindBest) {
+      if (val1Buy > 0) {
+        dispatch(mainActions.onFindBestPool.request({
+          pools: matchedPools,
+          aid1: secondToken,
+          aid2: currentToken,
+          val2_pay: 0,
+          val1_buy: val1Buy,
+        }));
+      }
       return;
     }
-    if (!amountSendInput.isMax && amountSendInput.isValid && lastChangedInput === 2) {
-      dispatch(mainActions.onTradePool.request(requestData));
-    }
-  }, [requestData, amountSendInput.isMax, amountSendInput.isValid, lastChangedInput, activePool, dispatch]);
+    if (amountSendInput.isMax || !amountSendInput.isValid) return;
+    dispatch(mainActions.onPredictTrade.request(walletRequestData));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [walletRequestData, lastChangedInput, amountSendInput.isMax, amountSendInput.isValid,
+    hasActivePool, dispatch]);
 
   useEffect(() => {
     if (activePool && assets) {
@@ -339,7 +426,8 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
 
   const isTradeDisabled = !activePool || (!amountInput.isValid && !amountSendInput.isValid);
 
-  const fromAmountError = Boolean(amountInput.isMax && lastChangedInput === 1 && !anyPoolCoversFromAmount);
+  // Paying FROM is not constrained by FROM-side reserve; reserve-limit checks apply to desired TO amount.
+  const fromAmountError = false;
   const toAmountError = Boolean(amountSendInput.isMax && lastChangedInput === 2 && !anyPoolCoversToAmount);
 
   const selectValue = (assetId: number | null): IOptions | null => (
@@ -454,12 +542,86 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
     );
   }
 
+  function renderEmbeddedTradeSummary() {
+    return (
+      <SummaryPanel>
+        <SummaryHeader>trade summary</SummaryHeader>
+        <SummaryWrapper style={{ marginTop: 0 }}>
+          <RateRow>
+            <SummaryTitle>Rate</SummaryTitle>
+            <RateText>{`1 ${rateLeft} = ${shownRate.toLocaleString('en-US', { minimumFractionDigits: 8, maximumFractionDigits: 8 })} ${rateRight}`}</RateText>
+            <Button icon={IconExchange} variant="icon" onClick={() => setFlipRate((f) => !f)} />
+          </RateRow>
+          <SummaryContainer>
+            <SummaryTitle>You buy</SummaryTitle>
+            <SummaryAsset>
+              <AssetLabel
+                variant="predict"
+                title={tokenName_2}
+                assets_id={secondToken ?? 0}
+                amount={displayedBuyRaw}
+              />
+            </SummaryAsset>
+          </SummaryContainer>
+          <SummaryContainer>
+            <SummaryTitle>DAO Fee</SummaryTitle>
+            <SummaryAsset>
+              <AssetLabel
+                variant="predict"
+                title={tokenName_1}
+                assets_id={currentToken ?? 0}
+                amount={displayedFeeDao}
+              />
+            </SummaryAsset>
+          </SummaryContainer>
+          <SummaryContainer>
+            <SummaryTitle>LP Fee</SummaryTitle>
+            <SummaryAsset>
+              <AssetLabel
+                variant="predict"
+                title={tokenName_1}
+                assets_id={currentToken ?? 0}
+                amount={displayedFeePool}
+              />
+            </SummaryAsset>
+          </SummaryContainer>
+          <SummaryContainer>
+            <SummaryTitle>Total Fee</SummaryTitle>
+            <SummaryAsset>
+              <AssetLabel
+                variant="predict"
+                title={tokenName_1}
+                assets_id={currentToken ?? 0}
+                amount={displayedFeeTotal}
+              />
+            </SummaryAsset>
+          </SummaryContainer>
+          <SummaryContainer>
+            <SummaryTitle>Total Pay</SummaryTitle>
+            <SummaryAsset>
+              <AssetLabel
+                variant="predict"
+                title={tokenName_1}
+                assets_id={currentToken ?? 0}
+                amount={displayedPayRaw}
+              />
+            </SummaryAsset>
+          </SummaryContainer>
+          <SummaryContainer>
+            <SummaryTitle>Impact</SummaryTitle>
+            <SummaryAsset>{`${displayedImpact.toFixed(2)}%`}</SummaryAsset>
+          </SummaryContainer>
+        </SummaryWrapper>
+      </SummaryPanel>
+    );
+  }
+
   if (embedded) {
     return (
       <Window hideHeader>
         <Container wide>
           <EmbeddedLayout>
-            <div>
+            <EmbeddedSwapColumn>
               <SwapCard>
                 <SwapBlock>
                   <BlockLabel>From</BlockLabel>
@@ -523,75 +685,11 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                     {toAmountError && <ErrorHint>amount exceeds pool reserves</ErrorHint>}
                   </HintRow>
                 </SwapBlock>
-                <SummaryPanel>
-                  <SummaryHeader>trade summary</SummaryHeader>
-                  <SummaryWrapper style={{ marginTop: 0 }}>
-                    <RateRow>
-                      <SummaryTitle>Rate</SummaryTitle>
-                      <RateText>{`1 ${rateLeft} = ${shownRate.toLocaleString('en-US', { minimumFractionDigits: 8, maximumFractionDigits: 8 })} ${rateRight}`}</RateText>
-                      <Button icon={IconExchange} variant="icon" onClick={() => setFlipRate((f) => !f)} />
-                    </RateRow>
-                    <SummaryContainer>
-                      <SummaryTitle>You buy</SummaryTitle>
-                      <SummaryAsset>
-                        <AssetLabel
-                          variant="predict"
-                          title={tokenName_2}
-                          assets_id={secondToken ?? 0}
-                          amount={displayedBuyRaw}
-                        />
-                      </SummaryAsset>
-                    </SummaryContainer>
-                    <SummaryContainer>
-                      <SummaryTitle>DAO Fee</SummaryTitle>
-                      <SummaryAsset>
-                        <AssetLabel
-                          variant="predict"
-                          title={tokenName_1}
-                          assets_id={currentToken ?? 0}
-                          amount={displayedFeeDao}
-                        />
-                      </SummaryAsset>
-                    </SummaryContainer>
-                    <SummaryContainer>
-                      <SummaryTitle>LP Fee</SummaryTitle>
-                      <SummaryAsset>
-                        <AssetLabel
-                          variant="predict"
-                          title={tokenName_1}
-                          assets_id={currentToken ?? 0}
-                          amount={displayedFeePool}
-                        />
-                      </SummaryAsset>
-                    </SummaryContainer>
-                    <SummaryContainer>
-                      <SummaryTitle>Total Fee</SummaryTitle>
-                      <SummaryAsset>
-                        <AssetLabel
-                          variant="predict"
-                          title={tokenName_1}
-                          assets_id={currentToken ?? 0}
-                          amount={displayedFeeTotal}
-                        />
-                      </SummaryAsset>
-                    </SummaryContainer>
-                    <SummaryContainer>
-                      <SummaryTitle>Total Pay</SummaryTitle>
-                      <SummaryAsset>
-                        <AssetLabel
-                          variant="predict"
-                          title={tokenName_1}
-                          assets_id={currentToken ?? 0}
-                          amount={displayedPayRaw}
-                        />
-                      </SummaryAsset>
-                    </SummaryContainer>
-                    <SummaryContainer>
-                      <SummaryTitle>Impact</SummaryTitle>
-                      <SummaryAsset>{`${displayedImpact.toFixed(2)}%`}</SummaryAsset>
-                    </SummaryContainer>
-                  </SummaryWrapper>
-                </SummaryPanel>
+                {!activePool && (
+                  <div style={{ marginTop: 12 }}>
+                    {renderEmbeddedTradeSummary()}
+                  </div>
+                )}
                 <EmbeddedTradeButtonWrap>
                   <Button
                     disabled={isTradeDisabled}
@@ -603,36 +701,43 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   </Button>
                 </EmbeddedTradeButtonWrap>
               </SwapCard>
-            </div>
-            <RightPanel>
+            </EmbeddedSwapColumn>
+            <EmbeddedRightStack>
+              <RightPanel>
+                {activePool ? (
+                  <>
+                    <PoolStat data={activePool} lp={currentLPToken} showFavorite plain />
+                    {renderFeeTierRow()}
+                    <EmbeddedActionRow>
+                      <Button
+                        icon={IconShieldChecked}
+                        variant="control"
+                        onClick={() => navigate(ROUTES.POOLS.ADD_LIQUIDITY)}
+                        disabled={!activePool}
+                      >
+                        Add Liquidity
+                      </Button>
+                      <Button
+                        icon={IconReceive}
+                        variant="control"
+                        pallete="blue"
+                        onClick={() => navigate(ROUTES.POOLS.WITHDRAW_POOL)}
+                        disabled={!activePool}
+                      >
+                        Withdraw
+                      </Button>
+                    </EmbeddedActionRow>
+                  </>
+                ) : (
+                  <EmptyPoolState>No pool matches this pair and filter combination.</EmptyPoolState>
+                )}
+              </RightPanel>
               {activePool ? (
-                <>
-                  <PoolStat data={activePool} lp={currentLPToken} showFavorite plain />
-                  {renderFeeTierRow()}
-                  <EmbeddedActionRow>
-                    <Button
-                      icon={IconShieldChecked}
-                      variant="control"
-                      onClick={() => navigate(ROUTES.POOLS.ADD_LIQUIDITY)}
-                      disabled={!activePool}
-                    >
-                      Add Liquidity
-                    </Button>
-                    <Button
-                      icon={IconReceive}
-                      variant="control"
-                      pallete="blue"
-                      onClick={() => navigate(ROUTES.POOLS.WITHDRAW_POOL)}
-                      disabled={!activePool}
-                    >
-                      Withdraw
-                    </Button>
-                  </EmbeddedActionRow>
-                </>
-              ) : (
-                <EmptyPoolState>No pool matches this pair and filter combination.</EmptyPoolState>
-              )}
-            </RightPanel>
+                <EmbeddedTradeSummaryBelowPool>
+                  {renderEmbeddedTradeSummary()}
+                </EmbeddedTradeSummaryBelowPool>
+              ) : null}
+            </EmbeddedRightStack>
           </EmbeddedLayout>
         </Container>
       </Window>
@@ -702,6 +807,12 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
           </Section>
         </AssetsContainer>
         <SectionWrapper>
+          {activePool ? (
+            <>
+              <PoolStat data={activePool} lp={currentLPToken} />
+              {renderFeeTierRow()}
+            </>
+          ) : null}
           <Section title="trade summary">
             <SummaryWrapper>
               <SummaryContainer>
@@ -762,12 +873,6 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
               </SummaryContainer>
             </SummaryWrapper>
           </Section>
-          {activePool ? (
-            <>
-              <PoolStat data={activePool} lp={currentLPToken} />
-              {renderFeeTierRow()}
-            </>
-          ) : null}
         </SectionWrapper>
         <ButtonBlock>
           <ButtonWrapper>

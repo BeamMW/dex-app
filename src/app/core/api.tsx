@@ -4,6 +4,28 @@ import {
 } from '@core/types';
 import { CID } from '@app/shared/constants';
 
+function isWalletLockedError(error: unknown): boolean {
+  return error instanceof Error && error.message === 'Wallet is locked';
+}
+
+function isUserCanceledError(error: unknown): boolean {
+  return error instanceof Error
+    && (error.message === 'Wallet is locked' || error.message === 'Request canceled by user');
+}
+
+async function callApiWithRecovery(method: string, params: Record<string, any>) {
+  try {
+    return await connector.callApi(method, params);
+  } catch (error) {
+    if (!isWalletLockedError(error) || method === 'wallet_status') {
+      throw error;
+    }
+    // Some cancel/lock transitions briefly report locked; probe and retry once.
+    await connector.callApi('wallet_status');
+    return connector.callApi(method, params);
+  }
+}
+
 /**
  * Call invoke_contract and return { shaderResult, rawData }.
  * We call callApi directly (not invokeContract) so we retain raw_data
@@ -13,7 +35,7 @@ async function invokeRaw(args: string, contractBytes?: number[] | null) {
   const params: Record<string, any> = { create_tx: false, args };
   if (contractBytes) params.contract = contractBytes;
 
-  const result = await connector.callApi('invoke_contract', params);
+  const result = await callApiWithRecovery('invoke_contract', params);
 
   let shaderResult: any = null;
   if (result?.output && typeof result.output === 'string') {
@@ -31,11 +53,10 @@ async function invokeRaw(args: string, contractBytes?: number[] | null) {
  */
 async function makeTx(rawData: any[]): Promise<string | undefined> {
   try {
-    const res: any = await connector.processInvokeData(rawData);
+    const res: any = await callApiWithRecovery('process_invoke_data', { data: rawData });
     return res?.txid;
   } catch (e: any) {
-    // Connector rejects with Error('Wallet is locked') for user-cancel (-32021)
-    if (e instanceof Error && e.message === 'Wallet is locked') return undefined;
+    if (isUserCanceledError(e)) return undefined;
     throw e;
   }
 }
@@ -83,7 +104,7 @@ export async function TradePoolApi<T = any>({
     `action=pool_trade,aid1=${aid1},aid2=${aid2},kind=${kind},val1_buy=${val1_buy || 0},`
     + ` val2_pay=${val2_pay || 0},bPredictOnly=${bPredictOnly},cid=${CID}`,
   );
-  if (rawData?.length) {
+  if (bPredictOnly === 0 && rawData?.length) {
     const txid = await makeTx(rawData);
     return { txid } as unknown as T;
   }

@@ -14,14 +14,11 @@ export const ExchangeWrapper = styled.div`
 export const SectionWrapper = styled.div`
   margin: 10px 0 40px 0;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 24px;
   width: 100%;
   height: auto;
-  @media (max-width: 913px) {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
+  align-items: center;
 `;
 
 export const SummaryWrapper = styled.div`
@@ -111,6 +108,14 @@ export const EmbeddedLayout = styled.div`
   }
 `;
 
+/** Left column (swap form); on narrow screens first: trade, then summary, then pool. */
+export const EmbeddedSwapColumn = styled.div`
+  min-width: 0;
+  @media (max-width: 1080px) {
+    order: 1;
+  }
+`;
+
 export const SwapCard = styled.div`
   width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -185,6 +190,27 @@ export const EmbeddedTradeButtonWrap = styled.div`
   margin-top: 12px;
 `;
 
+/** Right column stack: pool info card, then trade summary below (spacing via margin, not gap). */
+export const EmbeddedRightStack = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  @media (max-width: 1080px) {
+    display: contents;
+  }
+`;
+
+/** Separates trade summary from the pool card; margin works more reliably than flex gap here. */
+export const EmbeddedTradeSummaryBelowPool = styled.div`
+  margin-top: 16px;
+  width: 100%;
+  @media (max-width: 1080px) {
+    margin-top: 0;
+    order: 2;
+  }
+`;
+
 export const RightPanel = styled.div`
   width: 100%;
   min-height: 0;
@@ -194,8 +220,12 @@ export const RightPanel = styled.div`
   padding: 14px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  @media (max-width: 1080px) {
+    order: 3;
+  }
 `;
+
 
 export const EmptyPoolState = styled.div`
   color: rgba(255, 255, 255, 0.6);
@@ -226,9 +256,10 @@ export const RateText = styled.div`
 export const SummaryPanel = styled.div`
   width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
+  border-radius: 18px;
   padding: 12px;
-  margin-top: 12px;
+  margin-top: 0;
+  background: rgba(255, 255, 255, 0.02);
 `;
 
 export const SummaryHeader = styled.div`

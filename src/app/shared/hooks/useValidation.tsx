@@ -14,8 +14,10 @@ export const useValidation = ({ value, validations }: IUseValidation) => {
           setIsEmpty(!value);
           break;
         case 'isMax':
-          if (val) {
-            setIsMax(+String(value).replace(/,/g, '') >= val);
+          {
+            const maxValue = Number(val);
+            const hasMaxValue = Number.isFinite(maxValue);
+            setIsMax(hasMaxValue ? +String(value).replace(/,/g, '') >= maxValue : false);
           }
           break;
         default:

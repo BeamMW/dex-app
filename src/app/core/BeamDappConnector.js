@@ -51,6 +51,7 @@ const DEFAULT_CONFIG = {
     minApiVersion: '',
     appName: 'BEAM DApp',
     headlessNode: 'eu-node01.masternet.beam.mw:8200',
+    network: 'mainnet',            // 'mainnet' | 'dappnet'
     connectionTimeout: 30000,      // 30 seconds
     reconnectDelay: 1000,          // Initial reconnect delay
     maxReconnectDelay: 30000,      // Max reconnect delay
@@ -636,9 +637,6 @@ class BeamDappConnector extends EventEmitter {
             }, this.config.connectionTimeout);
 
             this._messageListener = async (ev) => {
-                // Only handle messages from same origin
-                if (ev.origin !== window.origin) return;
-
                 this._log('Message received:', ev.data);
 
                 if (ev.data === 'apiInjected') {
@@ -694,7 +692,8 @@ class BeamDappConnector extends EventEmitter {
                 const WasmModule = await BeamModule();
                 const WasmWalletClient = WasmModule.WasmWalletClient;
 
-                const client = new WasmWalletClient(this.config.headlessNode);
+                const networkType = WasmModule.Network[this.config.network] ?? WasmModule.Network.mainnet;
+                const client = new WasmWalletClient(this.config.headlessNode, networkType);
                 client.startWallet();
 
                 client.subscribe((response) => {
@@ -794,8 +793,17 @@ class BeamDappConnector extends EventEmitter {
             this._callTimeouts.delete(callId);
         }
 
+        // Handle user-cancel separately from true wallet lock.
+        if (response.error?.code === -32021) {
+            if (pending) {
+                pending.reject(new Error('Request canceled by user'));
+                this._pendingCalls.delete(callId);
+            }
+            return;
+        }
+
         // Handle wallet locked state
-        if (response.error?.code === -32021 || response.errcode === -5) {
+        if (response.errcode === -5) {
             this._setState(ConnectionState.LOCKED);
             this.emit('locked');
 

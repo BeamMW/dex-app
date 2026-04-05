@@ -10,15 +10,18 @@ import store from '../../../index';
 
 const iFrameDetection = window !== window.parent;
 
+let shaderBytes: number[] | null = null;
+
 export async function start() {
   const bytes = await connector.downloadShader('./amm.wasm');
+  shaderBytes = Array.from(bytes);
   await connector.callApi('ev_subunsub', {
     ev_txs_changed: true,
     ev_system_state: true,
   });
- 
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  store.dispatch(mainActions.loadAppParams.request(Array.from(bytes) as any));
+  store.dispatch(mainActions.loadAppParams.request(shaderBytes as any));
   store.dispatch(mainActions.loadPoolsList.request(null));
 }
 
@@ -48,11 +51,14 @@ function* sharedSaga() {
       switch (payload.id) {
         case 'ev_system_state':
           store.dispatch(setSystemState(payload.result));
-          store.dispatch(mainActions.loadAppParams.request(null));
           break;
 
         case 'ev_txs_changed':
           store.dispatch(setTxStatus(payload.result));
+          if (shaderBytes) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            store.dispatch(mainActions.loadAppParams.request(shaderBytes as any));
+          }
           break;
         default:
           break;

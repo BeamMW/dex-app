@@ -1,5 +1,5 @@
 import {
-  call, delay, put, select, takeLatest,
+  all, call, delay, put, select, takeLatest,
 } from 'redux-saga/effects';
 import {
   IAsset, IPoolCard, ITxId, ITxResult, ITxStatus, TxStatus,
@@ -140,12 +140,24 @@ export function* addLiquidity(action: ReturnType<typeof mainActions.onAddLiquidi
     }
   }
 }
+export function* predictTrade(action: ReturnType<typeof mainActions.onPredictTrade.request>): Generator {
+  try {
+    // @ts-ignore
+    const { res } = (yield call(TradePoolApi, action.payload ? action.payload : null)) as ITxResult;
+    if (res) {
+      yield put(mainActions.setPredict(res));
+    }
+  } catch (e) {
+    // @ts-ignore
+    yield put(mainActions.setErrorMessage(e));
+  }
+}
 export function* tradePool(action: ReturnType<typeof mainActions.onTradePool.request>): Generator {
   if (connector.isHeadless()) {
     yield onSwitchToApi();
   } else {
     try {
-      // @ts-ignore0
+      // @ts-ignore
       const {
         res,
         txid,
@@ -159,9 +171,7 @@ export function* tradePool(action: ReturnType<typeof mainActions.onTradePool.req
       }
     } catch (e) {
       // @ts-ignore
-      // yield put(mainActions.onTradePool.failure(e));
       yield put(mainActions.setErrorMessage(e));
-      // toast(e.error);
     }
   }
 }
@@ -237,32 +247,44 @@ export function* findBestPool(action: ReturnType<typeof mainActions.onFindBestPo
     pools, aid1, aid2, val2_pay, val1_buy,
   } = action.payload;
 
+  const predictParams = {
+    aid1,
+    aid2,
+    val2_pay: val2_pay || 0,
+    val1_buy: val1_buy || 0,
+    bPredictOnly: 1,
+  };
+
+  // @ts-ignore – fire all pool predictions in parallel
+  const results: Array<{ pool: IPoolCard; result: ITxResult | null }> = yield all(
+    pools.map((pool: IPoolCard) => call(function* () {
+      try {
+        const result = (yield call(TradePoolApi, { ...predictParams, kind: pool.kind })) as ITxResult;
+        return { pool, result };
+      } catch (_) {
+        return { pool, result: null };
+      }
+    })),
+  );
+
   let bestPool = pools[0];
   let bestBuy = -1;
+  let bestResult: ITxResult | null = null;
 
-  // eslint-disable-next-line no-restricted-syntax
-  for (const pool of pools) {
-    try {
-      // @ts-ignore
-      const result = (yield call(TradePoolApi, {
-        aid1,
-        aid2,
-        kind: pool.kind,
-        val2_pay: val2_pay || 0,
-        val1_buy: val1_buy || 0,
-        bPredictOnly: 1,
-      })) as ITxResult;
-      const buy = result?.res?.buy ?? 0;
-      if (buy > bestBuy) {
-        bestBuy = buy;
-        bestPool = pool;
-      }
-    // eslint-disable-next-line no-empty
-    } catch (_) {}
+  for (const { pool, result } of results) {
+    const buy = result?.res?.buy ?? 0;
+    if (buy > bestBuy) {
+      bestBuy = buy;
+      bestPool = pool;
+      bestResult = result;
+    }
   }
 
   if (bestBuy > 0) {
     yield put(mainActions.setCurrentPool(bestPool));
+    if (bestResult?.res) {
+      yield put(mainActions.setPredict(bestResult.res));
+    }
   }
 }
 
@@ -270,6 +292,7 @@ function* mainSaga() {
   yield takeLatest(mainActions.loadAppParams.request, loadParamsSaga);
   yield takeLatest(mainActions.onCreatePool.request, createPool);
   yield takeLatest(mainActions.onAddLiquidity.request, addLiquidity);
+  yield takeLatest(mainActions.onPredictTrade.request, predictTrade);
   yield takeLatest(mainActions.onTradePool.request, tradePool);
   yield takeLatest(mainActions.onWithdraw.request, withdrawPool);
   yield takeLatest(mainActions.onFavorites.request, favorites);

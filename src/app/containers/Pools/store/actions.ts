@@ -75,6 +75,11 @@ export const onFilterz = createAsyncAction(
   MainActionsTypes.FILTERZ_SUCCESS,
   MainActionsTypes.FILTERZ_FAILURE,
 )<IWithdraw, any>();
+export const onPredictTrade = createAsyncAction(
+  MainActionsTypes.PREDICT_TRADE,
+  MainActionsTypes.PREDICT_TRADE_SUCCESS,
+  MainActionsTypes.PREDICT_TRADE_FAILURE,
+)<ITrade, any>();
 export const onFindBestPool = createAsyncAction(
   MainActionsTypes.FIND_BEST_POOL,
   MainActionsTypes.FIND_BEST_POOL_SUCCESS,

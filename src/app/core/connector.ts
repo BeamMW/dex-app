@@ -10,6 +10,7 @@ const connector = new BeamDappConnector({
   appName: 'DEX',
   minApiVersion: '7.3',
   headlessNode,
+  network: CURRENT_NETWORK === NETWORK.MAINNET ? 'mainnet' : 'dappnet',
   debug: false,
 });
 
