@@ -13,10 +13,10 @@ import {
   Container,
   Input,
   PoolStat,
-  ReactSelect,
   Section,
   Window,
 } from '@app/shared/components';
+import { AssetSelectorButton } from '@app/shared/components/AssetSearchModal';
 import { useInput } from '@app/shared/hooks';
 import * as mainActions from '@app/containers/Pools/store/actions';
 import { useDispatch, useSelector } from 'react-redux';
@@ -476,15 +476,11 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                         onBlur={fromAmountFieldHandlers.onBlur}
                       />
                       <InlineSelect>
-                        <ReactSelect
-                          key={`embedded-buy-${currentToken}`}
-                          options={options}
-                          defaultValue={selectValue(currentToken)}
-                          onChange={onSelectFromToken}
-                          isIcon
-                          hideValueWhileSearching
-                          placeholder="Search..."
-                          customPrefix="custom-filter"
+                        <AssetSelectorButton
+                          value={selectValue(currentToken)}
+                          onSelect={onSelectFromToken}
+                          excludeAssetId={secondToken}
+                          placeholder="Select asset"
                         />
                       </InlineSelect>
                     </InputRow>
@@ -513,15 +509,11 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                         onBlur={toAmountFieldHandlers.onBlur}
                       />
                       <InlineSelect>
-                        <ReactSelect
-                          key={`embedded-pay-${secondToken}`}
-                          options={options}
-                          defaultValue={selectValue(secondToken)}
-                          onChange={onSelectToToken}
-                          isIcon
-                          hideValueWhileSearching
-                          placeholder="Search..."
-                          customPrefix="custom-filter"
+                        <AssetSelectorButton
+                          value={selectValue(secondToken)}
+                          onSelect={onSelectToToken}
+                          excludeAssetId={currentToken}
+                          placeholder="Select asset"
                         />
                       </InlineSelect>
                     </InputRow>
@@ -668,15 +660,11 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   onBlur={fromAmountFieldHandlers.onBlur}
                 />
                 <InlineSelect>
-                  <ReactSelect
-                    key={`buy-${currentToken}`}
-                    options={options}
-                    defaultValue={selectValue(currentToken)}
-                    onChange={onSelectFromToken}
-                    isIcon
-                    hideValueWhileSearching
-                    placeholder="Search..."
-                    customPrefix="custom-filter"
+                  <AssetSelectorButton
+                    value={selectValue(currentToken)}
+                    onSelect={onSelectFromToken}
+                    excludeAssetId={secondToken}
+                    placeholder="Select asset"
                   />
                 </InlineSelect>
               </InputRow>
@@ -701,15 +689,11 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   onBlur={toAmountFieldHandlers.onBlur}
                 />
                 <InlineSelect>
-                  <ReactSelect
-                    key={`pay-${secondToken}`}
-                    options={options}
-                    defaultValue={selectValue(secondToken)}
-                    onChange={onSelectToToken}
-                    isIcon
-                    hideValueWhileSearching
-                    placeholder="Search..."
-                    customPrefix="custom-filter"
+                  <AssetSelectorButton
+                    value={selectValue(secondToken)}
+                    onSelect={onSelectToToken}
+                    excludeAssetId={currentToken}
+                    placeholder="Select asset"
                   />
                 </InlineSelect>
               </InputRow>

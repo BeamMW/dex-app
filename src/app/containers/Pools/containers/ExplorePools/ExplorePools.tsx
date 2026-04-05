@@ -2,20 +2,19 @@ import React, { useMemo, useState } from 'react';
 import { styled } from '@linaria/react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { IPoolCard } from '@core/types';
+import { IOptions, IPoolCard } from '@core/types';
 import {
-  Button, Container, ReactSelect, Window,
+  Button, Container, Window,
 } from '@app/shared/components';
-import {
-  fromGroths, getPoolKind, getFilterPools, onFilter, truncate,
-} from '@core/appUtils';
-import { IconFavorite, IconFavoriteFilled, IconPlus } from '@app/shared/icons';
+import { AssetSelectorButton } from '@app/shared/components/AssetSearchModal';
+import { getFilterPools, onFilter } from '@core/appUtils';
+import { CancelIcon, IconPlus } from '@app/shared/icons';
 import { ROUTES, SORT } from '@app/shared/constants';
 import {
-  selectFavorites, selectFilter, selectMyPools, selectOptions, selectPoolsList,
+  selectFavorites, selectFilter, selectMyPools, selectPoolsList,
 } from '@app/containers/Pools/store/selectors';
 import * as mainActions from '@app/containers/Pools/store/actions';
-import AssetIcon from '@app/shared/components/AssetsIcon';
+import { PoolTable } from '@app/containers/Pools/containers/shared/PoolTable';
 
 const Header = styled.div`
   width: 100%;
@@ -28,14 +27,26 @@ const Header = styled.div`
     flex-direction: column;
   }
 `;
+
 const Left = styled.div`
-  width: 260px;
+  flex: 0 0 260px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
 `;
+
+const SelectorWrap = styled.div`
+  flex: 1;
+  min-width: 0;
+`;
+
 const Center = styled.div`
   flex: 1;
   display: flex;
   justify-content: center;
 `;
+
 const Right = styled.div`
   width: 180px;
   display: flex;
@@ -53,7 +64,7 @@ const SortButton = styled.button<{ active: boolean }>`
   background: transparent;
   border: none;
   color: ${({ active }) => (active ? 'white' : 'rgba(255, 255, 255, 0.5)')};
-  border-bottom: ${({ active }) => (active ? '2px solid var(--color-green)' : 'transparent')};
+  border-bottom: ${({ active }) => (active ? '2px solid var(--color-green)' : '2px solid transparent')};
   text-transform: uppercase;
   font-size: 12px;
   font-weight: 700;
@@ -61,47 +72,17 @@ const SortButton = styled.button<{ active: boolean }>`
   cursor: pointer;
 `;
 
-const Table = styled.table`
-  width: 100%;
-  max-width: 1100px;
-  border-collapse: collapse;
-  th,
-  td {
-    text-align: left;
-    padding: 10px 8px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  }
-  th {
-    font-size: 12px;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.6);
-  }
-`;
-const FavButton = styled.button`
-  border: none;
+const ClearBtn = styled.button`
   background: transparent;
-  padding: 0;
+  border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
-`;
-const Row = styled.tr`
-  cursor: pointer;
-`;
-const PairCell = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-`;
-const PairText = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-`;
-const TokenCell = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 4px;
+  flex-shrink: 0;
+
+  &:hover { color: white; }
 `;
 
 export const ExplorePools = () => {
@@ -109,24 +90,24 @@ export const ExplorePools = () => {
   const navigate = useNavigate();
   const data = useSelector(selectPoolsList());
   const favorites = useSelector(selectFavorites());
-  const options = useSelector(selectOptions());
   const currentFilter = useSelector(selectFilter());
   const myPools = useSelector(selectMyPools());
-  const [assetFilter, setAssetFilter] = useState(null);
-  const formatNum = (value) => Number(value).toLocaleString('en-US', { maximumFractionDigits: 8 });
-  const favoriteSet = useMemo(
-    () => new Set((favorites || []).map((item: IPoolCard) => `${item.aid1}-${item.aid2}-${item.kind}`)),
-    [favorites],
-  );
+  const [assetFilter, setAssetFilter] = useState<IOptions | null>(null);
+  const [pairFilter, setPairFilter] = useState<{ aid1: number; aid2: number; label: string } | null>(null);
 
   const rows = useMemo(() => {
     const filteredByTab = onFilter(data, currentFilter, favorites);
+    if (pairFilter) {
+      return filteredByTab.filter((p) => (p.aid1 === pairFilter.aid1 && p.aid2 === pairFilter.aid2)
+        || (p.aid1 === pairFilter.aid2 && p.aid2 === pairFilter.aid1));
+    }
     return getFilterPools(assetFilter, filteredByTab) || [];
-  }, [data, currentFilter, favorites, assetFilter]);
+  }, [data, currentFilter, favorites, assetFilter, pairFilter]);
 
   const handleFavorite = (pool: IPoolCard) => {
     dispatch(mainActions.onFavorites.request(pool));
   };
+
   const onOpenTrade = (pool: IPoolCard) => {
     dispatch(mainActions.setCurrentPool(pool));
     dispatch(mainActions.setPredict(null));
@@ -138,15 +119,20 @@ export const ExplorePools = () => {
       <Container>
         <Header>
           <Left>
-            <ReactSelect
-              options={options}
-              isClearable
-              onChange={(value) => setAssetFilter(value)}
-              isIcon
-              hideValueWhileSearching
-              placeholder="Search..."
-              customPrefix="custom-filter"
-            />
+            <SelectorWrap>
+              <AssetSelectorButton
+                value={pairFilter ? { value: -1, label: pairFilter.label } : assetFilter}
+                onSelect={(opt) => { setAssetFilter(opt); setPairFilter(null); }}
+                placeholder="Search..."
+                mode="explore"
+                onPairSelect={(aid1, aid2, label) => { setPairFilter({ aid1, aid2, label }); setAssetFilter(null); }}
+              />
+            </SelectorWrap>
+            {(assetFilter || pairFilter) && (
+              <ClearBtn onClick={() => { setAssetFilter(null); setPairFilter(null); }} type="button" aria-label="Clear filter">
+                <CancelIcon />
+              </ClearBtn>
+            )}
           </Left>
           <Center>
             <Sort>
@@ -168,72 +154,12 @@ export const ExplorePools = () => {
             </Button>
           </Right>
         </Header>
-        <Table>
-          <thead>
-            <tr>
-              <th>Favorite</th>
-              <th>Pair</th>
-              <th>Token 1</th>
-              <th>Token 2</th>
-              <th>Fee Rate</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((pool) => (
-              <Row
-                key={`${pool.aid1}_${pool.aid2}_${pool.kind}`}
-                onClick={() => onOpenTrade(pool)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    onOpenTrade(pool);
-                  }
-                }}
-                role="button"
-                tabIndex={0}
-              >
-                <td>
-                  <FavButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleFavorite(pool);
-                    }}
-                    type="button"
-                    aria-label="Toggle pool favorite"
-                  >
-                    {favoriteSet.has(`${pool.aid1}-${pool.aid2}-${pool.kind}`)
-                      ? <IconFavoriteFilled />
-                      : <IconFavorite />}
-                  </FavButton>
-                </td>
-                <td>
-                  <PairCell>
-                    <AssetIcon asset_id={pool.aid1} />
-                    <AssetIcon asset_id={pool.aid2} />
-                    <PairText>
-                      {`${truncate(pool.metadata1?.UN || 'Token')} (id:${pool.aid1}) / ${
-                        truncate(pool.metadata2?.UN || 'Token')
-                      } (id:${pool.aid2})`}
-                    </PairText>
-                  </PairCell>
-                </td>
-                <td>
-                  <TokenCell>
-                    <AssetIcon asset_id={pool.aid1} />
-                    {formatNum(fromGroths(pool.tok1))}
-                  </TokenCell>
-                </td>
-                <td>
-                  <TokenCell>
-                    <AssetIcon asset_id={pool.aid2} />
-                    {formatNum(fromGroths(pool.tok2))}
-                  </TokenCell>
-                </td>
-                <td>{getPoolKind(pool.kind)}</td>
-              </Row>
-            ))}
-          </tbody>
-        </Table>
+        <PoolTable
+          rows={rows}
+          favorites={favorites || []}
+          onFavorite={handleFavorite}
+          onOpenTrade={onOpenTrade}
+        />
       </Container>
     </Window>
   );

@@ -56,7 +56,7 @@ export const WithdrawPool = () => {
 
   return (
     <Window hideHeader>
-      <Container>
+      <Container wide>
         <EmbeddedLayout>
           <SwapCard>
             <SwapBlock>

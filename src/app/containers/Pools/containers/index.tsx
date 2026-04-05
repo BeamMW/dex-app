@@ -8,3 +8,4 @@ export * from './SwapPoolsHome';
 export * from './ExplorePools';
 export * from './PoolView';
 export * from './MyPools';
+export * from './AssetInfo';

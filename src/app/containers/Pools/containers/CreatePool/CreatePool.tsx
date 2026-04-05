@@ -3,8 +3,8 @@ import './index.scss';
 import {
   Button, Window, Container, ReactSelect,
 } from '@app/shared/components';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectOptions } from '@app/containers/Pools/store/selectors';
+import { AssetSelectorButton } from '@app/shared/components/AssetSearchModal';
+import { useDispatch } from 'react-redux';
 import { ICreatePool, IOptions, Kind } from '@core/types';
 import {
   kindSelect, placeHolder, ROUTES, titleSections,
@@ -28,10 +28,10 @@ const FeeField = styled.div`
 `;
 
 export const CreatePool = () => {
-  const options = useSelector(selectOptions());
   const [requestData, setRequestData] = useState(null);
   const [currentToken1, setCurrentToken1] = useState<IOptions>(null);
   const [currentToken2, setCurrentToken2] = useState<IOptions>(null);
+  const [openSlot, setOpenSlot] = useState<null | 1 | 2>(null);
   const [currentKind, setCurrentKind] = useState<IOptions>({ value: Kind.High, label: '1%' });
   const [isValidate, setIsValidate] = useState(false);
   const navigate = useNavigate();
@@ -70,20 +70,26 @@ export const CreatePool = () => {
           <SelectWrapper>
             <SwapBlock>
               <BlockLabel>{titleSections.CREATE_FIRST}</BlockLabel>
-              <ReactSelect
-                options={options}
-                onChange={(e) => setCurrentToken1(e)}
-                isIcon
+              <AssetSelectorButton
+                value={currentToken1}
+                onSelect={(opt) => setCurrentToken1(opt)}
+                excludeAssetId={currentToken2?.value ?? null}
                 placeholder={placeHolder.ASSETS}
+                isOpen={openSlot === 1}
+                onOpen={() => setOpenSlot(1)}
+                onClose={() => setOpenSlot(null)}
               />
             </SwapBlock>
             <SwapBlock>
               <BlockLabel>{titleSections.CREATE_SECOND}</BlockLabel>
-              <ReactSelect
-                options={options}
-                onChange={(e) => setCurrentToken2(e)}
-                isIcon
+              <AssetSelectorButton
+                value={currentToken2}
+                onSelect={(opt) => setCurrentToken2(opt)}
+                excludeAssetId={currentToken1?.value ?? null}
                 placeholder={placeHolder.ASSETS}
+                isOpen={openSlot === 2}
+                onOpen={() => setOpenSlot(2)}
+                onClose={() => setOpenSlot(null)}
               />
             </SwapBlock>
           </SelectWrapper>

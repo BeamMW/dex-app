@@ -20,6 +20,7 @@ import {
   ExplorePools,
   PoolView,
   MyPools,
+  AssetInfo,
 } from '@app/containers';
 import { ROUTES } from '@app/shared/constants';
 import { AlertWallet, Loader, TopNav } from '@app/shared/components';
@@ -69,6 +70,10 @@ const routes = [
   {
     path: ROUTES.POOLS.WITHDRAW_POOL,
     element: <WithdrawPool />,
+  },
+  {
+    path: '/asset/:id',
+    element: <AssetInfo />,
   },
 ];
 

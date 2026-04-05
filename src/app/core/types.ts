@@ -42,14 +42,12 @@ export interface IMetadataPairs {
 }
 export interface IAsset {
   asset_id?: number;
-  aid?: number
+  aid?: number;
   metadata: string;
-  mintedHi: number;
-  mintedLo: number;
+  emission?: number;
+  emission_str?: string;
   owner_pk: string;
   parsedMetadata: IMetadataPairs;
-  limitHi?: number;
-  limitLo?: number;
 }
 export interface IPoolCard {
   aid1: number;

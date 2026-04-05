@@ -1,0 +1,153 @@
+import React, { useMemo } from 'react';
+import { styled } from '@linaria/react';
+import { IPoolCard } from '@core/types';
+import { fromGroths, getPoolKind, truncate } from '@core/appUtils';
+import { IconFavorite, IconFavoriteFilled } from '@app/shared/icons';
+import AssetIcon from '@app/shared/components/AssetsIcon';
+
+const Table = styled.table`
+  width: 100%;
+  max-width: 1100px;
+  border-collapse: collapse;
+  th,
+  td {
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  th {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+  }
+`;
+
+const FavButton = styled.button`
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+`;
+
+const Row = styled.tr`
+  cursor: pointer;
+`;
+
+const PairCell = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const PairText = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
+
+const TokenCell = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const EmptyState = styled.div`
+  padding: 24px 8px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+`;
+
+interface PoolTableProps {
+  rows: IPoolCard[];
+  favorites: IPoolCard[];
+  onFavorite: (pool: IPoolCard) => void;
+  onOpenTrade: (pool: IPoolCard) => void;
+}
+
+const formatNum = (value) => Number(value).toLocaleString('en-US', { maximumFractionDigits: 8 });
+
+export const PoolTable: React.FC<PoolTableProps> = ({
+  rows, favorites, onFavorite, onOpenTrade,
+}) => {
+  const favoriteSet = useMemo(
+    () => new Set((favorites || []).map((item: IPoolCard) => `${item.aid1}-${item.aid2}-${item.kind}`)),
+    [favorites],
+  );
+
+  if (!rows.length) {
+    return <EmptyState>No pools found.</EmptyState>;
+  }
+
+  return (
+    <Table>
+      <thead>
+        <tr>
+          <th>Favorite</th>
+          <th>Pair</th>
+          <th>Token 1</th>
+          <th>Token 2</th>
+          <th>Fee Rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((pool) => (
+          <Row
+            key={`${pool.aid1}_${pool.aid2}_${pool.kind}`}
+            onClick={() => onOpenTrade(pool)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onOpenTrade(pool);
+              }
+            }}
+            role="button"
+            tabIndex={0}
+          >
+            <td>
+              <FavButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onFavorite(pool);
+                }}
+                type="button"
+                aria-label="Toggle pool favorite"
+              >
+                {favoriteSet.has(`${pool.aid1}-${pool.aid2}-${pool.kind}`)
+                  ? <IconFavoriteFilled />
+                  : <IconFavorite />}
+              </FavButton>
+            </td>
+            <td>
+              <PairCell>
+                <AssetIcon asset_id={pool.aid1} />
+                <AssetIcon asset_id={pool.aid2} />
+                <PairText>
+                  {`${truncate(pool.metadata1?.UN || 'Token')} (id:${pool.aid1}) / ${
+                    truncate(pool.metadata2?.UN || 'Token')
+                  } (id:${pool.aid2})`}
+                </PairText>
+              </PairCell>
+            </td>
+            <td>
+              <TokenCell>
+                <AssetIcon asset_id={pool.aid1} />
+                {formatNum(fromGroths(pool.tok1))}
+              </TokenCell>
+            </td>
+            <td>
+              <TokenCell>
+                <AssetIcon asset_id={pool.aid2} />
+                {formatNum(fromGroths(pool.tok2))}
+              </TokenCell>
+            </td>
+            <td>{getPoolKind(pool.kind)}</td>
+          </Row>
+        ))}
+      </tbody>
+    </Table>
+  );
+};
+
+export default PoolTable;
