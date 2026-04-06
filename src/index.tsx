@@ -7,6 +7,10 @@ import 'core-js/stable';
 import configureStore from '@app/store/store';
 import App from './app';
 
+if (process.env.NODE_ENV === 'development') {
+  import('react-grab').then((m) => m.init({ activationMode: 'toggle', allowActivationInsideInput: false, maxContextLines: 3 }));
+}
+
 const { store } = configureStore();
 
 window.global = window;

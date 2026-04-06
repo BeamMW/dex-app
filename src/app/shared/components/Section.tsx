@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { styled } from '@linaria/react';
+import { rowCenter, textButtonReset } from '../../styles/linariaShared';
 
 import Title from './Title';
 import Angle from './Angle';
@@ -78,22 +79,17 @@ const SectionCardStyled = styled(SectionStyled)`
 `;
 
 const SectionExchangeStyled = styled(SectionStyled)`
-  display: flex;
+  ${rowCenter}
   justify-content: center;
   height: 54px;
-  align-items: center;
 `;
 
-const ButtonStyled = styled.button`
+const ButtonStyled = styled('button')`
   position: absolute;
   top: 20px;
   right: 20px;
+  ${textButtonReset}
   cursor: pointer;
-  border: none;
-  background-color: transparent;
-  text-decoration: none;
-  color: white;
-  white-space: nowrap;
 `;
 
 const ShowAll = styled.div`
@@ -108,10 +104,9 @@ const ShowAll = styled.div`
   cursor: pointer;
 `;
 
-const TitleWrapper = styled.div`
-  display: flex;
+const TitleWrapper = styled('div')`
+  ${rowCenter}
   justify-content: space-between;
-  align-items: center;
   margin-bottom: 20px;
 `;
 

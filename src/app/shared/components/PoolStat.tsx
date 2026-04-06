@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { IAsset, IPoolCard } from '@core/types';
 import { Section } from '@app/shared/components/index';
 import AssetLabel from '@app/shared/components/AssetLabel';
@@ -45,15 +46,16 @@ const SideRightWrap = styled.div`
   align-items: flex-end;
   width: 100%;
 `;
-const HeaderMeta = styled.div`
-  width: 100%;
+const HeaderMeta = styled('div')`
   display: flex;
   align-items: center;
+  margin-left: auto;
   justify-content: flex-end;
+  flex-wrap: nowrap;
   gap: 8px;
 `;
 const FeeBadge = styled.div`
-  margin-right: 3px;
+  margin: 0;
   background: rgba(255, 255, 255, 0.05);
   padding: 4px 8px;
   border-radius: 20px;
@@ -62,14 +64,20 @@ const FeeBadge = styled.div`
   line-height: 14px;
   color: white;
 `;
-const FavoriteButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
+const FavoriteButton = styled('button')`
   border: none;
   background: transparent;
+  margin: 0;
   padding: 0;
+  line-height: 0;
   cursor: pointer;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  & svg {
+    display: block;
+  }
 `;
 const PlainWrapper = styled.div`
   width: 100%;
@@ -89,11 +97,15 @@ const PlainTitle = styled.div`
   text-transform: uppercase;
   color: var(--color-white);
 `;
+const AssetInfoLink = styled.div`
+  cursor: pointer;
+`;
 
 const PoolStat = ({
   data, lp, showFavorite = false, plain = false,
 }: PoolStatType) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const favorites = useSelector(selectFavorites());
   const nameToken1 = truncate(data?.metadata1?.UN || `Token ${data?.aid1 ?? ''}`);
   const nameToken2 = truncate(data?.metadata2?.UN || `Token ${data?.aid2 ?? ''}`);
@@ -106,9 +118,15 @@ const PoolStat = ({
     <>
       <AmountWrapper>
         <SideLeftWrap>
-          <AssetLabel title={nameToken1} assets_id={data.aid1} id variant="predict" />
-          <AssetLabel title={nameToken2} assets_id={data.aid2} id variant="predict" />
-          <AssetLabel title={nameLPToken} assets_id={lpId} id variant="predict" />
+          <AssetInfoLink onClick={() => navigate(`/asset/${data.aid1}`)}>
+            <AssetLabel title={nameToken1} assets_id={data.aid1} id variant="predict" />
+          </AssetInfoLink>
+          <AssetInfoLink onClick={() => navigate(`/asset/${data.aid2}`)}>
+            <AssetLabel title={nameToken2} assets_id={data.aid2} id variant="predict" />
+          </AssetInfoLink>
+          <AssetInfoLink onClick={() => navigate(`/asset/${lpId}`)}>
+            <AssetLabel title={nameLPToken} assets_id={lpId} id variant="predict" />
+          </AssetInfoLink>
         </SideLeftWrap>
         <SideRightWrap>
           <AssetAmount>{formatNumber(fromGroths(data.tok1))}</AssetAmount>

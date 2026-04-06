@@ -7,6 +7,26 @@ object-assign
 /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/babel/babel/blob/main/packages/babel-helpers/LICENSE */
 
 /**
+ * BEAM DApp Connector - Stable Wallet Integration Library
+ *
+ * A robust, production-ready library for connecting BEAM dApps to various
+ * BEAM wallet environments (Desktop, Web Extension, Mobile, Headless).
+ *
+ * Features:
+ * - Automatic reconnection with exponential backoff
+ * - Connection state management
+ * - Event-driven architecture
+ * - Promise-based API with timeouts
+ * - Heartbeat mechanism for connection monitoring
+ * - Memory-safe callback handling
+ * - TypeScript-ready JSDoc annotations
+ *
+ * @version 2.0.0
+ * @license MIT
+ * @author BEAM Community
+ */
+
+/**
  * React Router DOM v6.3.0
  *
  * Copyright (c) Remix Software Inc.

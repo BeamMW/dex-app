@@ -9,10 +9,10 @@ import { PoolCard } from '@app/containers/Pools/components/PoolList';
 import { placeHolder, SORT } from '@app/shared/constants';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  selectFavorites, selectFilter, selectIsLoading, selectMyPools, selectOptions, selectPoolsList,
+  selectFavorites, selectFilter, selectIsLoading, selectOptions, selectPoolsList,
 } from '@app/containers/Pools/store/selectors';
 import * as mainActions from '@app/containers/Pools/store/actions';
-import { getFilterPools } from '@core/appUtils';
+import { getFilterPools, onFilter } from '@core/appUtils';
 import { styled } from '@linaria/react';
 import { IPoolCard } from '@core/types';
 
@@ -93,27 +93,30 @@ const WrapperSelect = styled.div`
   margin-bottom: 15px;
 }
 `;
+
+const EmptyPools = styled.div`
+  padding: 24px 8px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  text-align: center;
+  width: 100%;
+`;
+
 export const PoolsList = () => {
   const data = useSelector(selectPoolsList());
   const options = useSelector(selectOptions());
-  const favorites = useMemo(() => JSON.parse(localStorage.getItem('favorites') || '[]'), []);
   const localFiltered = useMemo(() => JSON.parse(sessionStorage.getItem('filtered') || 'null'), []);
   const currentFilter = useSelector(selectFilter());
   const isLoading = useSelector(selectIsLoading());
-  const [poolsList, setPoolList] = useState(data);
   const [filtered, setFiltered] = useState(null);
   const storage = useSelector(selectFavorites());
   const dispatch = useDispatch();
-  const myPools = useSelector(selectMyPools());
 
   useEffect(() => {
-    if (!favorites?.length) {
-      dispatch(mainActions.setFilter('all'));
-    }
     if (localFiltered) {
       setFiltered(localFiltered);
     }
-  }, [dispatch, favorites, localFiltered]);
+  }, [localFiltered]);
 
   const handleSort = (filter) => {
     dispatch(mainActions.setFilter(filter));
@@ -122,22 +125,28 @@ export const PoolsList = () => {
     dispatch(mainActions.setIsLoading(true));
   };
   // todo: store
-  const onFilter = useCallback(
+  const handleFilterSelect = useCallback(
     (value) => {
       setFiltered(value);
       sessionStorage.setItem('filtered', JSON.stringify(value));
     },
     [],
   );
-  // useEffect(() => {
-  //   if (favorites.length === 0 || favorites.length === undefined || favorites.length === null) {
-  //     handleSort('all');
-  //   }
-  // }, []);
 
-  useEffect(() => {
-    setPoolList(getFilterPools(filtered, data));
-  }, [data, filtered]);
+  const filteredByTab = useMemo(
+    () => onFilter(data, currentFilter, storage || []),
+    [data, currentFilter, storage],
+  );
+  const poolsList = useMemo(
+    () => getFilterPools(filtered, filteredByTab),
+    [filtered, filteredByTab],
+  );
+
+  const listEmptyMessage = useMemo(() => {
+    if (currentFilter === 'fav') return 'No favorite pools';
+    if (currentFilter === 'created') return 'No created pools';
+    return 'No pools found';
+  }, [currentFilter]);
 
   const favoritesSet = useMemo(
     () => new Set((storage || []).map((item) => `${item.aid1}-${item.aid2}-${item.kind}`)),
@@ -157,7 +166,7 @@ export const PoolsList = () => {
                     <ReactSelect
                       options={options}
                       isClearable
-                      onChange={(e) => onFilter(e)}
+                      onChange={(e) => handleFilterSelect(e)}
                       defaultValue={localFiltered}
                       isIcon
                       placeholder={placeHolder.SEARCH}
@@ -172,12 +181,6 @@ export const PoolsList = () => {
                           key={el.value}
                           active={currentFilter === el.value}
                           onClick={() => handleSort(el.value)}
-                          disabled={
-                            !!(
-                              (el.value === 'fav' && !favorites.length)
-                              || (el.value === 'created' && !myPools.length)
-                            )
-                          }
                         >
                           {el.name}
                         </SortItemLink>
@@ -202,7 +205,7 @@ export const PoolsList = () => {
                     ))}
                 </PoolList>
               ) : (
-                <Loader />
+                <EmptyPools>{listEmptyMessage}</EmptyPools>
               )}
             </Container>
           </Window>

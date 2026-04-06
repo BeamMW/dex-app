@@ -11,6 +11,7 @@ const currentPoolSelector = createSelector(selectMain, (state) => state.currentP
 const filterSelector = createSelector(selectMain, (state) => state.filter);
 const optionsSelector = createSelector(selectMain, (state) => state.options);
 const favoritesSelector = createSelector(selectMain, (state) => state.favorites);
+const favoriteAssetsSelector = createSelector(selectMain, (state) => state.favoriteAssets);
 const currentLpTokenSelector = createSelector(selectMain, (state) => state.currentLPToken);
 const isLoadingSelector = createSelector(selectMain, (state) => state.isLoading);
 const myPoolsSelector = createSelector(selectMain, (state) => state.myPools);
@@ -25,6 +26,7 @@ export const selectCurrentPool = () => currentPoolSelector;
 export const selectFilter = () => filterSelector;
 export const selectOptions = () => optionsSelector;
 export const selectFavorites = () => favoritesSelector;
+export const selectFavoriteAssets = () => favoriteAssetsSelector;
 export const selectCurrentLPToken = () => currentLpTokenSelector;
 export const selectIsLoading = () => isLoadingSelector;
 export const selectMyPools = () => myPoolsSelector;

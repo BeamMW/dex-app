@@ -1,9 +1,8 @@
 import {
-  IAsset, IOptions, IPoolCard, IPredict, ITxStatus, Kind,
+  IAsset, IMetadataPairs, IOptions, IPoolCard, IPredict, ITxStatus, Kind,
 } from '@core/types';
 import { ASSET_BEAM, GROTHS_IN_BEAM } from '@app/shared/constants';
-// eslint-disable-next-line import/extensions
-import Utils from '@app/core/utils.js';
+import connector from '@app/core/connector';
 import { start } from '@app/shared/store/saga';
 import { toast } from 'react-toastify';
 import { actions as mainActions } from '@app/containers/Pools/store';
@@ -32,6 +31,12 @@ export function truncate(value: string, len = LENGTH_MAX): string {
   return `${value.slice(0, len)}…`;
 }
 
+/** Short ticker from STD metadata (e.g. SN=TQR), else UN / N. */
+export function assetShortLabel(m: IMetadataPairs | undefined): string {
+  if (!m) return '';
+  return (m.SN || m.UN || m.N || '').trim();
+}
+
 export function getOptions(assets: IAsset[]) {
   const options = [
     {
@@ -40,7 +45,7 @@ export function getOptions(assets: IAsset[]) {
     },
   ];
   assets.forEach((item) => {
-    options.push({ value: item.asset_id, label: `${truncate(item.parsedMetadata.UN)}` });
+    options.push({ value: item.asset_id, label: `${truncate(assetShortLabel(item.parsedMetadata))}` });
   });
   return options;
 }
@@ -59,7 +64,38 @@ export function numFormatter(num) {
 
 export function formatNumber(num: string | number): string {
   const parsedNum = typeof num === 'number' ? num : Number(num);
-  return parsedNum.toLocaleString('en-US');
+  return parsedNum.toLocaleString('en-US', { maximumFractionDigits: 8 });
+}
+
+/** Maps selection indices after thousand-separator grouping (see TradePool formatUserInput). */
+function displayIndexForNormalizedPrefix(nextDisplay: string, normPrefix: string): number {
+  if (!normPrefix) return 0;
+  let acc = '';
+  for (let pos = 0; pos <= nextDisplay.length; pos += 1) {
+    if (acc === normPrefix) return pos;
+    if (pos < nextDisplay.length) {
+      const ch = nextDisplay[pos];
+      if (ch !== ',') acc += ch;
+    }
+  }
+  return nextDisplay.length;
+}
+
+export function caretAfterGroupingFormat(
+  prevDisplay: string,
+  nextDisplay: string,
+  caretStart: number | null,
+  caretEnd: number | null,
+): { start: number; end: number } {
+  const n = prevDisplay.length;
+  const s = Math.min(Math.max(caretStart ?? 0, 0), n);
+  const e = Math.min(Math.max(caretEnd ?? s, 0), n);
+  const normStart = prevDisplay.slice(0, s).replace(/,/g, '');
+  const normEnd = prevDisplay.slice(0, e).replace(/,/g, '');
+  return {
+    start: displayIndexForNormalizedPrefix(nextDisplay, normStart),
+    end: displayIndexForNormalizedPrefix(nextDisplay, normEnd),
+  };
 }
 
 export const getPoolKind = (kind: number) => {
@@ -256,11 +292,15 @@ export function setStorage() {
   if (!fav) {
     localStorage.setItem('favorites', JSON.stringify([]));
   }
+  const favAssets = JSON.parse(localStorage.getItem('favoriteAssets'));
+  if (!favAssets) {
+    localStorage.setItem('favoriteAssets', JSON.stringify([]));
+  }
   return fav;
 }
 
 export async function onSwitchToApi() {
-  if (await Utils.switchToWebAPI()) {
+  if (await connector.switchToWebAPI()) {
     await start()
       .then(() => {
         store.dispatch(mainActions.setIsHeadless(false));

@@ -1,5 +1,5 @@
 import {
-  call, delay, put, select, takeLatest,
+  all, call, delay, put, select, takeLatest,
 } from 'redux-saga/effects';
 import {
   IAsset, IPoolCard, ITxId, ITxResult, ITxStatus, TxStatus,
@@ -22,14 +22,15 @@ import { selectCurrentPool, selectFavorites, selectFilter } from '@app/container
 import { toast } from 'react-toastify';
 import { navigate } from '@app/shared/store/actions';
 import { ROUTES } from '@app/shared/constants';
-import Utils from '@core/utils.js';
+import connector from '@core/connector';
 import { actions as Shared } from '@app/shared/store/index';
 import { actions } from '.';
 
 export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.request>): Generator {
   try {
     yield setStorage();
-    const favoritesLocal = JSON.parse(localStorage.getItem('favorites'));
+    const favoritesLocal = JSON.parse(localStorage.getItem('favorites')) || [];
+    const favoriteAssetsLocal: number[] = JSON.parse(localStorage.getItem('favoriteAssets')) || [];
     const filter = yield select(selectFilter());
     let assetsList: IAsset[] = [];
     try {
@@ -42,6 +43,7 @@ export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.
       asset.parsedMetadata = parseMetadata(asset.metadata);
     });
     yield put(mainActions.setFavorites(favoritesLocal));
+    yield put(mainActions.setFavoriteAssets(favoriteAssetsLocal));
     yield put(mainActions.setAssetsList(assetsList));
     const options = getOptions(assetsList);
     yield put(mainActions.setOptions(options));
@@ -49,7 +51,7 @@ export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.
     const newPoolList: IPoolCard[] = poolsList.map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList));
     const myPools = newPoolList.filter((el) => el.creator);
     yield put(mainActions.setMyPools(myPools));
-    const filteredPools = onFilter(newPoolList, filter, favoritesLocal) as IPoolCard[];
+    const filteredPools = onFilter(newPoolList, filter as string, favoritesLocal) as IPoolCard[];
     yield put(mainActions.setPoolsList(filteredPools));
     yield put(Shared.setIsLoaded(true));
   } catch (e) {
@@ -88,7 +90,7 @@ function* getStatus(txid: string) {
   }
 }
 export function* createPool(action: ReturnType<typeof mainActions.onCreatePool.request>): Generator {
-  if (yield Utils.isHeadless()) {
+  if (connector.isHeadless()) {
     yield onSwitchToApi();
   } else {
     try {
@@ -107,7 +109,7 @@ export function* createPool(action: ReturnType<typeof mainActions.onCreatePool.r
 }
 
 export function* addLiquidity(action: ReturnType<typeof mainActions.onAddLiquidity.request>): Generator {
-  if (yield Utils.isHeadless()) {
+  if (connector.isHeadless()) {
     yield onSwitchToApi();
   } else {
     try {
@@ -138,12 +140,24 @@ export function* addLiquidity(action: ReturnType<typeof mainActions.onAddLiquidi
     }
   }
 }
+export function* predictTrade(action: ReturnType<typeof mainActions.onPredictTrade.request>): Generator {
+  try {
+    // @ts-ignore
+    const { res } = (yield call(TradePoolApi, action.payload ? action.payload : null)) as ITxResult;
+    if (res) {
+      yield put(mainActions.setPredict(res));
+    }
+  } catch (e) {
+    // @ts-ignore
+    yield put(mainActions.setErrorMessage(e));
+  }
+}
 export function* tradePool(action: ReturnType<typeof mainActions.onTradePool.request>): Generator {
-  if (yield Utils.isHeadless()) {
+  if (connector.isHeadless()) {
     yield onSwitchToApi();
   } else {
     try {
-      // @ts-ignore0
+      // @ts-ignore
       const {
         res,
         txid,
@@ -157,14 +171,12 @@ export function* tradePool(action: ReturnType<typeof mainActions.onTradePool.req
       }
     } catch (e) {
       // @ts-ignore
-      // yield put(mainActions.onTradePool.failure(e));
       yield put(mainActions.setErrorMessage(e));
-      // toast(e.error);
     }
   }
 }
 export function* withdrawPool(action: ReturnType<typeof mainActions.onWithdraw.request>): Generator {
-  if (yield Utils.isHeadless()) {
+  if (connector.isHeadless()) {
     yield onSwitchToApi();
   } else {
     try {
@@ -215,13 +227,77 @@ export function* favorites(action: ReturnType<typeof mainActions.onFavorites.req
   }
 }
 
+export function* favoriteAsset(action: ReturnType<typeof mainActions.onToggleFavoriteAsset.request>): Generator {
+  try {
+    const assetId = action.payload as number;
+    const current = (yield select((state: AppState) => state.main.favoriteAssets)) as number[];
+    const list = current || [];
+    const updated = list.includes(assetId)
+      ? list.filter((id) => id !== assetId)
+      : [...list, assetId];
+    yield localStorage.setItem('favoriteAssets', JSON.stringify(updated));
+    yield put(mainActions.setFavoriteAssets(updated));
+  } catch (e) {
+    toast(e.error);
+  }
+}
+
+export function* findBestPool(action: ReturnType<typeof mainActions.onFindBestPool.request>): Generator {
+  const {
+    pools, aid1, aid2, val2_pay, val1_buy,
+  } = action.payload;
+
+  const predictParams = {
+    aid1,
+    aid2,
+    val2_pay: val2_pay || 0,
+    val1_buy: val1_buy || 0,
+    bPredictOnly: 1,
+  };
+
+  // @ts-ignore – fire all pool predictions in parallel
+  const results: Array<{ pool: IPoolCard; result: ITxResult | null }> = yield all(
+    pools.map((pool: IPoolCard) => call(function* () {
+      try {
+        const result = (yield call(TradePoolApi, { ...predictParams, kind: pool.kind })) as ITxResult;
+        return { pool, result };
+      } catch (_) {
+        return { pool, result: null };
+      }
+    })),
+  );
+
+  let bestPool = pools[0];
+  let bestBuy = -1;
+  let bestResult: ITxResult | null = null;
+
+  for (const { pool, result } of results) {
+    const buy = result?.res?.buy ?? 0;
+    if (buy > bestBuy) {
+      bestBuy = buy;
+      bestPool = pool;
+      bestResult = result;
+    }
+  }
+
+  if (bestBuy > 0) {
+    yield put(mainActions.setCurrentPool(bestPool));
+    if (bestResult?.res) {
+      yield put(mainActions.setPredict(bestResult.res));
+    }
+  }
+}
+
 function* mainSaga() {
   yield takeLatest(mainActions.loadAppParams.request, loadParamsSaga);
   yield takeLatest(mainActions.onCreatePool.request, createPool);
   yield takeLatest(mainActions.onAddLiquidity.request, addLiquidity);
+  yield takeLatest(mainActions.onPredictTrade.request, predictTrade);
   yield takeLatest(mainActions.onTradePool.request, tradePool);
   yield takeLatest(mainActions.onWithdraw.request, withdrawPool);
   yield takeLatest(mainActions.onFavorites.request, favorites);
+  yield takeLatest(mainActions.onToggleFavoriteAsset.request, favoriteAsset);
+  yield takeLatest(mainActions.onFindBestPool.request, findBestPool);
 }
 
 export default mainSaga;

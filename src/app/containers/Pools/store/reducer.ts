@@ -15,6 +15,7 @@ const initialState: DexStateType = {
   filter: 'all',
   options: [],
   favorites: [],
+  favoriteAssets: [],
   currentLPToken: null,
   isLoading: false,
   myPools: [],
@@ -49,6 +50,9 @@ const reducer = createReducer<DexStateType, Action>(initialState)
   }))
   .handleAction(actions.setFavorites, (state, action) => produce(state, (nexState) => {
     nexState.favorites = action.payload;
+  }))
+  .handleAction(actions.setFavoriteAssets, (state, action) => produce(state, (nexState) => {
+    nexState.favoriteAssets = action.payload;
   }))
   .handleAction(actions.setCurrentLPToken, (state, action) => produce(state, (nexState) => {
     nexState.currentPool = action.payload;

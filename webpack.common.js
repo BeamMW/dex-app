@@ -40,6 +40,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, 'html'),
     filename: '[name].js',
+    clean: true,
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
@@ -66,7 +67,13 @@ module.exports = {
       },
       {
         test: /\.svg$/,
-        use: ['@svgr/webpack', 'svgo-loader'],
+        use: [
+          {
+            loader: '@svgr/webpack',
+            // SVGO breaks BeamX-style nested transforms; keep svgo disabled.
+            options: { svgo: false },
+          },
+        ],
       },
       {
         test: /\.css$/,
@@ -128,6 +135,10 @@ module.exports = {
           from: path.join(__dirname, 'src/index.html'),
           to: path.join(__dirname, 'html'),
           context: 'public',
+        },
+        {
+          from: path.join(__dirname, 'src/app/shared/icons/logo-dex.svg'),
+          to: path.join(__dirname, 'html/logo.svg'),
         },
         ...(beamWasmClientPath ? [{
           from: beamWasmClientPath,

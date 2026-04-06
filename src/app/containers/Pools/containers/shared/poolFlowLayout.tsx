@@ -14,14 +14,11 @@ export const ExchangeWrapper = styled.div`
 export const SectionWrapper = styled.div`
   margin: 10px 0 40px 0;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 24px;
   width: 100%;
   height: auto;
-  @media (max-width: 913px) {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
+  align-items: center;
 `;
 
 export const SummaryWrapper = styled.div`
@@ -66,7 +63,8 @@ export const AssetAmount = styled.div`
 export const Line = styled.div`
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 2px;
-  width: 412px;
+  width: 100%;
+  max-width: 412px;
   margin: 20px 0;
 `;
 
@@ -98,13 +96,23 @@ export const SelectWrapper = styled.div`
 export const EmbeddedLayout = styled.div`
   width: 100%;
   max-width: 1230px;
+  min-width: 0;
+  overflow-x: hidden;
   display: grid;
-  grid-template-columns: minmax(0, 540px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 620px) minmax(0, 1fr);
   grid-gap: 20px;
   align-items: flex-start;
   margin-top: 10px;
   @media (max-width: 1080px) {
     grid-template-columns: 1fr;
+  }
+`;
+
+/** Left column (swap form); on narrow screens first: trade, then summary, then pool. */
+export const EmbeddedSwapColumn = styled.div`
+  min-width: 0;
+  @media (max-width: 1080px) {
+    order: 1;
   }
 `;
 
@@ -129,12 +137,17 @@ export const InputRow = styled.div`
   gap: 8px;
   align-items: center;
   min-width: 0;
+
+  & > *:first-child {
+    flex: 1;
+    min-width: 0;
+  }
 `;
 
 export const InlineSelect = styled.div`
-  width: 170px;
-  max-width: 45%;
-  min-width: 140px;
+  width: 220px;
+  max-width: 52%;
+  min-width: 200px;
   min-height: 41px;
   flex-shrink: 0;
 `;
@@ -143,6 +156,20 @@ export const SearchHint = styled.div`
   font-size: 11px;
   color: rgba(255, 255, 255, 0.55);
   margin-top: 6px;
+`;
+
+export const HintRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+`;
+
+export const ErrorHint = styled.span`
+  color: #ff625c;
+  font-size: 11px;
 `;
 
 export const BlockLabel = styled.div`
@@ -163,6 +190,27 @@ export const EmbeddedTradeButtonWrap = styled.div`
   margin-top: 12px;
 `;
 
+/** Right column stack: pool info card, then trade summary below (spacing via margin, not gap). */
+export const EmbeddedRightStack = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  @media (max-width: 1080px) {
+    display: contents;
+  }
+`;
+
+/** Separates trade summary from the pool card; margin works more reliably than flex gap here. */
+export const EmbeddedTradeSummaryBelowPool = styled.div`
+  margin-top: 16px;
+  width: 100%;
+  @media (max-width: 1080px) {
+    margin-top: 0;
+    order: 2;
+  }
+`;
+
 export const RightPanel = styled.div`
   width: 100%;
   min-height: 0;
@@ -172,8 +220,12 @@ export const RightPanel = styled.div`
   padding: 14px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  @media (max-width: 1080px) {
+    order: 3;
+  }
 `;
+
 
 export const EmptyPoolState = styled.div`
   color: rgba(255, 255, 255, 0.6);
@@ -204,9 +256,10 @@ export const RateText = styled.div`
 export const SummaryPanel = styled.div`
   width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
+  border-radius: 18px;
   padding: 12px;
-  margin-top: 12px;
+  margin-top: 0;
+  background: rgba(255, 255, 255, 0.02);
 `;
 
 export const SummaryHeader = styled.div`

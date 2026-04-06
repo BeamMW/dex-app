@@ -61,7 +61,6 @@ const InputStyled = styled.input<InputProps>`
   }
 
   &.invalid {
-    background-color: rgba(255, 116, 107, 0.15);
     color: #ff625c;
   }
 `;
@@ -77,6 +76,10 @@ const InputGrayStyled = styled(InputStyled)`
 
 const InputAmountStyled = styled(InputGrayStyled)<{ pallete: string }>`
   color: ${({ pallete }) => `var(--color-${pallete})`};
+
+  &.invalid {
+    color: #ff625c;
+  }
 `;
 
 const LabelStyled = styled.div<InputProps>`
@@ -109,12 +112,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const [inputValue, setInputValue] = useState(rest.value ?? '');
 
     const inputHandler: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-      const { value: raw } = e.target;
-      if (raw !== '' && !REG_AMOUNT.test(raw)) {
-        return;
-      }
-      if (rest?.onChange) rest?.onChange(e);
-      setInputValue(raw);
+      const stripped = e.target.value.replace(/,/g, '');
+      if (stripped !== '' && !REG_AMOUNT.test(stripped)) return;
+      rest.onChange?.(e);
+      setInputValue(e.target.value);
     };
     return (
       <ContainerStyled className={className} margin={margin}>

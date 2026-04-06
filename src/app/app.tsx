@@ -20,10 +20,11 @@ import {
   ExplorePools,
   PoolView,
   MyPools,
+  AssetInfo,
 } from '@app/containers';
 import { ROUTES } from '@app/shared/constants';
 import { AlertWallet, Loader, TopNav } from '@app/shared/components';
-import Utils from '@core/utils.js';
+import BeamDappConnector from '@core/BeamDappConnector.js';
 import { selectIsHeadless } from '@app/containers/Pools/store/selectors';
 import { selectIsLoaded } from '@app/shared/store/selectors';
 
@@ -70,6 +71,10 @@ const routes = [
     path: ROUTES.POOLS.WITHDRAW_POOL,
     element: <WithdrawPool />,
   },
+  {
+    path: '/asset/:id',
+    element: <AssetInfo />,
+  },
 ];
 
 const App = () => {
@@ -80,7 +85,7 @@ const App = () => {
   const isHeadless = useSelector(selectIsHeadless());
   const isLoaded = useSelector(selectIsLoaded());
   const iFrameDetection = window !== window.parent;
-  const isWeb = Utils.isWeb();
+  const isWeb = BeamDappConnector.isWeb();
 
   useEffect(() => {
     if (navigateURL) {
@@ -92,7 +97,23 @@ const App = () => {
   return (
     <>
       {isLoaded ? (
-        <Scrollbars renderThumbVertical={(props) => <div {...props} className={trackStyle} />}>
+        <Scrollbars
+          style={{ width: '100%', height: '100%' }}
+          hideTracksWhenNotNeeded
+          renderThumbVertical={(props) => <div {...props} className={trackStyle} />}
+          renderView={({ style, ...viewProps }) => (
+            <div
+              {...viewProps}
+              style={{
+                ...style,
+                overflowX: 'hidden',
+                overflowY: 'scroll',
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'none',
+              }}
+            />
+          )}
+        >
           {isHeadless && isWeb && !iFrameDetection ? <AlertWallet /> : null}
           <TopNav />
           {content}
