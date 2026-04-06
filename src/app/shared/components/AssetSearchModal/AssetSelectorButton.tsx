@@ -7,7 +7,7 @@ import AssetSearchModal from './AssetSearchModal';
 
 interface AssetSelectorButtonProps {
   value: IOptions | null;
-  onSelect: (option: IOptions) => void;
+  onSelect: (option: IOptions) => boolean | void;
   placeholder?: string;
   excludeAssetId?: number | null;
   mode?: 'asset-only' | 'explore';
@@ -16,6 +16,7 @@ interface AssetSelectorButtonProps {
   onOpen?: () => void;
   onClose?: () => void;
   onPairSelect?: (aid1: number, aid2: number, label: string) => void;
+  showWarning?: boolean;
 }
 
 const SelectorBtn = styled.button`
@@ -66,6 +67,19 @@ const ChevronWrap = styled.span`
   opacity: 0.5;
 `;
 
+const WarningBadge = styled.span`
+  color: #ff5f5f;
+  border: 1px solid rgba(255, 95, 95, 0.55);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  margin-right: 10px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+`;
+
 const AssetSelectorButton: React.FC<AssetSelectorButtonProps> = ({
   value,
   onSelect,
@@ -76,6 +90,7 @@ const AssetSelectorButton: React.FC<AssetSelectorButtonProps> = ({
   onOpen,
   onClose: controlledOnClose,
   onPairSelect,
+  showWarning = false,
 }) => {
   const [internalOpen, setInternalOpen] = useState(false);
 
@@ -105,6 +120,7 @@ const AssetSelectorButton: React.FC<AssetSelectorButtonProps> = ({
           <>
             {value.value !== -1 && <AssetIcon asset_id={value.value} />}
             <Label>{value.label}</Label>
+            {showWarning && <WarningBadge>fake</WarningBadge>}
           </>
         ) : (
           <Placeholder>{placeholder}</Placeholder>
@@ -117,10 +133,7 @@ const AssetSelectorButton: React.FC<AssetSelectorButtonProps> = ({
       <AssetSearchModal
         isOpen={open}
         onClose={handleClose}
-        onSelect={(opt) => {
-          onSelect(opt);
-          handleClose();
-        }}
+        onSelect={onSelect}
         excludeAssetId={excludeAssetId}
         mode={mode}
         onPairSelect={onPairSelect}

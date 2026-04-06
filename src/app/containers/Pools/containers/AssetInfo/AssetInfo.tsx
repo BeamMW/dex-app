@@ -6,7 +6,7 @@ import { IOptions } from '@core/types';
 import {
   assetShortLabel, fromGroths, getFilterPools, onFilter,
 } from '@core/appUtils';
-import { ASSET_BEAM, ROUTES } from '@app/shared/constants';
+import { ASSET_BEAM, ROUTES, getRealAssetIdForFake } from '@app/shared/constants';
 import {
   Container, Window,
 } from '@app/shared/components';
@@ -193,6 +193,42 @@ const SiteLink = styled.a`
   &:hover { text-decoration: underline; }
 `;
 
+const WarningCard = styled.div`
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid rgba(255, 95, 95, 0.55);
+  background: rgba(255, 95, 95, 0.1);
+  border-radius: 10px;
+`;
+
+const WarningTitle = styled.div`
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #ff5f5f;
+  margin-bottom: 6px;
+`;
+
+const WarningText = styled.div`
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 13px;
+  line-height: 1.5;
+`;
+
+const WarningAction = styled.button`
+  margin-top: 10px;
+  height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+  border-radius: 17px;
+  padding: 0 12px;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+`;
+
 export const AssetInfo = () => {
   const { id } = useParams<{ id: string }>();
   const assetId = parseInt(id, 10);
@@ -262,6 +298,7 @@ export const AssetInfo = () => {
 
   const longDesc = (m as any)?.OPT_LONG_DESC || null;
   const siteUrl = (m as any)?.OPT_SITE_URL || null;
+  const realAssetId = getRealAssetIdForFake(assetId);
 
   return (
     <Window hideHeader>
@@ -306,6 +343,19 @@ export const AssetInfo = () => {
                   <InfoLabel>Website</InfoLabel>
                   <SiteLink href={siteUrl} target="_blank" rel="noopener noreferrer">{siteUrl}</SiteLink>
                 </DescBlock>
+              )}
+              {realAssetId !== null && (
+                <WarningCard>
+                  <WarningTitle>Imposter asset warning</WarningTitle>
+                  <WarningText>
+                    {`Asset id ${assetId} is marked as an imposter.`}
+                    {' '}
+                    {`The real asset id is ${realAssetId}.`}
+                  </WarningText>
+                  <WarningAction type="button" onClick={() => navigate(`/asset/${realAssetId}`)}>
+                    Open real asset info
+                  </WarningAction>
+                </WarningCard>
               )}
             </AssetCard>
 

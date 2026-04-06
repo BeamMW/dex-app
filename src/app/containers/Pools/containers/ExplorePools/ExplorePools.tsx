@@ -9,9 +9,9 @@ import {
 import { AssetSelectorButton } from '@app/shared/components/AssetSearchModal';
 import { getFilterPools, onFilter } from '@core/appUtils';
 import { CancelIcon, IconPlus } from '@app/shared/icons';
-import { ROUTES, SORT } from '@app/shared/constants';
+import { ROUTES, SORT, getRealAssetIdForFake, poolHasImposterAsset } from '@app/shared/constants';
 import {
-  selectFavorites, selectFilter, selectMyPools, selectPoolsList,
+  selectFavorites, selectFilter, selectPoolsList,
 } from '@app/containers/Pools/store/selectors';
 import * as mainActions from '@app/containers/Pools/store/actions';
 import { PoolTable } from '@app/containers/Pools/containers/shared/PoolTable';
@@ -91,7 +91,6 @@ export const ExplorePools = () => {
   const data = useSelector(selectPoolsList());
   const favorites = useSelector(selectFavorites());
   const currentFilter = useSelector(selectFilter());
-  const myPools = useSelector(selectMyPools());
   const [assetFilter, setAssetFilter] = useState<IOptions | null>(null);
   const [pairFilter, setPairFilter] = useState<{ aid1: number; aid2: number; label: string } | null>(null);
 
@@ -104,11 +103,30 @@ export const ExplorePools = () => {
     return getFilterPools(assetFilter, filteredByTab) || [];
   }, [data, currentFilter, favorites, assetFilter, pairFilter]);
 
+  const tableEmptyMessage = useMemo(() => {
+    if (currentFilter === 'fav') return 'No favorite pools';
+    if (currentFilter === 'created') return 'No created pools';
+    return 'No pools found';
+  }, [currentFilter]);
+
   const handleFavorite = (pool: IPoolCard) => {
     dispatch(mainActions.onFavorites.request(pool));
   };
 
   const onOpenTrade = (pool: IPoolCard) => {
+    if (poolHasImposterAsset(pool.aid1, pool.aid2)) {
+      const poolWarnings = [pool.aid1, pool.aid2]
+        .map((assetId) => {
+          const realId = getRealAssetIdForFake(assetId);
+          return realId === null ? null : `fake id ${assetId}; real id ${realId}`;
+        })
+        .filter(Boolean)
+        .join('\n');
+      const continueTrade = window.confirm(
+        `Selected pool contains imposter assets:\n${poolWarnings}\n\nPress OK to continue anyways.\nPress Cancel to stop.`,
+      );
+      if (!continueTrade) return;
+    }
     dispatch(mainActions.setCurrentPool(pool));
     dispatch(mainActions.setPredict(null));
     navigate(ROUTES.NAV.TRADE);
@@ -141,7 +159,6 @@ export const ExplorePools = () => {
                   key={item.value}
                   active={currentFilter === item.value}
                   onClick={() => dispatch(mainActions.setFilter(item.value))}
-                  disabled={!!((item.value === 'fav' && !favorites.length) || (item.value === 'created' && !myPools.length))}
                 >
                   {item.name}
                 </SortButton>
@@ -160,6 +177,7 @@ export const ExplorePools = () => {
           favorites={favorites || []}
           onFavorite={handleFavorite}
           onOpenTrade={onOpenTrade}
+          emptyMessage={tableEmptyMessage}
         />
       </Container>
     </Window>

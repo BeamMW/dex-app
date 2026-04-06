@@ -1,6 +1,7 @@
 import React, {
   useCallback, useEffect, useMemo, useState,
 } from 'react';
+import { createPortal } from 'react-dom';
 import { IOptions, ITrade, IPoolCard } from '@core/types';
 import {
   emptyPredict, fromGroths, getPoolKind, setDataRequest, toGroths, truncate,
@@ -34,6 +35,7 @@ import {
 } from '@app/shared/icons';
 import {
   BEAM_ID, BEAMX_ID, ROUTES, titleSections,
+  getRealAssetIdForFake, isImposterAsset,
 } from '@app/shared/constants';
 import AssetLabel from '@app/shared/components/AssetLabel';
 import { useNavigate } from 'react-router-dom';
@@ -167,8 +169,66 @@ const AutoButton = styled.button`
   cursor: pointer;
 `;
 
+const WarningModalBackdrop = styled.div`
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const WarningModalPanel = styled.div`
+  width: 460px;
+  max-width: calc(100vw - 24px);
+  background: var(--color-dark-blue);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+`;
+
+const WarningTitle = styled.div`
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #ff5f5f;
+  margin-bottom: 10px;
+`;
+
+const WarningText = styled.p`
+  margin: 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 14px;
+  line-height: 1.5;
+`;
+
+const WarningList = styled.ul`
+  margin: 12px 0;
+  padding-left: 18px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 13px;
+`;
+
+const WarningActions = styled.div`
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+`;
+
 interface TradePoolProps {
   embedded?: boolean;
+}
+
+type SelectionSide = 'from' | 'to';
+
+interface AssetSelectionWarningState {
+  side: SelectionSide;
+  selectedOption: IOptions;
+  realAssetId: number;
 }
 
 export const TradePool = ({ embedded = false }: TradePoolProps) => {
@@ -197,6 +257,13 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   const walletRequestData = BeamDappConnector.isDesktop() ? requestData : debouncedRequestData;
   const [lastChangedInput, setLastChangedInput] = useState<number>(1);
   const [flipRate, setFlipRate] = useState(false);
+  const [fromSelectorOpen, setFromSelectorOpen] = useState(false);
+  const [toSelectorOpen, setToSelectorOpen] = useState(false);
+  const [selectionWarning, setSelectionWarning] = useState<AssetSelectionWarningState | null>(null);
+  const [pendingSelectionWarning, setPendingSelectionWarning] = useState<AssetSelectionWarningState | null>(null);
+  const [tradeWarningOpen, setTradeWarningOpen] = useState(false);
+  const [pendingTradeData, setPendingTradeData] = useState<ITrade | null>(null);
+  const isDesktopClient = BeamDappConnector.isDesktop();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -416,9 +483,9 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
     }
   }, [activePool, assets]);
 
-  const onTrade = (dataTrade: ITrade) => {
+  const onTrade = useCallback((dataTrade: ITrade) => {
     dispatch(mainActions.onTradePool.request(setDataRequest(dataTrade)));
-  };
+  }, [dispatch]);
 
   const onPreviousClick = () => {
     navigate(ROUTES.POOLS.BASE);
@@ -433,6 +500,20 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   const selectValue = (assetId: number | null): IOptions | null => (
     options.find((item) => item.value === assetId) || null
   );
+  const optionById = useCallback((assetId: number): IOptions => (
+    options.find((item) => item.value === assetId) || { value: assetId, label: `Asset ${assetId}` }
+  ), [options]);
+  const selectedImposterWarnings = useMemo(() => {
+    const warnings: Array<{ fakeAssetId: number; realAssetId: number }> = [];
+    [currentToken, secondToken].forEach((assetId) => {
+      const realAssetId = getRealAssetIdForFake(assetId);
+      if (assetId !== null && realAssetId !== null) {
+        warnings.push({ fakeAssetId: assetId, realAssetId });
+      }
+    });
+    return warnings;
+  }, [currentToken, secondToken]);
+  const hasSelectedImposterAssets = selectedImposterWarnings.length > 0;
   const fromReserve = activePool
     ? (currentToken === activePool.aid1 ? fromGroths(activePool.tok1) : fromGroths(activePool.tok2))
     : 0;
@@ -491,21 +572,148 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   const fromAmountFieldHandlers = createAmountFieldHandlers(predictData, amountInput, amountSendInput.value);
   const toAmountFieldHandlers = createAmountFieldHandlers(predictData, amountSendInput, amountInput.value);
 
-  const onSelectFromToken = useCallback((value: IOptions) => {
-    setCurrentToken(value?.value ?? null);
-    if (value?.value === secondToken) {
-      setSecondToken(currentToken);
-    }
-    dispatch(mainActions.setPredict(null));
-  }, [secondToken, currentToken, dispatch]);
-
-  const onSelectToToken = useCallback((value: IOptions) => {
-    setSecondToken(value?.value ?? null);
-    if (value?.value === currentToken) {
-      setCurrentToken(secondToken);
+  const applyTokenSelection = useCallback((side: SelectionSide, value: IOptions) => {
+    if (side === 'from') {
+      setCurrentToken(value?.value ?? null);
+      if (value?.value === secondToken) {
+        setSecondToken(currentToken);
+      }
+    } else {
+      setSecondToken(value?.value ?? null);
+      if (value?.value === currentToken) {
+        setCurrentToken(secondToken);
+      }
     }
     dispatch(mainActions.setPredict(null));
   }, [currentToken, secondToken, dispatch]);
+
+  useEffect(() => {
+    if (!pendingSelectionWarning) return;
+    if (!fromSelectorOpen && !toSelectorOpen) {
+      setSelectionWarning(pendingSelectionWarning);
+      setPendingSelectionWarning(null);
+    }
+  }, [pendingSelectionWarning, fromSelectorOpen, toSelectorOpen]);
+
+  const onSelectFromToken = useCallback((value: IOptions) => {
+    const selectedId = value?.value ?? null;
+    const realAssetId = getRealAssetIdForFake(selectedId);
+    if (selectedId !== null && realAssetId !== null) {
+      if (isDesktopClient) {
+        setTimeout(() => {
+          const tradeReal = window.confirm(
+            `Asset id ${selectedId} is marked as an imposter.\nThe real asset id is: ${realAssetId}.\n\nPress OK to trade real asset.\nPress Cancel to continue anyways.`,
+          );
+          if (tradeReal) {
+            applyTokenSelection('from', optionById(realAssetId));
+          } else {
+            applyTokenSelection('from', value);
+          }
+        }, 0);
+        return true;
+      }
+      setPendingSelectionWarning({
+        side: 'from',
+        selectedOption: value,
+        realAssetId,
+      });
+      setFromSelectorOpen(false);
+      return true;
+    }
+    applyTokenSelection('from', value);
+    return true;
+  }, [applyTokenSelection, isDesktopClient, optionById]);
+
+  const onSelectToToken = useCallback((value: IOptions) => {
+    const selectedId = value?.value ?? null;
+    const realAssetId = getRealAssetIdForFake(selectedId);
+    if (selectedId !== null && realAssetId !== null) {
+      if (isDesktopClient) {
+        setTimeout(() => {
+          const tradeReal = window.confirm(
+            `Asset id ${selectedId} is marked as an imposter.\nThe real asset id is: ${realAssetId}.\n\nPress OK to trade real asset.\nPress Cancel to continue anyways.`,
+          );
+          if (tradeReal) {
+            applyTokenSelection('to', optionById(realAssetId));
+          } else {
+            applyTokenSelection('to', value);
+          }
+        }, 0);
+        return true;
+      }
+      setPendingSelectionWarning({
+        side: 'to',
+        selectedOption: value,
+        realAssetId,
+      });
+      setToSelectorOpen(false);
+      return true;
+    }
+    applyTokenSelection('to', value);
+    return true;
+  }, [applyTokenSelection, isDesktopClient, optionById]);
+
+  const onSelectionWarningContinue = useCallback(() => {
+    if (!selectionWarning) return;
+    applyTokenSelection(selectionWarning.side, selectionWarning.selectedOption);
+    setSelectionWarning(null);
+  }, [selectionWarning, applyTokenSelection]);
+
+  const onSelectionWarningTradeReal = useCallback(() => {
+    if (!selectionWarning) return;
+    applyTokenSelection(selectionWarning.side, optionById(selectionWarning.realAssetId));
+    setSelectionWarning(null);
+  }, [selectionWarning, applyTokenSelection, optionById]);
+
+  const onReplaceSelectedWithRealAssets = useCallback(() => {
+    let nextCurrent = currentToken;
+    let nextSecond = secondToken;
+    const realCurrent = getRealAssetIdForFake(currentToken);
+    const realSecond = getRealAssetIdForFake(secondToken);
+
+    if (realCurrent !== null) nextCurrent = realCurrent;
+    if (realSecond !== null) nextSecond = realSecond;
+
+    if (nextCurrent !== currentToken || nextSecond !== secondToken) {
+      setCurrentToken(nextCurrent);
+      setSecondToken(nextSecond);
+      dispatch(mainActions.setPredict(null));
+    }
+
+    setTradeWarningOpen(false);
+    setPendingTradeData(null);
+  }, [currentToken, secondToken, dispatch]);
+
+  const onTradeWithWarningCheck = useCallback((dataTrade: ITrade) => {
+    if (!hasSelectedImposterAssets) {
+      onTrade(dataTrade);
+      return;
+    }
+    if (isDesktopClient) {
+      const warningDetails = selectedImposterWarnings
+        .map((w) => `fake id ${w.fakeAssetId}; real id ${w.realAssetId}`)
+        .join('\n');
+      const tradeReal = window.confirm(
+        `Selected trading asset(s) are marked as potential imposters:\n${warningDetails}\n\nPress OK to switch to real asset(s).\nPress Cancel to continue anyways.`,
+      );
+      if (tradeReal) {
+        onReplaceSelectedWithRealAssets();
+        return;
+      }
+      onTrade(dataTrade);
+      return;
+    }
+    setPendingTradeData(dataTrade);
+    setTradeWarningOpen(true);
+  }, [hasSelectedImposterAssets, isDesktopClient, onReplaceSelectedWithRealAssets, onTrade, selectedImposterWarnings]);
+
+  const onTradeWarningContinue = useCallback(() => {
+    if (pendingTradeData) {
+      onTrade(pendingTradeData);
+    }
+    setTradeWarningOpen(false);
+    setPendingTradeData(null);
+  }, [pendingTradeData, onTrade]);
 
   function renderFeeTierRow() {
     if (matchedPools.length <= 1) return null;
@@ -616,13 +824,70 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
     );
   }
 
+  const warningDialogs = (
+    <>
+      {selectionWarning && (
+        <WarningModalBackdrop>
+          <WarningModalPanel onClick={(e) => e.stopPropagation()}>
+            <WarningTitle>Imposter asset warning</WarningTitle>
+            <WarningText>
+              {`You selected asset id ${selectionWarning.selectedOption.value},`}
+              {' '}
+              {'which is marked as an imposter.'}
+              {' '}
+              {`The real asset id is ${selectionWarning.realAssetId}.`}
+            </WarningText>
+            <WarningActions>
+              <Button icon={DoneIcon} variant="approve" onClick={onSelectionWarningTradeReal}>
+                Trade real asset
+              </Button>
+              <Button variant="control" onClick={onSelectionWarningContinue}>
+                Continue anyways
+              </Button>
+            </WarningActions>
+          </WarningModalPanel>
+        </WarningModalBackdrop>
+      )}
+
+      {tradeWarningOpen && (
+        <WarningModalBackdrop>
+          <WarningModalPanel onClick={(e) => e.stopPropagation()}>
+            <WarningTitle>Imposter asset warning</WarningTitle>
+            <WarningText>
+              One or more selected trading assets are marked as imposters:
+            </WarningText>
+            <WarningList>
+              {selectedImposterWarnings.map((warning) => (
+                <li key={`${warning.fakeAssetId}-${warning.realAssetId}`}>
+                  {`fake id ${warning.fakeAssetId}; real id ${warning.realAssetId}`}
+                </li>
+              ))}
+            </WarningList>
+            <WarningActions>
+              <Button icon={DoneIcon} variant="approve" onClick={onReplaceSelectedWithRealAssets}>
+                Trade real asset
+              </Button>
+              <Button variant="control" onClick={onTradeWarningContinue}>
+                Continue anyways
+              </Button>
+            </WarningActions>
+          </WarningModalPanel>
+        </WarningModalBackdrop>
+      )}
+    </>
+  );
+  const warningLayer = typeof document !== 'undefined'
+    ? createPortal(warningDialogs, document.body)
+    : warningDialogs;
+
   if (embedded) {
     return (
-      <Window hideHeader>
-        <Container wide>
-          <EmbeddedLayout>
-            <EmbeddedSwapColumn>
-              <SwapCard>
+      <>
+        <Window hideHeader>
+          <Container wide>
+            <EmbeddedLayout>
+              <EmbeddedSwapColumn>
+                <SwapCard>
                 <SwapBlock>
                   <BlockLabel>From</BlockLabel>
                   <AssetsSection error={fromAmountError}>
@@ -643,6 +908,10 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                           onSelect={onSelectFromToken}
                           excludeAssetId={secondToken}
                           placeholder="Select asset"
+                          showWarning={isImposterAsset(currentToken)}
+                          isOpen={fromSelectorOpen}
+                          onOpen={() => setFromSelectorOpen(true)}
+                          onClose={() => setFromSelectorOpen(false)}
                         />
                       </InlineSelect>
                     </InputRow>
@@ -676,6 +945,10 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                           onSelect={onSelectToToken}
                           excludeAssetId={currentToken}
                           placeholder="Select asset"
+                          showWarning={isImposterAsset(secondToken)}
+                          isOpen={toSelectorOpen}
+                          onOpen={() => setToSelectorOpen(true)}
+                          onClose={() => setToSelectorOpen(false)}
                         />
                       </InlineSelect>
                     </InputRow>
@@ -695,14 +968,14 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                     disabled={isTradeDisabled}
                     icon={DoneIcon}
                     variant="approve"
-                    onClick={() => requestData && onTrade(requestData)}
+                    onClick={() => requestData && onTradeWithWarningCheck(requestData)}
                   >
                     Trade
                   </Button>
                 </EmbeddedTradeButtonWrap>
-              </SwapCard>
-            </EmbeddedSwapColumn>
-            <EmbeddedRightStack>
+                </SwapCard>
+              </EmbeddedSwapColumn>
+              <EmbeddedRightStack>
               <RightPanel>
                 {activePool ? (
                   <>
@@ -737,159 +1010,172 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   {renderEmbeddedTradeSummary()}
                 </EmbeddedTradeSummaryBelowPool>
               ) : null}
-            </EmbeddedRightStack>
-          </EmbeddedLayout>
-        </Container>
-      </Window>
+              </EmbeddedRightStack>
+            </EmbeddedLayout>
+          </Container>
+        </Window>
+        {warningLayer}
+      </>
     );
   }
 
   return (
-    <Window title="trade" backButton>
-      <Container>
-        <SelectWrapper>
-          <SearchHint>Search asset directly inside each amount row selector.</SearchHint>
-        </SelectWrapper>
-        <AssetsContainer>
-          <Section title={titleSections.TRADE_RECEIVE}>
-            <AssetsSection error={fromAmountError}>
-              <InputRow>
-                <Input
-                  ref={amountInputRef}
-                  value={amountInput.value}
-                  variant="amount"
-                  pallete="blue"
-                  valid={!fromAmountError}
-                  onChange={handleAmountInputChange}
-                  onFocus={fromAmountFieldHandlers.onFocus}
-                  onBlur={fromAmountFieldHandlers.onBlur}
-                />
-                <InlineSelect>
-                  <AssetSelectorButton
-                    value={selectValue(currentToken)}
-                    onSelect={onSelectFromToken}
-                    excludeAssetId={secondToken}
-                    placeholder="Select asset"
+    <>
+      <Window title="trade" backButton>
+        <Container>
+          <SelectWrapper>
+            <SearchHint>Search asset directly inside each amount row selector.</SearchHint>
+          </SelectWrapper>
+          <AssetsContainer>
+            <Section title={titleSections.TRADE_RECEIVE}>
+              <AssetsSection error={fromAmountError}>
+                <InputRow>
+                  <Input
+                    ref={amountInputRef}
+                    value={amountInput.value}
+                    variant="amount"
+                    pallete="blue"
+                    valid={!fromAmountError}
+                    onChange={handleAmountInputChange}
+                    onFocus={fromAmountFieldHandlers.onFocus}
+                    onBlur={fromAmountFieldHandlers.onBlur}
                   />
-                </InlineSelect>
-              </InputRow>
-            </AssetsSection>
-            {fromAmountError && <HintRow><ErrorHint>amount exceeds pool reserves</ErrorHint></HintRow>}
-            <ExchangeWrapper>
-              <Button icon={IconExchange} variant="icon" onClick={swapTokensAndResetSend} />
-            </ExchangeWrapper>
-          </Section>
-          <Section title={titleSections.TRADE_SEND}>
-            <AssetsSection error={toAmountError}>
-              <InputRow>
-                <Input
-                  ref={amountSendInputRef}
-                  pallete="purple"
-                  variant="amount"
-                  style={receiveAmountInputStyle}
-                  value={amountSendInput.value}
-                  valid={!toAmountError}
-                  onChange={handleAmountSendInputChange}
-                  onFocus={toAmountFieldHandlers.onFocus}
-                  onBlur={toAmountFieldHandlers.onBlur}
-                />
-                <InlineSelect>
-                  <AssetSelectorButton
-                    value={selectValue(secondToken)}
-                    onSelect={onSelectToToken}
-                    excludeAssetId={currentToken}
-                    placeholder="Select asset"
+                  <InlineSelect>
+                    <AssetSelectorButton
+                      value={selectValue(currentToken)}
+                      onSelect={onSelectFromToken}
+                      excludeAssetId={secondToken}
+                      placeholder="Select asset"
+                      showWarning={isImposterAsset(currentToken)}
+                    isOpen={fromSelectorOpen}
+                    onOpen={() => setFromSelectorOpen(true)}
+                    onClose={() => setFromSelectorOpen(false)}
+                    />
+                  </InlineSelect>
+                </InputRow>
+              </AssetsSection>
+              {fromAmountError && <HintRow><ErrorHint>amount exceeds pool reserves</ErrorHint></HintRow>}
+              <ExchangeWrapper>
+                <Button icon={IconExchange} variant="icon" onClick={swapTokensAndResetSend} />
+              </ExchangeWrapper>
+            </Section>
+            <Section title={titleSections.TRADE_SEND}>
+              <AssetsSection error={toAmountError}>
+                <InputRow>
+                  <Input
+                    ref={amountSendInputRef}
+                    pallete="purple"
+                    variant="amount"
+                    style={receiveAmountInputStyle}
+                    value={amountSendInput.value}
+                    valid={!toAmountError}
+                    onChange={handleAmountSendInputChange}
+                    onFocus={toAmountFieldHandlers.onFocus}
+                    onBlur={toAmountFieldHandlers.onBlur}
                   />
-                </InlineSelect>
-              </InputRow>
-            </AssetsSection>
-            {toAmountError && <HintRow><ErrorHint>amount exceeds pool reserves</ErrorHint></HintRow>}
-          </Section>
-        </AssetsContainer>
-        <SectionWrapper>
-          {activePool ? (
-            <>
-              <PoolStat data={activePool} lp={currentLPToken} />
-              {renderFeeTierRow()}
-            </>
-          ) : null}
-          <Section title="trade summary">
-            <SummaryWrapper>
-              <SummaryContainer>
-                <SummaryTitle>You buy</SummaryTitle>
-                <SummaryAsset>
-                  <AssetAmount>
-                    <AssetLabel
-                      variant="predict"
-                      title={tokenName_2}
-                      assets_id={secondToken ?? 0}
-                      amount={predictData ? predictData.buy : 0}
+                  <InlineSelect>
+                    <AssetSelectorButton
+                      value={selectValue(secondToken)}
+                      onSelect={onSelectToToken}
+                      excludeAssetId={currentToken}
+                      placeholder="Select asset"
+                      showWarning={isImposterAsset(secondToken)}
+                    isOpen={toSelectorOpen}
+                    onOpen={() => setToSelectorOpen(true)}
+                    onClose={() => setToSelectorOpen(false)}
                     />
-                  </AssetAmount>
-                </SummaryAsset>
-              </SummaryContainer>
-              <SummaryContainer>
-                <SummaryTitle>DAO Fee</SummaryTitle>
-                <SummaryAsset>
-                  <AssetAmount>
-                    <AssetLabel
-                      variant="predict"
-                      title={tokenName_1}
-                      assets_id={currentToken ?? 0}
-                      amount={predictData ? predictData.fee_dao : 0}
-                    />
-                  </AssetAmount>
-                </SummaryAsset>
-              </SummaryContainer>
-              <SummaryContainer>
-                <SummaryTitle>Pool Fee</SummaryTitle>
-                <SummaryAsset>
-                  <AssetAmount>
-                    <AssetLabel
-                      variant="predict"
-                      title={tokenName_1}
-                      assets_id={currentToken ?? 0}
-                      amount={predictData ? predictData.fee_pool : 0}
-                    />
-                  </AssetAmount>
-                </SummaryAsset>
-              </SummaryContainer>
-              <Line />
-              <SummaryContainer>
-                <TotalTitle>Total Pay</TotalTitle>
-                <SummaryAsset>
-                  <AssetAmount>
-                    <div>
+                  </InlineSelect>
+                </InputRow>
+              </AssetsSection>
+              {toAmountError && <HintRow><ErrorHint>amount exceeds pool reserves</ErrorHint></HintRow>}
+            </Section>
+          </AssetsContainer>
+          <SectionWrapper>
+            {activePool ? (
+              <>
+                <PoolStat data={activePool} lp={currentLPToken} />
+                {renderFeeTierRow()}
+              </>
+            ) : null}
+            <Section title="trade summary">
+              <SummaryWrapper>
+                <SummaryContainer>
+                  <SummaryTitle>You buy</SummaryTitle>
+                  <SummaryAsset>
+                    <AssetAmount>
+                      <AssetLabel
+                        variant="predict"
+                        title={tokenName_2}
+                        assets_id={secondToken ?? 0}
+                        amount={predictData ? predictData.buy : 0}
+                      />
+                    </AssetAmount>
+                  </SummaryAsset>
+                </SummaryContainer>
+                <SummaryContainer>
+                  <SummaryTitle>DAO Fee</SummaryTitle>
+                  <SummaryAsset>
+                    <AssetAmount>
                       <AssetLabel
                         variant="predict"
                         title={tokenName_1}
                         assets_id={currentToken ?? 0}
-                        amount={predictData ? predictData.pay : 0}
-                        id={false}
+                        amount={predictData ? predictData.fee_dao : 0}
                       />
-                    </div>
-                  </AssetAmount>
-                </SummaryAsset>
-              </SummaryContainer>
-            </SummaryWrapper>
-          </Section>
-        </SectionWrapper>
-        <ButtonBlock>
-          <ButtonWrapper>
-            <Button icon={CancelIcon} variant="cancel" onClick={onPreviousClick}>
-              Cancel
-            </Button>
-            <Button
-              disabled={isTradeDisabled}
-              icon={DoneIcon}
-              variant="approve"
-              onClick={() => requestData && onTrade(requestData)}
-            >
-              Trade
-            </Button>
-          </ButtonWrapper>
-        </ButtonBlock>
-      </Container>
-    </Window>
+                    </AssetAmount>
+                  </SummaryAsset>
+                </SummaryContainer>
+                <SummaryContainer>
+                  <SummaryTitle>Pool Fee</SummaryTitle>
+                  <SummaryAsset>
+                    <AssetAmount>
+                      <AssetLabel
+                        variant="predict"
+                        title={tokenName_1}
+                        assets_id={currentToken ?? 0}
+                        amount={predictData ? predictData.fee_pool : 0}
+                      />
+                    </AssetAmount>
+                  </SummaryAsset>
+                </SummaryContainer>
+                <Line />
+                <SummaryContainer>
+                  <TotalTitle>Total Pay</TotalTitle>
+                  <SummaryAsset>
+                    <AssetAmount>
+                      <div>
+                        <AssetLabel
+                          variant="predict"
+                          title={tokenName_1}
+                          assets_id={currentToken ?? 0}
+                          amount={predictData ? predictData.pay : 0}
+                          id={false}
+                        />
+                      </div>
+                    </AssetAmount>
+                  </SummaryAsset>
+                </SummaryContainer>
+              </SummaryWrapper>
+            </Section>
+          </SectionWrapper>
+          <ButtonBlock>
+            <ButtonWrapper>
+              <Button icon={CancelIcon} variant="cancel" onClick={onPreviousClick}>
+                Cancel
+              </Button>
+              <Button
+                disabled={isTradeDisabled}
+                icon={DoneIcon}
+                variant="approve"
+                onClick={() => requestData && onTradeWithWarningCheck(requestData)}
+              >
+                Trade
+              </Button>
+            </ButtonWrapper>
+          </ButtonBlock>
+        </Container>
+      </Window>
+      {warningLayer}
+    </>
   );
 };

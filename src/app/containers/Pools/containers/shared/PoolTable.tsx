@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { styled } from '@linaria/react';
 import { IPoolCard } from '@core/types';
 import { fromGroths, getPoolKind, truncate } from '@core/appUtils';
+import { poolHasImposterAsset } from '@app/shared/constants';
 import { IconFavorite, IconFavoriteFilled } from '@app/shared/icons';
 import AssetIcon from '@app/shared/components/AssetsIcon';
 
@@ -47,6 +48,19 @@ const PairText = styled.div`
   gap: 4px;
 `;
 
+const WarningBadge = styled.span`
+  color: #ff5f5f;
+  border: 1px solid rgba(255, 95, 95, 0.55);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  margin-left: 12px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+`;
+
 const TokenCell = styled.div`
   display: flex;
   align-items: center;
@@ -64,12 +78,14 @@ interface PoolTableProps {
   favorites: IPoolCard[];
   onFavorite: (pool: IPoolCard) => void;
   onOpenTrade: (pool: IPoolCard) => void;
+  /** Shown when `rows` is empty; defaults to "No pools found." */
+  emptyMessage?: string;
 }
 
 const formatNum = (value) => Number(value).toLocaleString('en-US', { maximumFractionDigits: 8 });
 
 export const PoolTable: React.FC<PoolTableProps> = ({
-  rows, favorites, onFavorite, onOpenTrade,
+  rows, favorites, onFavorite, onOpenTrade, emptyMessage,
 }) => {
   const favoriteSet = useMemo(
     () => new Set((favorites || []).map((item: IPoolCard) => `${item.aid1}-${item.aid2}-${item.kind}`)),
@@ -77,7 +93,7 @@ export const PoolTable: React.FC<PoolTableProps> = ({
   );
 
   if (!rows.length) {
-    return <EmptyState>No pools found.</EmptyState>;
+    return <EmptyState>{emptyMessage ?? 'No pools found'}</EmptyState>;
   }
 
   return (
@@ -92,59 +108,63 @@ export const PoolTable: React.FC<PoolTableProps> = ({
         </tr>
       </thead>
       <tbody>
-        {rows.map((pool) => (
-          <Row
-            key={`${pool.aid1}_${pool.aid2}_${pool.kind}`}
-            onClick={() => onOpenTrade(pool)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onOpenTrade(pool);
-              }
-            }}
-            role="button"
-            tabIndex={0}
-          >
-            <td>
-              <FavButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onFavorite(pool);
-                }}
-                type="button"
-                aria-label="Toggle pool favorite"
-              >
-                {favoriteSet.has(`${pool.aid1}-${pool.aid2}-${pool.kind}`)
-                  ? <IconFavoriteFilled />
-                  : <IconFavorite />}
-              </FavButton>
-            </td>
-            <td>
-              <PairCell>
-                <AssetIcon asset_id={pool.aid1} />
-                <AssetIcon asset_id={pool.aid2} />
-                <PairText>
-                  {`${truncate(pool.metadata1?.UN || 'Token')} (id:${pool.aid1}) / ${
-                    truncate(pool.metadata2?.UN || 'Token')
-                  } (id:${pool.aid2})`}
-                </PairText>
-              </PairCell>
-            </td>
-            <td>
-              <TokenCell>
-                <AssetIcon asset_id={pool.aid1} />
-                {formatNum(fromGroths(pool.tok1))}
-              </TokenCell>
-            </td>
-            <td>
-              <TokenCell>
-                <AssetIcon asset_id={pool.aid2} />
-                {formatNum(fromGroths(pool.tok2))}
-              </TokenCell>
-            </td>
-            <td>{getPoolKind(pool.kind)}</td>
-          </Row>
-        ))}
+        {rows.map((pool) => {
+          const hasImposterWarning = poolHasImposterAsset(pool.aid1, pool.aid2);
+          return (
+            <Row
+              key={`${pool.aid1}_${pool.aid2}_${pool.kind}`}
+              onClick={() => onOpenTrade(pool)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onOpenTrade(pool);
+                }
+              }}
+              role="button"
+              tabIndex={0}
+            >
+              <td>
+                <FavButton
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onFavorite(pool);
+                  }}
+                  type="button"
+                  aria-label="Toggle pool favorite"
+                >
+                  {favoriteSet.has(`${pool.aid1}-${pool.aid2}-${pool.kind}`)
+                    ? <IconFavoriteFilled />
+                    : <IconFavorite />}
+                </FavButton>
+              </td>
+              <td>
+                <PairCell>
+                  <AssetIcon asset_id={pool.aid1} />
+                  <AssetIcon asset_id={pool.aid2} />
+                  <PairText>
+                    {`${truncate(pool.metadata1?.UN || 'Token')} (id:${pool.aid1}) / ${
+                      truncate(pool.metadata2?.UN || 'Token')
+                    } (id:${pool.aid2})`}
+                  </PairText>
+                  {hasImposterWarning && <WarningBadge>fake asset</WarningBadge>}
+                </PairCell>
+              </td>
+              <td>
+                <TokenCell>
+                  <AssetIcon asset_id={pool.aid1} />
+                  {formatNum(fromGroths(pool.tok1))}
+                </TokenCell>
+              </td>
+              <td>
+                <TokenCell>
+                  <AssetIcon asset_id={pool.aid2} />
+                  {formatNum(fromGroths(pool.tok2))}
+                </TokenCell>
+              </td>
+              <td>{getPoolKind(pool.kind)}</td>
+            </Row>
+          );
+        })}
       </tbody>
     </Table>
   );

@@ -8,7 +8,11 @@ import { IAsset, IOptions } from '@core/types';
 import { assetShortLabel } from '@core/appUtils';
 import { selectAssetsList, selectFavoriteAssets, selectPoolsList } from '@app/containers/Pools/store/selectors';
 import * as mainActions from '@app/containers/Pools/store/actions';
-import { ASSET_BEAM } from '@app/shared/constants';
+import {
+  ASSET_BEAM,
+  isImposterAsset,
+  poolHasImposterAsset,
+} from '@app/shared/constants';
 import AssetIcon from '@app/shared/components/AssetsIcon';
 import { CancelIcon, IconFavorite, IconFavoriteFilled } from '@app/shared/icons';
 import { AssetSearchModalProps } from './AssetSearchModal.types';
@@ -180,6 +184,18 @@ const AssetIdBadge = styled.span`
   color: rgba(255, 255, 255, 0.3);
   white-space: nowrap;
   flex-shrink: 0;
+`;
+
+const WarningBadge = styled.span`
+  font-size: 10px;
+  font-weight: 700;
+  color: #ff5f5f;
+  border: 1px solid rgba(255, 95, 95, 0.55);
+  border-radius: 999px;
+  padding: 1px 7px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-transform: uppercase;
 `;
 
 const RowAction = styled.span`
@@ -483,8 +499,10 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
   const handleAssetOnlySelect = (asset: IAsset) => {
     const id = getAssetId(asset);
     if (id === excludeAssetId) return;
-    onSelect(buildOption(asset));
-    onClose();
+    const shouldClose = onSelect(buildOption(asset));
+    if (shouldClose !== false) {
+      onClose();
+    }
   };
 
   const handleNavigateToAsset = (asset: IAsset) => {
@@ -515,6 +533,7 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
     const name = ammLabel || m?.UN || m?.N || 'Unknown';
     const ticker = ammLabel ? null : assetShortLabel(m);
     const isExcluded = mode === 'asset-only' && id === excludeAssetId;
+    const hasImposterWarning = isImposterAsset(id);
 
     return (
       <AssetRow
@@ -529,7 +548,8 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
           <AssetName>{name}</AssetName>
           {ticker && ticker !== name && <AssetSub>{ticker}</AssetSub>}
         </AssetRowText>
-        <AssetIdBadge>{`id:${id}`}</AssetIdBadge>
+        {hasImposterWarning && <WarningBadge>fake</WarningBadge>}
+        <AssetIdBadge style={hasImposterWarning ? { marginLeft: 6 } : undefined}>{`id:${id}`}</AssetIdBadge>
         {actionLabel && <RowAction>{actionLabel}</RowAction>}
         <StarButton
           type="button"
@@ -652,23 +672,27 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
             return (
               <>
                 <SectionLabel>Pools</SectionLabel>
-                {displayedPairs.map((pair) => (
-                  <AssetRow
-                    key={`pair-${pair.aid1}-${pair.aid2}`}
-                    type="button"
-                    onClick={() => {
-                      onPairSelect?.(pair.aid1, pair.aid2, pair.label);
-                      onClose();
-                    }}
-                  >
-                    <AssetIcon asset_id={pair.aid1} />
-                    <AssetIcon asset_id={pair.aid2} />
-                    <AssetRowText>
-                      <AssetName>{pair.label}</AssetName>
-                    </AssetRowText>
-                    <RowAction>→ filter</RowAction>
-                  </AssetRow>
-                ))}
+                {displayedPairs.map((pair) => {
+                  const hasImposterWarning = poolHasImposterAsset(pair.aid1, pair.aid2);
+                  return (
+                    <AssetRow
+                      key={`pair-${pair.aid1}-${pair.aid2}`}
+                      type="button"
+                      onClick={() => {
+                        onPairSelect?.(pair.aid1, pair.aid2, pair.label);
+                        onClose();
+                      }}
+                    >
+                      <AssetIcon asset_id={pair.aid1} />
+                      <AssetIcon asset_id={pair.aid2} />
+                      <AssetRowText>
+                        <AssetName>{pair.label}</AssetName>
+                      </AssetRowText>
+                      {hasImposterWarning && <WarningBadge>fake asset</WarningBadge>}
+                      <RowAction>→ filter</RowAction>
+                    </AssetRow>
+                  );
+                })}
               </>
             );
           })() : renderContent()}

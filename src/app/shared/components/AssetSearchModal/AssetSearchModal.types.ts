@@ -4,7 +4,7 @@ export interface AssetSearchModalProps {
   isOpen: boolean;
   onClose: () => void;
   /** Called on asset selection (asset-only mode) or pool-filter selection (explore POOL tab) */
-  onSelect: (option: IOptions) => void;
+  onSelect: (option: IOptions) => boolean | void;
   excludeAssetId?: number | null;
   mode?: 'asset-only' | 'explore';
   title?: string;
