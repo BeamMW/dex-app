@@ -44,7 +44,7 @@ const OptionActiveStyled = styled(OptionStyled)`
   }
 `;
 
-const ButtonStyled = styled.button`
+const ButtonStyled = styled('button')`
   line-height: 26px;
   cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
   padding: 0;

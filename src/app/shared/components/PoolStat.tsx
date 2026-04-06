@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { IAsset, IPoolCard } from '@core/types';
 import { Section } from '@app/shared/components/index';
 import AssetLabel from '@app/shared/components/AssetLabel';
-import { iconButtonReset, rowCenter } from '../../styles/linariaShared';
 import {
   fromGroths, truncate, formatNumber, getPoolKind,
 } from '@core/appUtils';
@@ -47,14 +46,16 @@ const SideRightWrap = styled.div`
   align-items: flex-end;
   width: 100%;
 `;
-const HeaderMeta = styled.div`
-  width: 100%;
-  ${rowCenter}
+const HeaderMeta = styled('div')`
+  display: flex;
+  align-items: center;
+  margin-left: auto;
   justify-content: flex-end;
+  flex-wrap: nowrap;
   gap: 8px;
 `;
 const FeeBadge = styled.div`
-  margin-right: 3px;
+  margin: 0;
   background: rgba(255, 255, 255, 0.05);
   padding: 4px 8px;
   border-radius: 20px;
@@ -63,9 +64,20 @@ const FeeBadge = styled.div`
   line-height: 14px;
   color: white;
 `;
-const FavoriteButton = styled.button`
-  ${iconButtonReset}
+const FavoriteButton = styled('button')`
+  border: none;
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+  cursor: pointer;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
   justify-content: center;
+  & svg {
+    display: block;
+  }
 `;
 const PlainWrapper = styled.div`
   width: 100%;

@@ -24,7 +24,7 @@ const Table = styled.table`
   }
 `;
 
-const FavButton = styled.button`
+const FavButton = styled('button')`
   ${iconButtonReset}
 `;
 
@@ -32,23 +32,23 @@ const Row = styled.tr`
   cursor: pointer;
 `;
 
-const PairCell = styled.div`
+const PairCell = styled('div')`
   ${rowCenter}
   gap: 8px;
 `;
 
-const PairText = styled.div`
+const PairText = styled('div')`
   ${rowCenter}
   gap: 4px;
 `;
 
-const WarningBadge = styled.span`
+const WarningBadge = styled('span')`
   ${warningBadgeBase}
   padding: 1px 6px;
   margin-left: 12px;
 `;
 
-const TokenCell = styled.div`
+const TokenCell = styled('div')`
   ${rowCenter}
   gap: 8px;
 `;

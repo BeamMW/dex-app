@@ -73,7 +73,7 @@ const ModalTitle = styled.span`
   letter-spacing: 2px;
 `;
 
-const CloseButton = styled.button`
+const CloseButton = styled('button')`
   ${iconButtonReset}
   padding: 4px;
   opacity: 0.5;
@@ -183,7 +183,7 @@ const AssetIdBadge = styled.span`
   flex-shrink: 0;
 `;
 
-const WarningBadge = styled.span`
+const WarningBadge = styled('span')`
   ${warningBadgeBase}
   padding: 1px 7px;
 `;
@@ -197,7 +197,7 @@ const RowAction = styled.span`
   margin-left: 4px;
 `;
 
-const StarButton = styled.button`
+const StarButton = styled('button')`
   ${iconButtonReset}
   padding: 4px;
   flex-shrink: 0;
@@ -212,7 +212,7 @@ const FilterWrap = styled.div`
   padding-bottom: 8px;
 `;
 
-const FilterBtn = styled.button<{ active: boolean }>`
+const FilterBtn = styled('button')<{ active: boolean }>`
   background: ${({ active }) => (active ? 'rgba(0, 246, 170, 0.12)' : 'rgba(255, 255, 255, 0.06)')};
   border: 1px solid ${({ active }) => (active ? 'var(--color-green)' : 'rgba(255, 255, 255, 0.1)')};
   border-radius: 8px;

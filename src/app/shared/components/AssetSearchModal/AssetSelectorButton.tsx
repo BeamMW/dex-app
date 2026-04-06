@@ -20,7 +20,7 @@ interface AssetSelectorButtonProps {
   showWarning?: boolean;
 }
 
-const SelectorBtn = styled.button`
+const SelectorBtn = styled('button')`
   ${rowCenter}
   gap: 8px;
   width: 100%;
@@ -60,13 +60,13 @@ const Placeholder = styled(Label)`
   color: rgba(255, 255, 255, 0.5);
 `;
 
-const ChevronWrap = styled.span`
+const ChevronWrap = styled('span')`
   ${rowCenter}
   flex-shrink: 0;
   opacity: 0.5;
 `;
 
-const WarningBadge = styled.span`
+const WarningBadge = styled('span')`
   ${warningBadgeBase}
   padding: 1px 6px;
   margin-right: 10px;

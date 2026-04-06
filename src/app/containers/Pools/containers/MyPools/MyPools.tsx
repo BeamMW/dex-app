@@ -38,18 +38,18 @@ const Actions = styled.div`
 const Row = styled.tr`
   cursor: pointer;
 `;
-const FavButton = styled.button`
+const FavButton = styled('button')`
   ${iconButtonReset}
 `;
-const PairCell = styled.div`
+const PairCell = styled('div')`
   ${rowCenter}
   gap: 8px;
 `;
-const PairText = styled.div`
+const PairText = styled('div')`
   ${rowCenter}
   gap: 4px;
 `;
-const TokenCell = styled.div`
+const TokenCell = styled('div')`
   ${rowCenter}
   gap: 8px;
 `;

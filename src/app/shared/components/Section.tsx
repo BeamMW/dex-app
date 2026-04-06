@@ -84,7 +84,7 @@ const SectionExchangeStyled = styled(SectionStyled)`
   height: 54px;
 `;
 
-const ButtonStyled = styled.button`
+const ButtonStyled = styled('button')`
   position: absolute;
   top: 20px;
   right: 20px;
@@ -104,7 +104,7 @@ const ShowAll = styled.div`
   cursor: pointer;
 `;
 
-const TitleWrapper = styled.div`
+const TitleWrapper = styled('div')`
   ${rowCenter}
   justify-content: space-between;
   margin-bottom: 20px;
