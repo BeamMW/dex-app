@@ -53,7 +53,6 @@ const AssetCard = styled.div`
 const AssetHeader = styled.div`
   display: flex;
   align-items: center;
-  gap: 16px;
   margin-bottom: 16px;
   padding-bottom: 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
@@ -66,6 +65,7 @@ const IconWrap = styled.div`
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  margin-right: 6px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 50%;
 `;

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { IAsset, IPoolCard } from '@core/types';
 import { Section } from '@app/shared/components/index';
 import AssetLabel from '@app/shared/components/AssetLabel';
@@ -89,11 +90,15 @@ const PlainTitle = styled.div`
   text-transform: uppercase;
   color: var(--color-white);
 `;
+const AssetInfoLink = styled.div`
+  cursor: pointer;
+`;
 
 const PoolStat = ({
   data, lp, showFavorite = false, plain = false,
 }: PoolStatType) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const favorites = useSelector(selectFavorites());
   const nameToken1 = truncate(data?.metadata1?.UN || `Token ${data?.aid1 ?? ''}`);
   const nameToken2 = truncate(data?.metadata2?.UN || `Token ${data?.aid2 ?? ''}`);
@@ -106,9 +111,15 @@ const PoolStat = ({
     <>
       <AmountWrapper>
         <SideLeftWrap>
-          <AssetLabel title={nameToken1} assets_id={data.aid1} id variant="predict" />
-          <AssetLabel title={nameToken2} assets_id={data.aid2} id variant="predict" />
-          <AssetLabel title={nameLPToken} assets_id={lpId} id variant="predict" />
+          <AssetInfoLink onClick={() => navigate(`/asset/${data.aid1}`)}>
+            <AssetLabel title={nameToken1} assets_id={data.aid1} id variant="predict" />
+          </AssetInfoLink>
+          <AssetInfoLink onClick={() => navigate(`/asset/${data.aid2}`)}>
+            <AssetLabel title={nameToken2} assets_id={data.aid2} id variant="predict" />
+          </AssetInfoLink>
+          <AssetInfoLink onClick={() => navigate(`/asset/${lpId}`)}>
+            <AssetLabel title={nameLPToken} assets_id={lpId} id variant="predict" />
+          </AssetInfoLink>
         </SideLeftWrap>
         <SideRightWrap>
           <AssetAmount>{formatNumber(fromGroths(data.tok1))}</AssetAmount>
