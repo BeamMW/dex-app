@@ -295,7 +295,10 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
     if (manualKind !== null) {
       return matchedPools.find((p) => p.kind === manualKind) || matchedPools[0];
     }
-    if (data && matchedPools.some((p) => p.kind === data.kind)) {
+    const dataIsCurrentPair = data && matchedPools.some(
+      (p) => p.aid1 === data.aid1 && p.aid2 === data.aid2 && p.kind === data.kind,
+    );
+    if (dataIsCurrentPair) {
       return data;
     }
     return matchedPools[0];
