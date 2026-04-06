@@ -2,6 +2,7 @@ import React, {
   ReactElement, useEffect, useRef, useState,
 } from 'react';
 import { styled } from '@linaria/react';
+import { textButtonReset } from '../../styles/linariaShared';
 
 import { css } from '@linaria/core';
 import Angle from './Angle';
@@ -47,11 +48,7 @@ const ButtonStyled = styled.button`
   line-height: 26px;
   cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
   padding: 0;
-  border: none;
-  background-color: transparent;
-  text-decoration: none;
-  color: white;
-  white-space: nowrap;
+  ${textButtonReset}
 
   &:hover,
   &:active {

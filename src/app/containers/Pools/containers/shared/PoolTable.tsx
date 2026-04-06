@@ -3,6 +3,7 @@ import { styled } from '@linaria/react';
 import { IPoolCard } from '@core/types';
 import { fromGroths, getPoolKind, truncate } from '@core/appUtils';
 import { poolHasImposterAsset } from '@app/shared/constants';
+import { iconButtonReset, rowCenter, warningBadgeBase } from '../../../../styles/linariaShared';
 import { IconFavorite, IconFavoriteFilled } from '@app/shared/icons';
 import AssetIcon from '@app/shared/components/AssetsIcon';
 
@@ -24,12 +25,7 @@ const Table = styled.table`
 `;
 
 const FavButton = styled.button`
-  border: none;
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
+  ${iconButtonReset}
 `;
 
 const Row = styled.tr`
@@ -37,33 +33,23 @@ const Row = styled.tr`
 `;
 
 const PairCell = styled.div`
-  display: flex;
-  align-items: center;
+  ${rowCenter}
   gap: 8px;
 `;
 
 const PairText = styled.div`
-  display: flex;
-  align-items: center;
+  ${rowCenter}
   gap: 4px;
 `;
 
 const WarningBadge = styled.span`
-  color: #ff5f5f;
-  border: 1px solid rgba(255, 95, 95, 0.55);
-  border-radius: 999px;
-  font-size: 10px;
-  font-weight: 700;
+  ${warningBadgeBase}
   padding: 1px 6px;
   margin-left: 12px;
-  text-transform: uppercase;
-  white-space: nowrap;
-  flex-shrink: 0;
 `;
 
 const TokenCell = styled.div`
-  display: flex;
-  align-items: center;
+  ${rowCenter}
   gap: 8px;
 `;
 

@@ -9,6 +9,7 @@ import * as mainActions from '@app/containers/Pools/store/actions';
 import {
   IconExchangeTrade, IconFavorite, IconFavoriteFilled, IconShieldChecked,
 } from '@app/shared/icons';
+import { iconButtonReset, rowCenter } from '../../../../styles/linariaShared';
 import { fromGroths, getPoolKind, truncate } from '@core/appUtils';
 import { IPoolCard } from '@core/types';
 import AssetIcon from '@app/shared/components/AssetsIcon';
@@ -38,26 +39,18 @@ const Row = styled.tr`
   cursor: pointer;
 `;
 const FavButton = styled.button`
-  border: none;
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
+  ${iconButtonReset}
 `;
 const PairCell = styled.div`
-  display: flex;
-  align-items: center;
+  ${rowCenter}
   gap: 8px;
 `;
 const PairText = styled.div`
-  display: flex;
-  align-items: center;
+  ${rowCenter}
   gap: 4px;
 `;
 const TokenCell = styled.div`
-  display: flex;
-  align-items: center;
+  ${rowCenter}
   gap: 8px;
 `;
 

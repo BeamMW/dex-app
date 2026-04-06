@@ -1,13 +1,7 @@
+@use '../../../../styles/scss/stat-row.shared' as statRow;
+
 .amount-wrapper {
-  display: flex;
-  .amount-title {
-    margin-right: 24px;
-    max-width: 100px;
-    width: 100%;
-  }
-  .amount-value {
-    color: var(--color-green);
-  }
+  @include statRow.stat-row('amount-title', 'amount-value', null, 100px, 100%);
 }
 .assets-selector-wrapper {
   display: flex;
@@ -20,5 +14,5 @@
   outline: none;
   border-radius: 10px;
   padding-right: 15px;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--color-opasity-0-1);
 }

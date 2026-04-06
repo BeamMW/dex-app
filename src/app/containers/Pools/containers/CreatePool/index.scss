@@ -1,168 +1,64 @@
+@use '../../../../styles/scss/react-select.shared' as reactSelect;
+@use '../../../../styles/scss/stat-row.shared' as statRow;
+
 .custom-select {
   &__control {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    border: none !important;
-    border-radius: 10px;
+    @include reactSelect.control-base(var(--color-opasity-0-1), 10px);
     max-width: 412px !important;
     width: 100% !important;
     min-width: 300px !important;
     height: 56px !important;
-    cursor: pointer !important;
     &--menu-is-open {
       box-shadow: (0 0 0 1px) var(--color-green) !important;
     }
   }
-  &__input-container {
-    color: white !important;
-  }
-  &__input-container--has-value {
-    color: white !important;
-    height: 38px;
-  }
-  &__indicator-separator {
-    display: none;
-  }
-  &__indicators {
-    padding: 8px 16px 7px 0 !important;
-  }
-  &__indicator,
-  &__indicator-clear-value {
-    padding: 0 !important;
-    cursor: pointer;
-  }
+  @include reactSelect.input-colors(38px);
+  @include reactSelect.indicator-controls;
   &__menu {
     background-color: var(--color-select-list) !important;
     //box-shadow:( 0 0 0 1px ) var(--color-green) !important;
     border-radius: 20px !important;
     padding: 20px !important;
-
-    &-list::-webkit-scrollbar {
-      width: 4px;
-      height: 0;
-    }
-    &-list::-webkit-scrollbar-track {
-      background-color: rgba(255, 255, 255, 0.2) !important;
-      border-radius: 3px !important;
-    }
-    &-list::-webkit-scrollbar-thumb {
-      background-color: rgba(255, 255, 255, 0.2) !important;
-      border-radius: 3px !important;
-    }
-    &-list::-webkit-scrollbar-thumb:hover {
-      background: var(--color-green) !important;
-      border-radius: 3px !important;
-    }
+    @include reactSelect.scrollbar-base;
   }
   &__option {
     padding: 0;
     margin-bottom: 20px !important;
-    &--is-focused,
-    &--is-selected {
-      background-color: transparent !important;
-      color: var(--color-green) !important;
-      cursor: pointer !important;
-    }
+    @include reactSelect.option-active-state;
   }
-  &__single-value {
-    font-family: 'ProximaNova', sans-serif !important;
-    font-style: normal !important;
-    font-weight: 400 !important;
-    font-size: 20px !important;
-    line-height: 20px !important;
-    color: white !important;
-    text-transform: uppercase;
-  }
-  &__placeholder {
-    font-family: 'ProximaNova', sans-serif !important;
-    font-style: normal !important;
-    font-weight: 400 !important;
-    font-size: 20px !important;
-    line-height: 20px !important;
-    color: white !important;
-  }
+  @include reactSelect.simple-value-and-placeholder('ProximaNova', 20px, 20px, uppercase);
 }
 .custom-kind {
   &__control {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    border: none !important;
-    border-radius: 10px;
+    @include reactSelect.control-base(var(--color-opasity-0-1), 10px);
     max-width: 167px !important;
     width: 100% !important;
     height: 42px !important;
-    cursor: pointer !important;
     &--menu-is-open {
       box-shadow: (0 0 0 1px) var(--color-green) !important;
     }
   }
-  &__input-container {
-    color: white !important;
-  }
-  &__input-container--has-value {
-    color: white !important;
-    height: 38px;
-  }
-  &__indicator-separator {
-    display: none;
-  }
-  &__indicators {
-    padding: 8px 16px 7px 0 !important;
-  }
-  &__indicator,
-  &__indicator-clear-value {
-    padding: 0 !important;
-    cursor: pointer;
-  }
+  @include reactSelect.input-colors(38px);
+  @include reactSelect.indicator-controls;
   &__menu {
     background-color: rgba(0, 0, 0, 0.9) !important;
     box-shadow: none !important;
     border-radius: 20px !important;
     padding: 20px 0 0 20px !important;
-
-    &-list::-webkit-scrollbar {
-      width: 4px;
-      height: 0;
-    }
-    &-list::-webkit-scrollbar-track {
-      background-color: rgba(255, 255, 255, 0.2) !important;
-      border-radius: 3px !important;
-    }
-    &-list::-webkit-scrollbar-thumb {
-      background-color: rgba(255, 255, 255, 0.2) !important;
-      border-radius: 3px !important;
-    }
-    &-list::-webkit-scrollbar-thumb:hover {
-      background: var(--color-green) !important;
-      border-radius: 3px !important;
-    }
+    @include reactSelect.scrollbar-base;
   }
   &__option {
     padding: 0;
     margin-bottom: 14px !important;
-    &--is-focused,
-    &--is-selected {
-      background-color: transparent !important;
-      color: var(--color-green) !important;
-      cursor: pointer !important;
-    }
+    @include reactSelect.option-active-state;
   }
-  &__single-value {
-    font-family: 'ProximaNova', sans-serif !important;
-    font-style: normal !important;
-    font-weight: 400 !important;
-    font-size: 14px !important;
-    line-height: 14px !important;
-    color: white !important;
-    text-transform: uppercase;
-  }
-  &__placeholder {
-    font-family: 'ProximaNova', sans-serif !important;
-    font-style: normal !important;
-    font-weight: 400 !important;
-    font-size: 14px !important;
-    line-height: 14px !important;
-    color: white !important;
-    text-transform: lowercase;
-  }
+  @include reactSelect.simple-value-and-placeholder(
+    'ProximaNova',
+    14px,
+    14px,
+    uppercase,
+    lowercase
+  );
 }
 .custom-filter {
   width: 100%;
@@ -170,42 +66,24 @@
     z-index: 10050 !important;
   }
   &__control {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    border: none !important;
+    @include reactSelect.control-base(var(--color-opasity-0-1), 170px);
     width: 100% !important;
     max-width: 100% !important;
     min-width: 200px !important;
     overflow: hidden !important;
     border-radius: 170px !important;
     height: 41px !important;
-    cursor: pointer !important;
     &--menu-is-open,
     &--is-focused {
       box-shadow: (0 0 0 1px) var(--color-green) !important;
       width: 100% !important;
     }
   }
-  &__input-container {
-    color: white !important;
-  }
-  &__input-container--has-value {
-    color: white !important;
-    height: 41px;
-  }
-  &__indicator-separator {
-    display: none;
-  }
-  &__indicators {
-    padding: 8px 16px 7px 0 !important;
-  }
-  &__indicator,
-  &__indicator-clear-value {
-    padding: 0 !important;
-    cursor: pointer;
-  }
+  @include reactSelect.input-colors(41px);
+  @include reactSelect.indicator-controls;
 
   &__multi-value {
-    background-color: rgba(255, 255, 255, 0.05) !important;
+    background-color: var(--color-opasity-0-1) !important;
     padding: 8px 0 7px 16px !important;
   }
   &__value-container {
@@ -234,27 +112,7 @@
       overflow-x: hidden !important;
       overflow-y: auto !important;
     }
-    &-list::-webkit-scrollbar {
-      width: 4px !important;
-      height: 0 !important;
-    }
-    &-list::-webkit-scrollbar-track {
-      //background-color: rgba(255, 255, 255, 0.2) !important;
-      border-radius: 3px !important;
-    }
-    &-list::-webkit-scrollbar-track-piece {
-      //background-color: rgba(255, 255, 255, 0.2) !important;
-      border-radius: 3px !important;
-    }
-    &-list::-webkit-scrollbar-thumb {
-      background-color: rgba(255, 255, 255, 0.2) !important;
-      border-radius: 3px !important;
-    }
-
-    &-list::-webkit-scrollbar-thumb:hover {
-      background: var(--color-green) !important;
-      border-radius: 3px !important;
-    }
+    @include reactSelect.scrollbar-filter;
   }
   &__option {
     display: block !important;
@@ -265,20 +123,10 @@
     overflow: hidden !important;
     overflow-x: hidden !important;
     min-width: 0 !important;
-    &--is-focused,
-    &--is-selected {
-      background-color: transparent !important;
-      color: var(--color-green) !important;
-      cursor: pointer !important;
-    }
+    @include reactSelect.option-active-state;
   }
   &__single-value {
-    font-family: 'SFProDisplay', sans-serif !important;
-    font-style: normal !important;
-    font-weight: 400 !important;
-    font-size: 14px !important;
-    line-height: 17px !important;
-    color: white !important;
+    @include reactSelect.text-base('SFProDisplay', 14px, 17px);
     max-width: 100% !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -290,24 +138,12 @@
     }
   }
   &__placeholder {
-    font-family: 'SFProDisplay', sans-serif !important;
-    font-style: normal !important;
-    font-weight: 400 !important;
-    font-size: 14px !important;
-    line-height: 14px !important;
-    color: white !important;
+    @include reactSelect.text-base('SFProDisplay', 14px, 14px);
   }
 }
 
 .price-wrapper {
-  display: flex;
-  font-size: 18px;
-  .price-title {
-    margin-right: 24px;
-  }
-  .price-value {
-    color: var(--color-green);
-  }
+  @include statRow.stat-row('price-title', 'price-value', 18px);
 }
 
 .information {

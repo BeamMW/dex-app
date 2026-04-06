@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { styled } from '@linaria/react';
 import { IOptions } from '@core/types';
+import { rowCenter, warningBadgeBase } from '../../../styles/linariaShared';
 import AssetIcon from '@app/shared/components/AssetsIcon';
 import { IconDropdownDown } from '@app/shared/icons';
 import AssetSearchModal from './AssetSearchModal';
@@ -20,8 +21,7 @@ interface AssetSelectorButtonProps {
 }
 
 const SelectorBtn = styled.button`
-  display: flex;
-  align-items: center;
+  ${rowCenter}
   gap: 8px;
   width: 100%;
   height: 41px;
@@ -61,23 +61,15 @@ const Placeholder = styled(Label)`
 `;
 
 const ChevronWrap = styled.span`
-  display: flex;
-  align-items: center;
+  ${rowCenter}
   flex-shrink: 0;
   opacity: 0.5;
 `;
 
 const WarningBadge = styled.span`
-  color: #ff5f5f;
-  border: 1px solid rgba(255, 95, 95, 0.55);
-  border-radius: 999px;
-  font-size: 10px;
-  font-weight: 700;
+  ${warningBadgeBase}
   padding: 1px 6px;
   margin-right: 10px;
-  text-transform: uppercase;
-  white-space: nowrap;
-  flex-shrink: 0;
 `;
 
 const AssetSelectorButton: React.FC<AssetSelectorButtonProps> = ({

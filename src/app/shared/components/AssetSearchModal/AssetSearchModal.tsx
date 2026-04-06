@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { IAsset, IOptions } from '@core/types';
 import { assetShortLabel } from '@core/appUtils';
+import { iconButtonReset, rowCenter, warningBadgeBase } from '../../../styles/linariaShared';
 import { selectAssetsList, selectFavoriteAssets, selectPoolsList } from '@app/containers/Pools/store/selectors';
 import * as mainActions from '@app/containers/Pools/store/actions';
 import {
@@ -73,12 +74,8 @@ const ModalTitle = styled.span`
 `;
 
 const CloseButton = styled.button`
-  background: transparent;
-  border: none;
-  cursor: pointer;
+  ${iconButtonReset}
   padding: 4px;
-  display: flex;
-  align-items: center;
   opacity: 0.5;
   &:hover { opacity: 1; }
 `;
@@ -187,15 +184,8 @@ const AssetIdBadge = styled.span`
 `;
 
 const WarningBadge = styled.span`
-  font-size: 10px;
-  font-weight: 700;
-  color: #ff5f5f;
-  border: 1px solid rgba(255, 95, 95, 0.55);
-  border-radius: 999px;
+  ${warningBadgeBase}
   padding: 1px 7px;
-  white-space: nowrap;
-  flex-shrink: 0;
-  text-transform: uppercase;
 `;
 
 const RowAction = styled.span`
@@ -208,12 +198,8 @@ const RowAction = styled.span`
 `;
 
 const StarButton = styled.button`
-  background: transparent;
-  border: none;
-  cursor: pointer;
+  ${iconButtonReset}
   padding: 4px;
-  display: flex;
-  align-items: center;
   flex-shrink: 0;
   opacity: 0.6;
   &:hover { opacity: 1; }
@@ -236,8 +222,7 @@ const FilterBtn = styled.button<{ active: boolean }>`
   text-transform: uppercase;
   padding: 4px 10px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
+  ${rowCenter}
   gap: 4px;
   white-space: nowrap;
 `;

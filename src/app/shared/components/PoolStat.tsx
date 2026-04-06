@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { IAsset, IPoolCard } from '@core/types';
 import { Section } from '@app/shared/components/index';
 import AssetLabel from '@app/shared/components/AssetLabel';
+import { iconButtonReset, rowCenter } from '../../styles/linariaShared';
 import {
   fromGroths, truncate, formatNumber, getPoolKind,
 } from '@core/appUtils';
@@ -48,8 +49,7 @@ const SideRightWrap = styled.div`
 `;
 const HeaderMeta = styled.div`
   width: 100%;
-  display: flex;
-  align-items: center;
+  ${rowCenter}
   justify-content: flex-end;
   gap: 8px;
 `;
@@ -64,13 +64,8 @@ const FeeBadge = styled.div`
   color: white;
 `;
 const FavoriteButton = styled.button`
-  display: flex;
-  align-items: center;
+  ${iconButtonReset}
   justify-content: center;
-  border: none;
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
 `;
 const PlainWrapper = styled.div`
   width: 100%;
