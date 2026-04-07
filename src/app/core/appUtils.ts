@@ -1,7 +1,7 @@
 import {
   IAsset, IMetadataPairs, IOptions, IPoolCard, IPredict, ITxStatus, Kind,
 } from '@core/types';
-import { ASSET_BEAM, GROTHS_IN_BEAM } from '@app/shared/constants';
+import { ASSET_BEAM, GROTHS_IN_BEAM, poolHasRewards } from '@app/shared/constants';
 import connector from '@app/core/connector';
 import { start } from '@app/shared/store/saga';
 import { toast } from 'react-toastify';
@@ -187,6 +187,9 @@ export function onFilter(data: IPoolCard[], filter = 'all', favorite: IPoolCard[
     }
     case 'liquid': {
       return data.filter((el) => el.ctl);
+    }
+    case 'rewards': {
+      return data.filter((el) => poolHasRewards(el['lp-token'] || el.lp_token));
     }
     case 'empty': {
       return data.filter((el) => !el.ctl);

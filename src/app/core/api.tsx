@@ -3,6 +3,7 @@ import {
   IAddLiquidity, ICreatePool, ITrade, IWithdraw,
 } from '@core/types';
 import { CID } from '@app/shared/constants';
+import { ShaderRuntimeConfig } from '@app/core/shaderRegistry';
 
 function isWalletLockedError(error: unknown): boolean {
   return error instanceof Error && error.message === 'Wallet is locked';
@@ -24,6 +25,26 @@ async function callApiWithRecovery(method: string, params: Record<string, any>) 
     await connector.callApi('wallet_status');
     return connector.callApi(method, params);
   }
+}
+
+interface ContractCallConfig {
+  cid?: string;
+  contractBytes?: number[] | null;
+}
+
+function resolveCallConfig(config?: ContractCallConfig, fallbackCid: string = CID): Required<ContractCallConfig> {
+  return {
+    cid: config?.cid || fallbackCid,
+    contractBytes: config?.contractBytes || null,
+  };
+}
+
+export function toContractCallConfig(shader: ShaderRuntimeConfig | null | undefined): ContractCallConfig | undefined {
+  if (!shader) return undefined;
+  return {
+    cid: shader.cid,
+    contractBytes: shader.contractBytes,
+  };
 }
 
 /**
@@ -67,13 +88,21 @@ export async function LoadAssetsList<T = any>(): Promise<T> {
   return assets as unknown as T;
 }
 
-export async function LoadPoolsList<T = any>(payload?): Promise<T> {
-  const { shaderResult } = await invokeRaw(`action=pools_view,cid=${CID}`, payload || null);
+export async function LoadPoolsList<T = any>(config?: ContractCallConfig): Promise<T> {
+  const { cid, contractBytes } = resolveCallConfig(config);
+  const { shaderResult } = await invokeRaw(`action=pools_view,cid=${cid}`, contractBytes);
   return shaderResult?.res as unknown as T;
 }
 
-export async function CreatePoolApi<T = any>([{ aid1 = 180, aid2 = 210, kind = 1 }]: ICreatePool[]): Promise<T> {
-  const { rawData } = await invokeRaw(`action=pool_create,aid1=${aid1},aid2=${aid2},kind=${kind},cid=${CID}`);
+export async function CreatePoolApi<T = any>(
+  [{ aid1 = 180, aid2 = 210, kind = 1 }]: ICreatePool[],
+  config?: ContractCallConfig,
+): Promise<T> {
+  const { cid, contractBytes } = resolveCallConfig(config);
+  const { rawData } = await invokeRaw(
+    `action=pool_create,aid1=${aid1},aid2=${aid2},kind=${kind},cid=${cid}`,
+    contractBytes,
+  );
   const txid = rawData ? await makeTx(rawData) : undefined;
   return { txid } as unknown as T;
 }
@@ -85,10 +114,12 @@ export async function AddLiquidityApi<T = any>({
   val1,
   val2,
   bPredictOnly = 1,
-}: IAddLiquidity): Promise<T> {
+}: IAddLiquidity, config?: ContractCallConfig): Promise<T> {
+  const { cid, contractBytes } = resolveCallConfig(config);
   const { shaderResult, rawData } = await invokeRaw(
     `action=pool_add_liquidity,aid1=${aid1},aid2=${aid2},kind=${kind},`
-    + `val1=${val1},val2=${val2},bPredictOnly=${bPredictOnly},cid=${CID}`,
+    + `val1=${val1},val2=${val2},bPredictOnly=${bPredictOnly},cid=${cid}`,
+    contractBytes,
   );
   if (rawData?.length) {
     const txid = await makeTx(rawData);
@@ -99,10 +130,12 @@ export async function AddLiquidityApi<T = any>({
 
 export async function TradePoolApi<T = any>({
   aid1, aid2, kind, val1_buy, val2_pay, bPredictOnly = 1,
-}: ITrade): Promise<T> {
+}: ITrade, config?: ContractCallConfig): Promise<T> {
+  const { cid, contractBytes } = resolveCallConfig(config);
   const { shaderResult, rawData } = await invokeRaw(
     `action=pool_trade,aid1=${aid1},aid2=${aid2},kind=${kind},val1_buy=${val1_buy || 0},`
-    + ` val2_pay=${val2_pay || 0},bPredictOnly=${bPredictOnly},cid=${CID}`,
+    + ` val2_pay=${val2_pay || 0},bPredictOnly=${bPredictOnly},cid=${cid}`,
+    contractBytes,
   );
   if (bPredictOnly === 0 && rawData?.length) {
     const txid = await makeTx(rawData);
@@ -113,13 +146,68 @@ export async function TradePoolApi<T = any>({
 
 export async function WithdrawApi<T = any>({
   aid1, aid2, kind, ctl, bPredictOnly = 1,
-}: IWithdraw): Promise<T> {
+}: IWithdraw, config?: ContractCallConfig): Promise<T> {
+  const { cid, contractBytes } = resolveCallConfig(config);
   const { shaderResult, rawData } = await invokeRaw(
-    `action=pool_withdraw,aid1=${aid1},aid2=${aid2},kind=${kind},ctl=${ctl},bPredictOnly=${bPredictOnly},cid=${CID}`,
+    `action=pool_withdraw,aid1=${aid1},aid2=${aid2},kind=${kind},ctl=${ctl},bPredictOnly=${bPredictOnly},cid=${cid}`,
+    contractBytes,
   );
   if (rawData?.length) {
     const txid = await makeTx(rawData);
     return { txid } as unknown as T;
   }
   return (shaderResult ?? {}) as unknown as T;
+}
+
+export async function ViewAccumulatorParamsApi<T = any>(config?: ContractCallConfig): Promise<T> {
+  const { cid, contractBytes } = resolveCallConfig(config);
+  const { shaderResult } = await invokeRaw(`action=view_params,cid=${cid}`, contractBytes);
+  return (shaderResult?.res ?? shaderResult ?? {}) as unknown as T;
+}
+
+export async function ViewAccumulatorUserApi<T = any>(config?: ContractCallConfig): Promise<T> {
+  const { cid, contractBytes } = resolveCallConfig(config);
+  const { shaderResult } = await invokeRaw(`action=user_view,cid=${cid}`, contractBytes);
+  return (shaderResult ?? {}) as unknown as T;
+}
+
+export async function PredictAccumulatorYieldApi<T = any>(
+  payload: { amountLpToken: number; lockPeriods: number; isNph?: number },
+  config?: ContractCallConfig,
+): Promise<T> {
+  const { cid, contractBytes } = resolveCallConfig(config);
+  const isNph = payload.isNph || 0;
+  const { shaderResult } = await invokeRaw(
+    `action=get_yield,cid=${cid},amountLpToken=${payload.amountLpToken},lockPeriods=${payload.lockPeriods},isNph=${isNph}`,
+    contractBytes,
+  );
+  return (shaderResult ?? {}) as unknown as T;
+}
+
+export async function LockAccumulatorApi<T = any>(
+  payload: { amountLpToken: number; lockPeriods: number; isNph?: number },
+  config?: ContractCallConfig,
+): Promise<T> {
+  const { cid, contractBytes } = resolveCallConfig(config);
+  const isNph = payload.isNph || 0;
+  const { shaderResult, rawData } = await invokeRaw(
+    `action=user_lock,cid=${cid},amountLpToken=${payload.amountLpToken},lockPeriods=${payload.lockPeriods},isNph=${isNph}`,
+    contractBytes,
+  );
+  const txid = rawData?.length ? await makeTx(rawData) : undefined;
+  return { ...(shaderResult || {}), txid } as unknown as T;
+}
+
+export async function UpdateAccumulatorUserApi<T = any>(
+  payload: { withdrawBeamX: number; withdrawLpToken: number; hEnd: number; isNph?: number },
+  config?: ContractCallConfig,
+): Promise<T> {
+  const { cid, contractBytes } = resolveCallConfig(config);
+  const isNph = payload.isNph || 0;
+  const { shaderResult, rawData } = await invokeRaw(
+    `action=user_update,cid=${cid},withdrawBeamX=${payload.withdrawBeamX},withdrawLpToken=${payload.withdrawLpToken},hEnd=${payload.hEnd},isNph=${isNph}`,
+    contractBytes,
+  );
+  const txid = rawData?.length ? await makeTx(rawData) : undefined;
+  return { ...(shaderResult || {}), txid } as unknown as T;
 }

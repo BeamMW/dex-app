@@ -142,7 +142,7 @@ const ReactSelect = ({
       }}
       styles={userStyles}
       {...rest}
-      {...(customPrefix === 'custom-filter'
+      {...((customPrefix === 'custom-filter' || customPrefix === 'custom-asset-select')
         ? {
           menuPortalTarget: typeof document !== 'undefined' ? document.body : null,
           menuPosition: 'fixed' as const,

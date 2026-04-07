@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { styled } from '@linaria/react';
 import { IPoolCard } from '@core/types';
 import { fromGroths, getPoolKind, truncate } from '@core/appUtils';
-import { poolHasImposterAsset } from '@app/shared/constants';
+import { poolHasImposterAsset, poolHasRewards } from '@app/shared/constants';
 import { iconButtonReset, rowCenter, warningBadgeBase } from '../../../../styles/linariaShared';
 import { IconFavorite, IconFavoriteFilled } from '@app/shared/icons';
 import AssetIcon from '@app/shared/components/AssetsIcon';
@@ -46,6 +46,13 @@ const WarningBadge = styled('span')`
   ${warningBadgeBase}
   padding: 1px 6px;
   margin-left: 12px;
+`;
+
+const RewardsBadge = styled(WarningBadge)`
+  margin-left: 8px;
+  color: var(--color-purple);
+  border-color: rgba(162, 98, 247, 0.55);
+  background: rgba(162, 98, 247, 0.16);
 `;
 
 const TokenCell = styled('div')`
@@ -96,6 +103,7 @@ export const PoolTable: React.FC<PoolTableProps> = ({
       <tbody>
         {rows.map((pool) => {
           const hasImposterWarning = poolHasImposterAsset(pool.aid1, pool.aid2);
+          const hasRewards = poolHasRewards(pool['lp-token'] || pool.lp_token);
           return (
             <Row
               key={`${pool.aid1}_${pool.aid2}_${pool.kind}`}
@@ -133,6 +141,7 @@ export const PoolTable: React.FC<PoolTableProps> = ({
                     } (id:${pool.aid2})`}
                   </PairText>
                   {hasImposterWarning && <WarningBadge>fake asset</WarningBadge>}
+                  {hasRewards && <RewardsBadge>rewards</RewardsBadge>}
                 </PairCell>
               </td>
               <td>

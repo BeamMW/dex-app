@@ -16,6 +16,8 @@ const currentLpTokenSelector = createSelector(selectMain, (state) => state.curre
 const isLoadingSelector = createSelector(selectMain, (state) => state.isLoading);
 const myPoolsSelector = createSelector(selectMain, (state) => state.myPools);
 const isHeadlessSelector = createSelector(selectMain, (state) => state.isHeadless);
+const shaderRuntimeMapSelector = createSelector(selectMain, (state) => state.shaderRuntimeMap);
+const rewardsSelector = createSelector(selectMain, (state) => state.rewards);
 
 // Keep function signatures for backward compatibility while reusing stable selectors.
 export const selectAssetsList = () => assetsListSelector;
@@ -31,3 +33,5 @@ export const selectCurrentLPToken = () => currentLpTokenSelector;
 export const selectIsLoading = () => isLoadingSelector;
 export const selectMyPools = () => myPoolsSelector;
 export const selectIsHeadless = () => isHeadlessSelector;
+export const selectShaderRuntimeMap = () => shaderRuntimeMapSelector;
+export const selectRewards = () => rewardsSelector;

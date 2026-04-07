@@ -21,7 +21,6 @@ export const TopNav = () => (
       {[
         { to: ROUTES.NAV.TRADE, label: 'Trade' },
         { to: ROUTES.NAV.EXPLORE, label: 'Explore' },
-        { to: ROUTES.NAV.POOL, label: 'Pool' },
         { to: ROUTES.NAV.MY, label: 'My' },
       ].map((item) => (
         <NavLink

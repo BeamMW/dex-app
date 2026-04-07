@@ -9,3 +9,4 @@ export * from './ExplorePools';
 export * from './PoolView';
 export * from './MyPools';
 export * from './AssetInfo';
+export * from './AccumulatorRewards';

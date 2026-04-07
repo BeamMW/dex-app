@@ -106,6 +106,7 @@ export const ExplorePools = () => {
   const tableEmptyMessage = useMemo(() => {
     if (currentFilter === 'fav') return 'No favorite pools';
     if (currentFilter === 'created') return 'No created pools';
+    if (currentFilter === 'rewards') return 'No rewards pools';
     return 'No pools found';
   }, [currentFilter]);
 

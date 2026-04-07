@@ -20,6 +20,16 @@ const initialState: DexStateType = {
   isLoading: false,
   myPools: [],
   isHeadless: true,
+  shaderRuntimeMap: null,
+  rewards: {
+    isAvailable: false,
+    isLoading: false,
+    error: null,
+    lpTokenBalance: 0,
+    estimatedReward: 0,
+    lockOptions: [],
+    locks: [],
+  },
 };
 
 const reducer = createReducer<DexStateType, Action>(initialState)
@@ -65,5 +75,14 @@ const reducer = createReducer<DexStateType, Action>(initialState)
   }))
   .handleAction(actions.setIsHeadless, (state, action) => produce(state, (nexState) => {
     nexState.isHeadless = action.payload;
+  }))
+  .handleAction(actions.setShaderRuntimeMap, (state, action) => produce(state, (nexState) => {
+    nexState.shaderRuntimeMap = action.payload;
+  }))
+  .handleAction(actions.setRewardsState, (state, action) => produce(state, (nexState) => {
+    nexState.rewards = {
+      ...nexState.rewards,
+      ...action.payload,
+    };
   }));
 export { reducer as MainReducer };

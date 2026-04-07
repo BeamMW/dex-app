@@ -12,6 +12,7 @@ export const ROUTES = {
     ADD_LIQUIDITY: '/add_liquidity',
     TRADE_POOL: '/trade_pool/',
     WITHDRAW_POOL: '/withdraw_pool/',
+    ACCUMULATOR_REWARDS: '/accumulator_rewards/',
   },
 };
 
@@ -29,5 +30,6 @@ export const ROUTES_PATH = {
     ADD_LIQUIDITY: '/add_liquidity',
     TRADE_POOL: '/trade_pool/',
     WITHDRAW_POOL: '/withdraw_pool/',
+    ACCUMULATOR_REWARDS: '/accumulator_rewards/',
   },
 };

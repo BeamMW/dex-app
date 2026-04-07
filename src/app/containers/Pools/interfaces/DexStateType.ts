@@ -1,6 +1,7 @@
 import {
-  IAsset, IOptions, IPoolCard, IPredict, ITxStatus,
+  IAccumulatorRewardsState, IAsset, IOptions, IPoolCard, IPredict, ITxStatus,
 } from '@core/types';
+import { ShaderRuntimeMap } from '@app/core/shaderRegistry';
 
 export interface DexStateType {
   assetsList: IAsset[];
@@ -17,4 +18,6 @@ export interface DexStateType {
   isLoading: boolean;
   myPools: IPoolCard[];
   isHeadless: boolean;
+  shaderRuntimeMap: ShaderRuntimeMap | null;
+  rewards: IAccumulatorRewardsState;
 }

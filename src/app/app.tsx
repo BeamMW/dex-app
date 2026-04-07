@@ -18,7 +18,7 @@ import {
   WithdrawPool,
   SwapPoolsHome,
   ExplorePools,
-  PoolView,
+  AccumulatorRewards,
   MyPools,
   AssetInfo,
 } from '@app/containers';
@@ -49,7 +49,7 @@ const routes = [
   },
   {
     path: ROUTES.NAV.POOL,
-    element: <PoolView />,
+    element: <Navigate to={ROUTES.NAV.TRADE} replace />,
   },
   {
     path: ROUTES.NAV.MY,
@@ -70,6 +70,10 @@ const routes = [
   {
     path: ROUTES.POOLS.WITHDRAW_POOL,
     element: <WithdrawPool />,
+  },
+  {
+    path: ROUTES.POOLS.ACCUMULATOR_REWARDS,
+    element: <AccumulatorRewards />,
   },
   {
     path: '/asset/:id',

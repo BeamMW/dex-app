@@ -29,13 +29,14 @@ import {
   selectOptions,
   selectPredirect,
   selectPoolsList,
+  selectRewards,
 } from '@app/containers/Pools/store/selectors';
 import {
   CancelIcon, DoneIcon, IconExchange, IconReceive, IconShieldChecked,
 } from '@app/shared/icons';
 import {
-  BEAM_ID, BEAMX_ID, ROUTES, titleSections,
-  getRealAssetIdForFake, isImposterAsset,
+  BEAM_ID, BEAMX_ID, REWARDS_DEV_MODE, ROUTES, titleSections,
+  getRealAssetIdForFake, isImposterAsset, poolHasRewards,
 } from '@app/shared/constants';
 import AssetLabel from '@app/shared/components/AssetLabel';
 import { useNavigate } from 'react-router-dom';
@@ -237,6 +238,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   const pools = useSelector(selectPoolsList());
   const options = useSelector(selectOptions());
   const predictData = useSelector(selectPredirect());
+  const rewards = useSelector(selectRewards());
   const [currentToken, setCurrentToken] = useState<number | null>(data?.aid1 ?? null);
   const [secondToken, setSecondToken] = useState<number | null>(data?.aid2 ?? null);
   const [currentLPToken, setCurrentLPToken] = useState(null);
@@ -437,6 +439,17 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   }, [amountSendInput.value, currentToken, secondToken, lastChangedInput, manualKind]);
 
   const hasActivePool = !!activePool;
+  const hasRewardsPool = poolHasRewards(activePool?.['lp-token'] || activePool?.lp_token);
+  const hasRemainingRewardsBalance = rewards.lpTokenBalance > 0
+    || rewards.locks.some((lock) => Number(lock.lpToken || 0) > 0 || Number(lock['avail-BeamX'] || 0) > 0);
+  const showRewardsButton = REWARDS_DEV_MODE
+    ? true
+    : (hasActivePool && hasRewardsPool && rewards.isAvailable && hasRemainingRewardsBalance);
+
+  useEffect(() => {
+    dispatch(mainActions.loadAccumulatorRewards.request({ pool: activePool || null }));
+  }, [dispatch, activePool]);
+
   useEffect(() => {
     if (!walletRequestData || !hasActivePool || lastChangedInput !== 1) return;
     const willFindBest = !manualKind && matchedPools.length > 1;
@@ -984,16 +997,18 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   <>
                     <PoolStat data={activePool} lp={currentLPToken} showFavorite plain />
                     {renderFeeTierRow()}
-                    <EmbeddedActionRow>
+                    <EmbeddedActionRow className="trade-embedded-actions">
                       <Button
+                        className="trade-embedded-action-button"
                         icon={IconShieldChecked}
                         variant="control"
                         onClick={() => navigate(ROUTES.POOLS.ADD_LIQUIDITY)}
                         disabled={!activePool}
                       >
-                        Add Liquidity
+                        add 
                       </Button>
                       <Button
+                        className="trade-embedded-action-button"
                         icon={IconReceive}
                         variant="control"
                         pallete="blue"
@@ -1002,6 +1017,17 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                       >
                         Withdraw
                       </Button>
+                      {showRewardsButton && (
+                        <Button
+                          className="trade-embedded-action-button"
+                          variant="control"
+                          pallete="purple"
+                          onClick={() => navigate(ROUTES.POOLS.ACCUMULATOR_REWARDS)}
+                          disabled={!activePool}
+                        >
+                          $ rewards
+                        </Button>
+                      )}
                     </EmbeddedActionRow>
                   </>
                 ) : (

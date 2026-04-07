@@ -1,6 +1,7 @@
 import { createAction, createAsyncAction } from 'typesafe-actions';
 import {
   IAddLiquidity,
+  IAccumulatorRewardsState,
   IAsset,
   ICreatePool,
   IOptions,
@@ -10,6 +11,7 @@ import {
   ITxStatus,
   IWithdraw,
 } from '@core/types';
+import { ShaderRuntimeMap } from '@app/core/shaderRegistry';
 import { MainActionsTypes } from '@app/containers/Pools/store/constants';
 
 export const setAssetsList = createAction(MainActionsTypes.SET_ASSETS_LIST)<IAsset[]>();
@@ -32,18 +34,20 @@ export const setCurrentLPToken = createAction(MainActionsTypes.SET_CURRENT_LP_TO
 export const setIsLoading = createAction(MainActionsTypes.SET_IS_LOADING)<boolean>();
 export const setMyPools = createAction(MainActionsTypes.SET_MY_POOLS)<IPoolCard[]>();
 export const setIsHeadless = createAction(MainActionsTypes.SET_IS_HEADLESS)<boolean>();
+export const setShaderRuntimeMap = createAction(MainActionsTypes.SET_SHADER_RUNTIME_MAP)<ShaderRuntimeMap>();
+export const setRewardsState = createAction(MainActionsTypes.SET_REWARDS_STATE)<Partial<IAccumulatorRewardsState>>();
 
 export const loadAppParams = createAsyncAction(
   MainActionsTypes.LOAD_PARAMS,
   MainActionsTypes.LOAD_PARAMS_SUCCESS,
   MainActionsTypes.LOAD_PARAMS_FAILURE,
-)<ArrayBuffer, any>();
+)<ShaderRuntimeMap, any>();
 
 export const loadPoolsList = createAsyncAction(
   MainActionsTypes.LOAD_POOLS_LIST,
   MainActionsTypes.LOAD_POOLS_LIST_SUCCESS,
   MainActionsTypes.LOAD_POOLS_LIST_FAILURE,
-)<ArrayBuffer, any>();
+)<null, any>();
 export const onCreatePool = createAsyncAction(
   MainActionsTypes.CREATE_POOL,
   MainActionsTypes.CREATE_POOL_SUCCESS,
@@ -85,3 +89,27 @@ export const onFindBestPool = createAsyncAction(
   MainActionsTypes.FIND_BEST_POOL_SUCCESS,
   MainActionsTypes.FIND_BEST_POOL_FAILURE,
 )<{ pools: IPoolCard[]; aid1: number; aid2: number; val2_pay?: number; val1_buy?: number }, IPoolCard, any>();
+
+export const loadAccumulatorRewards = createAsyncAction(
+  MainActionsTypes.LOAD_ACCUMULATOR_REWARDS,
+  MainActionsTypes.LOAD_ACCUMULATOR_REWARDS_SUCCESS,
+  MainActionsTypes.LOAD_ACCUMULATOR_REWARDS_FAILURE,
+)<{ pool: IPoolCard | null }, any>();
+
+export const predictAccumulatorRewards = createAsyncAction(
+  MainActionsTypes.PREDICT_ACCUMULATOR_REWARDS,
+  MainActionsTypes.PREDICT_ACCUMULATOR_REWARDS_SUCCESS,
+  MainActionsTypes.PREDICT_ACCUMULATOR_REWARDS_FAILURE,
+)<{ amountLpToken: number; lockPeriods: number }, any>();
+
+export const lockAccumulatorRewards = createAsyncAction(
+  MainActionsTypes.LOCK_ACCUMULATOR_REWARDS,
+  MainActionsTypes.LOCK_ACCUMULATOR_REWARDS_SUCCESS,
+  MainActionsTypes.LOCK_ACCUMULATOR_REWARDS_FAILURE,
+)<{ amountLpToken: number; lockPeriods: number }, any>();
+
+export const updateAccumulatorRewards = createAsyncAction(
+  MainActionsTypes.UPDATE_ACCUMULATOR_REWARDS,
+  MainActionsTypes.UPDATE_ACCUMULATOR_REWARDS_SUCCESS,
+  MainActionsTypes.UPDATE_ACCUMULATOR_REWARDS_FAILURE,
+)<{ withdrawBeamX: number; withdrawLpToken: number; hEnd: number }, any>();
