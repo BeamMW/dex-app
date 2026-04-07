@@ -12,7 +12,7 @@ const CID_DAPPNET = '4e0a28b2b2a83b811ad17ba8228b0645dbce2969fd453a68fbc0b60bc88
 // export const CURRENT_NETWORK: string = NETWORK.DAPPNET
 export const CURRENT_NETWORK = NETWORK.MAINNET;
 export const BEAM_ID = 0;
-export const REWARDS_DEV_MODE = true;
+export const REWARDS_DEV_MODE = false;
 
 export const CID = CURRENT_NETWORK === NETWORK.MAINNET ? CID_MAINNET : CID_DAPPNET;
 export const BEAMX_ID = CURRENT_NETWORK === NETWORK.MAINNET ? 7 : 3;
