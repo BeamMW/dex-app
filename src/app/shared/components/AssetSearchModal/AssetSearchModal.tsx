@@ -266,6 +266,7 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
   onClose,
   onSelect,
   excludeAssetId = null,
+  allowedAssetIds = null,
   mode = 'asset-only',
   title,
   onPairSelect,
@@ -377,9 +378,13 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
   }, [allAssets, query, assetsById]);
 
   const displayedAssets = useMemo(() => {
-    if (favTab === 'FAV') return filteredAssets.filter((a) => favoriteSet.has(getAssetId(a)));
-    return filteredAssets;
-  }, [filteredAssets, favTab, favoriteSet]);
+    let list = filteredAssets;
+    if (allowedAssetIds != null) {
+      list = list.filter((a) => allowedAssetIds.has(getAssetId(a)));
+    }
+    if (favTab === 'FAV') return list.filter((a) => favoriteSet.has(getAssetId(a)));
+    return list;
+  }, [filteredAssets, favTab, favoriteSet, allowedAssetIds]);
 
   const poolPairResults = useMemo(() => {
     if (mode !== 'explore' || !query.includes('/')) return [];

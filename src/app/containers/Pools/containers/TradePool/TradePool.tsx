@@ -282,6 +282,16 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
     setLastChangedInput,
   );
 
+  const toPoolPartnerIds = useMemo(() => {
+    if (currentToken === null) return new Set<number>();
+    const partnerIds = (pools || []).flatMap((p) => {
+      if (p.aid1 === currentToken) return [p.aid2];
+      if (p.aid2 === currentToken) return [p.aid1];
+      return [];
+    });
+    return new Set(partnerIds);
+  }, [pools, currentToken]);
+
   const matchedPools = useMemo<IPoolCard[]>(() => {
     if (currentToken === null || secondToken === null) return [];
     return pools
@@ -362,6 +372,14 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
       }
     }
   }, [embedded, pools, options, currentToken, secondToken]);
+
+  useEffect(() => {
+    if (currentToken === null || secondToken === null) return;
+    if (!toPoolPartnerIds.has(secondToken)) {
+      const first = toPoolPartnerIds.values().next().value;
+      if (first !== undefined) setSecondToken(first);
+    }
+  }, [currentToken, secondToken, toPoolPartnerIds]);
 
   useEffect(() => {
     if (!embedded && data?.aid1 && data?.aid2) {
@@ -960,6 +978,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                           value={selectValue(secondToken)}
                           onSelect={onSelectToToken}
                           excludeAssetId={currentToken}
+                          allowedAssetIds={currentToken === null ? null : toPoolPartnerIds}
                           placeholder="Select asset"
                           showWarning={isImposterAsset(secondToken)}
                           isOpen={toSelectorOpen}
@@ -974,11 +993,6 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                     {toAmountError && <ErrorHint>amount exceeds pool reserves</ErrorHint>}
                   </HintRow>
                 </SwapBlock>
-                {!activePool && (
-                  <div style={{ marginTop: 12 }}>
-                    {renderEmbeddedTradeSummary()}
-                  </div>
-                )}
                 <EmbeddedTradeButtonWrap>
                   <Button
                     disabled={isTradeDisabled}
@@ -1034,11 +1048,9 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   <EmptyPoolState>No pool matches this pair and filter combination.</EmptyPoolState>
                 )}
               </RightPanel>
-              {activePool ? (
-                <EmbeddedTradeSummaryBelowPool>
-                  {renderEmbeddedTradeSummary()}
-                </EmbeddedTradeSummaryBelowPool>
-              ) : null}
+              <EmbeddedTradeSummaryBelowPool>
+                {renderEmbeddedTradeSummary()}
+              </EmbeddedTradeSummaryBelowPool>
               </EmbeddedRightStack>
             </EmbeddedLayout>
           </Container>
@@ -1107,6 +1119,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                       value={selectValue(secondToken)}
                       onSelect={onSelectToToken}
                       excludeAssetId={currentToken}
+                      allowedAssetIds={currentToken === null ? null : toPoolPartnerIds}
                       placeholder="Select asset"
                       showWarning={isImposterAsset(secondToken)}
                     isOpen={toSelectorOpen}

@@ -11,6 +11,7 @@ interface AssetSelectorButtonProps {
   onSelect: (option: IOptions) => boolean | void;
   placeholder?: string;
   excludeAssetId?: number | null;
+  allowedAssetIds?: ReadonlySet<number> | null;
   mode?: 'asset-only' | 'explore';
   // controlled open state — when provided, external code manages open/close
   isOpen?: boolean;
@@ -77,6 +78,7 @@ const AssetSelectorButton: React.FC<AssetSelectorButtonProps> = ({
   onSelect,
   placeholder = 'Select asset',
   excludeAssetId = null,
+  allowedAssetIds = null,
   mode = 'asset-only',
   isOpen: controlledIsOpen,
   onOpen,
@@ -127,6 +129,7 @@ const AssetSelectorButton: React.FC<AssetSelectorButtonProps> = ({
         onClose={handleClose}
         onSelect={onSelect}
         excludeAssetId={excludeAssetId}
+        allowedAssetIds={allowedAssetIds}
         mode={mode}
         onPairSelect={onPairSelect}
       />
