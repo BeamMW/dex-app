@@ -29,7 +29,6 @@ const initialState: DexStateType = {
   favoriteAssets: [],
   currentLPToken: null,
   isLoading: false,
-  myPools: [],
   isHeadless: true,
   shaderRuntimeMap: null,
   rewards: initialRewardsState,
@@ -75,9 +74,6 @@ const reducer = createReducer<DexStateType, Action>(initialState)
   }))
   .handleAction(actions.setIsLoading, (state, action) => produce(state, (nexState) => {
     nexState.isLoading = action.payload;
-  }))
-  .handleAction(actions.setMyPools, (state, action) => produce(state, (nexState) => {
-    nexState.myPools = action.payload;
   }))
   .handleAction(actions.setIsHeadless, (state, action) => produce(state, (nexState) => {
     nexState.isHeadless = action.payload;

@@ -85,8 +85,6 @@ export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.
     const ammConfig = (yield selectAmmCallConfig()) as ReturnType<typeof toContractCallConfig>;
     const poolsList = (yield call(LoadPoolsList, ammConfig)) as IPoolCard[];
     const newPoolList: IPoolCard[] = poolsList.map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList));
-    const myPools = newPoolList.filter((el) => el.creator);
-    yield put(mainActions.setMyPools(myPools));
     const filteredPools = onFilter(newPoolList, filter as string, favoritesLocal) as IPoolCard[];
     yield put(mainActions.setPoolsList(filteredPools));
     yield put(Shared.setIsLoaded(true));

@@ -44,7 +44,6 @@ const items = [
   { to: ROUTES.NAV.TRADE, label: 'Swap' },
   { to: ROUTES.NAV.POOLS, label: 'Pools' },
   { to: ROUTES.NAV.ASSETS, label: 'Assets' },
-  { to: ROUTES.NAV.MY, label: 'My' },
 ];
 
 export const TopNav = () => (

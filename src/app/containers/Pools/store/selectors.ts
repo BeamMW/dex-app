@@ -15,7 +15,6 @@ const favoritesSelector = createSelector(selectMain, (state) => state.favorites)
 const favoriteAssetsSelector = createSelector(selectMain, (state) => state.favoriteAssets);
 const currentLpTokenSelector = createSelector(selectMain, (state) => state.currentLPToken);
 const isLoadingSelector = createSelector(selectMain, (state) => state.isLoading);
-const myPoolsSelector = createSelector(selectMain, (state) => state.myPools);
 const isHeadlessSelector = createSelector(selectMain, (state) => state.isHeadless);
 const shaderRuntimeMapSelector = createSelector(selectMain, (state) => state.shaderRuntimeMap);
 const rewardsSelector = createSelector(selectMain, (state) => state.rewards);
@@ -33,7 +32,6 @@ export const selectFavorites = () => favoritesSelector;
 export const selectFavoriteAssets = () => favoriteAssetsSelector;
 export const selectCurrentLPToken = () => currentLpTokenSelector;
 export const selectIsLoading = () => isLoadingSelector;
-export const selectMyPools = () => myPoolsSelector;
 export const selectIsHeadless = () => isHeadlessSelector;
 export const selectShaderRuntimeMap = () => shaderRuntimeMapSelector;
 export const selectRewards = () => rewardsSelector;

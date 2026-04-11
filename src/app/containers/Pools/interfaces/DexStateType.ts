@@ -27,7 +27,6 @@ export interface DexStateType {
   favoriteAssets: number[];
   currentLPToken: IPoolCard;
   isLoading: boolean;
-  myPools: IPoolCard[];
   isHeadless: boolean;
   shaderRuntimeMap: ShaderRuntimeMap | null;
   rewards: AccumulatorRewardsState;

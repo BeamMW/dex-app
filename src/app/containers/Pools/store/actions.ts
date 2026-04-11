@@ -34,7 +34,6 @@ export const onToggleFavoriteAsset = createAsyncAction(
 )<number, number[], any>();
 export const setCurrentLPToken = createAction(MainActionsTypes.SET_CURRENT_LP_TOKEN)<IPoolCard>();
 export const setIsLoading = createAction(MainActionsTypes.SET_IS_LOADING)<boolean>();
-export const setMyPools = createAction(MainActionsTypes.SET_MY_POOLS)<IPoolCard[]>();
 export const setIsHeadless = createAction(MainActionsTypes.SET_IS_HEADLESS)<boolean>();
 
 export const loadAppParams = createAsyncAction(

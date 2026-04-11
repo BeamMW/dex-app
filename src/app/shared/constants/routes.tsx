@@ -4,7 +4,6 @@ export const ROUTES = {
     POOLS: '/pools',
     ASSETS: '/assets',
     POOL: '/pool',
-    MY: '/my',
     ASSET_INFO: '/asset/:id',
   },
   POOLS: {
@@ -22,7 +21,6 @@ export const ROUTES_PATH = {
     TRADE: '/trade',
     POOLS: '/pools',
     POOL: '/pool',
-    MY: '/my',
     ASSET_INFO: '/asset/:id',
   },
   POOLS: {

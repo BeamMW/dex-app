@@ -19,7 +19,6 @@ import {
   SwapPoolsHome,
   ExplorePools,
   AccumulatorRewards,
-  MyPools,
   AssetInfo,
   Assets,
 } from '@app/containers';
@@ -55,10 +54,6 @@ const routes = [
   {
     path: ROUTES.NAV.ASSETS,
     element: <Assets />,
-  },
-  {
-    path: ROUTES.NAV.MY,
-    element: <MyPools />,
   },
   {
     path: ROUTES.POOLS.CREATE_POOL,
