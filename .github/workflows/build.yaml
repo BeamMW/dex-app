@@ -3,13 +3,9 @@ name: Build and Package .dapp
 on:
   push:
     branches:
-      - dappnet
-      - workflow-test
       - master
   pull_request:
     branches:
-      - dappnet
-      - workflow-test
       - master
 jobs:
   build:

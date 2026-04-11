@@ -24,9 +24,6 @@ const ContainerStyled = styled.div<ContainerProps>`
     return '914px';
   }};
   align-content: center;
-  @media (max-width: 480px) {
-    padding: 5px;
-  }
 `;
 
 const Container: React.FC<ContainerProps> = ({

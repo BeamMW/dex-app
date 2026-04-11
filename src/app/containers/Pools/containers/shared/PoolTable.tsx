@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { styled } from '@linaria/react';
 import { IPoolCard } from '@core/types';
 import { fromGroths, getPoolKind, truncate } from '@core/appUtils';
-import { poolHasImposterAsset, poolHasRewards } from '@app/shared/constants';
+import { poolHasImposterAsset } from '@app/shared/constants';
 import { iconButtonReset, rowCenter, warningBadgeBase } from '../../../../styles/linariaShared';
 import { IconFavorite, IconFavoriteFilled } from '@app/shared/icons';
 import AssetIcon from '@app/shared/components/AssetsIcon';
@@ -48,13 +48,6 @@ const WarningBadge = styled('span')`
   margin-left: 12px;
 `;
 
-const RewardsBadge = styled(WarningBadge)`
-  margin-left: 8px;
-  color: var(--color-purple);
-  border-color: rgba(162, 98, 247, 0.55);
-  background: rgba(162, 98, 247, 0.16);
-`;
-
 const TokenCell = styled('div')`
   ${rowCenter}
   gap: 8px;
@@ -64,6 +57,10 @@ const EmptyState = styled.div`
   padding: 24px 8px;
   color: rgba(255, 255, 255, 0.5);
   font-size: 14px;
+`;
+
+const DimText = styled.span`
+  color: rgba(255, 255, 255, 0.4);
 `;
 
 interface PoolTableProps {
@@ -103,7 +100,6 @@ export const PoolTable: React.FC<PoolTableProps> = ({
       <tbody>
         {rows.map((pool) => {
           const hasImposterWarning = poolHasImposterAsset(pool.aid1, pool.aid2);
-          const hasRewards = poolHasRewards(pool['lp-token'] || pool.lp_token);
           return (
             <Row
               key={`${pool.aid1}_${pool.aid2}_${pool.kind}`}
@@ -136,12 +132,13 @@ export const PoolTable: React.FC<PoolTableProps> = ({
                   <AssetIcon asset_id={pool.aid1} />
                   <AssetIcon asset_id={pool.aid2} />
                   <PairText>
-                    {`${truncate(pool.metadata1?.UN || 'Token')} (id:${pool.aid1}) / ${
-                      truncate(pool.metadata2?.UN || 'Token')
-                    } (id:${pool.aid2})`}
+                    <span>{truncate(pool.metadata1?.UN || 'Token')}</span>
+                    <DimText>(id:{pool.aid1})</DimText>
+                    <span>/</span>
+                    <span>{truncate(pool.metadata2?.UN || 'Token')}</span>
+                    <DimText>(id:{pool.aid2})</DimText>
                   </PairText>
                   {hasImposterWarning && <WarningBadge>fake asset</WarningBadge>}
-                  {hasRewards && <RewardsBadge>rewards</RewardsBadge>}
                 </PairCell>
               </td>
               <td>

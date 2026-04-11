@@ -1,9 +1,19 @@
-import { DexStateType } from '@app/containers/Pools/interfaces/DexStateType';
+import { AccumulatorRewardsState, DexStateType } from '@app/containers/Pools/interfaces/DexStateType';
 import { ActionType, createReducer } from 'typesafe-actions';
 import produce from 'immer';
 import * as actions from './actions';
 
 type Action = ActionType<typeof actions>;
+
+const initialRewardsState: AccumulatorRewardsState = {
+  isAvailable: false,
+  isLoading: false,
+  error: null,
+  lpTokenBalance: 0,
+  estimatedReward: 0,
+  locks: [],
+  lockOptions: [],
+};
 
 const initialState: DexStateType = {
   assetsList: [],
@@ -13,6 +23,7 @@ const initialState: DexStateType = {
   predict: null,
   currentPool: null,
   filter: 'all',
+  feeFilter: null,
   options: [],
   favorites: [],
   favoriteAssets: [],
@@ -21,15 +32,7 @@ const initialState: DexStateType = {
   myPools: [],
   isHeadless: true,
   shaderRuntimeMap: null,
-  rewards: {
-    isAvailable: false,
-    isLoading: false,
-    error: null,
-    lpTokenBalance: 0,
-    estimatedReward: 0,
-    lockOptions: [],
-    locks: [],
-  },
+  rewards: initialRewardsState,
 };
 
 const reducer = createReducer<DexStateType, Action>(initialState)
@@ -54,6 +57,9 @@ const reducer = createReducer<DexStateType, Action>(initialState)
   }))
   .handleAction(actions.setFilter, (state, action) => produce(state, (nexState) => {
     nexState.filter = action.payload;
+  }))
+  .handleAction(actions.setFeeFilter, (state, action) => produce(state, (nexState) => {
+    nexState.feeFilter = action.payload;
   }))
   .handleAction(actions.setOptions, (state, action) => produce(state, (nexState) => {
     nexState.options = action.payload;
@@ -80,9 +86,6 @@ const reducer = createReducer<DexStateType, Action>(initialState)
     nexState.shaderRuntimeMap = action.payload;
   }))
   .handleAction(actions.setRewardsState, (state, action) => produce(state, (nexState) => {
-    nexState.rewards = {
-      ...nexState.rewards,
-      ...action.payload,
-    };
+    nexState.rewards = { ...nexState.rewards, ...action.payload };
   }));
 export { reducer as MainReducer };

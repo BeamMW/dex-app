@@ -9,6 +9,7 @@ const txStatusSelector = createSelector(selectMain, (state) => state.statusTrans
 const predictSelector = createSelector(selectMain, (state) => state.predict);
 const currentPoolSelector = createSelector(selectMain, (state) => state.currentPool);
 const filterSelector = createSelector(selectMain, (state) => state.filter);
+const feeFilterSelector = createSelector(selectMain, (state) => state.feeFilter);
 const optionsSelector = createSelector(selectMain, (state) => state.options);
 const favoritesSelector = createSelector(selectMain, (state) => state.favorites);
 const favoriteAssetsSelector = createSelector(selectMain, (state) => state.favoriteAssets);
@@ -26,6 +27,7 @@ export const selectTxStatus = () => txStatusSelector;
 export const selectPredirect = () => predictSelector;
 export const selectCurrentPool = () => currentPoolSelector;
 export const selectFilter = () => filterSelector;
+export const selectFeeFilter = () => feeFilterSelector;
 export const selectOptions = () => optionsSelector;
 export const selectFavorites = () => favoritesSelector;
 export const selectFavoriteAssets = () => favoriteAssetsSelector;

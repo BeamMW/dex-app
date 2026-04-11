@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { IAsset, IOptions } from '@core/types';
 import { assetShortLabel } from '@core/appUtils';
-import { iconButtonReset, rowCenter, warningBadgeBase } from '../../../styles/linariaShared';
 import { selectAssetsList, selectFavoriteAssets, selectPoolsList } from '@app/containers/Pools/store/selectors';
 import * as mainActions from '@app/containers/Pools/store/actions';
 import {
@@ -16,6 +15,7 @@ import {
 } from '@app/shared/constants';
 import AssetIcon from '@app/shared/components/AssetsIcon';
 import { CancelIcon, IconFavorite, IconFavoriteFilled } from '@app/shared/icons';
+import { iconButtonReset, rowCenter, warningBadgeBase } from '../../../styles/linariaShared';
 import { AssetSearchModalProps } from './AssetSearchModal.types';
 
 const BEAM_ASSET: IAsset = {

@@ -9,10 +9,10 @@ import * as mainActions from '@app/containers/Pools/store/actions';
 import {
   IconExchangeTrade, IconFavorite, IconFavoriteFilled, IconShieldChecked,
 } from '@app/shared/icons';
-import { iconButtonReset, rowCenter } from '../../../../styles/linariaShared';
 import { fromGroths, getPoolKind, truncate } from '@core/appUtils';
 import { IPoolCard } from '@core/types';
 import AssetIcon from '@app/shared/components/AssetsIcon';
+import { iconButtonReset, rowCenter } from '../../../../styles/linariaShared';
 
 const Table = styled.table`
   width: 100%;

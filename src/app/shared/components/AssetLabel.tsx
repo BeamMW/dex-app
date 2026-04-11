@@ -26,7 +26,7 @@ const RegularTitleStyled = styled.span`
   color: rgba(255, 255, 255, 0.7);
   text-transform: uppercase;
 `;
-const Amount = styled(RegularTitleStyled)`
+export const Amount = styled(RegularTitleStyled)`
   font-style: normal;
   font-weight: 400;
   font-size: 14px;
@@ -36,14 +36,14 @@ const Amount = styled(RegularTitleStyled)`
   margin-right: 4px;
 `;
 
-const PredictTitleStyled = styled(RegularTitleStyled)`
+export const PredictTitleStyled = styled(RegularTitleStyled)`
   font-weight: 400;
   font-size: 14px;
   line-height: 14px;
   color: var(--color-white);
 `;
-const AssetsId = styled(PredictTitleStyled)`
-  display: flex;
+export const AssetsId = styled(PredictTitleStyled)`
+  display: inline-flex;
   margin-left: 4px;
   color: rgba(255, 255, 255, 0.7);
   text-transform: lowercase;

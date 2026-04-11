@@ -1,7 +1,7 @@
 import {
-  IAsset, IMetadataPairs, IOptions, IPoolCard, IPredict, ITxStatus, Kind,
+  IAsset, IMetadataPairs, IOptions, IPoolCard, IPredict, ITxStatus, Kind, KindProcent,
 } from '@core/types';
-import { ASSET_BEAM, GROTHS_IN_BEAM, poolHasRewards } from '@app/shared/constants';
+import { ASSET_BEAM, GROTHS_IN_BEAM } from '@app/shared/constants';
 import connector from '@app/core/connector';
 import { start } from '@app/shared/store/saga';
 import { toast } from 'react-toastify';
@@ -98,22 +98,17 @@ export function caretAfterGroupingFormat(
   };
 }
 
-export const getPoolKind = (kind: number) => {
-  let kindDesc = null;
+const KIND_TO_PROCENT: Partial<Record<Kind, KindProcent>> = {
+  [Kind.Low]: KindProcent.Low,
+  [Kind.Mid]: KindProcent.Mid,
+  [Kind.High]: KindProcent.High,
+};
 
-  if (kind === Kind.Low) {
-    kindDesc = '0.05%';
-  }
+export const getPoolKind = (kind: number): KindProcent | null => KIND_TO_PROCENT[kind as Kind] ?? null;
 
-  if (kind === Kind.Mid) {
-    kindDesc = '0.3%';
-  }
-
-  if (kind === Kind.High) {
-    kindDesc = '1%';
-  }
-
-  return kindDesc;
+export const onFeeFilter = (data: IPoolCard[], feeFilter: KindProcent | null): IPoolCard[] => {
+  if (feeFilter === null) return data;
+  return data.filter((pool) => getPoolKind(pool.kind) === feeFilter);
 };
 
 export const parsePoolMetadata = (poolCard, aid1, aid2, assetList: IAsset[]) => {
@@ -187,9 +182,6 @@ export function onFilter(data: IPoolCard[], filter = 'all', favorite: IPoolCard[
     }
     case 'liquid': {
       return data.filter((el) => el.ctl);
-    }
-    case 'rewards': {
-      return data.filter((el) => poolHasRewards(el['lp-token'] || el.lp_token));
     }
     case 'empty': {
       return data.filter((el) => !el.ctl);

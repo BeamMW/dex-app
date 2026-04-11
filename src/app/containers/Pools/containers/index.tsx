@@ -10,3 +10,4 @@ export * from './PoolView';
 export * from './MyPools';
 export * from './AssetInfo';
 export * from './AccumulatorRewards';
+export * from './Assets';

@@ -335,7 +335,7 @@ export const AssetInfo = () => {
               {longDesc && (
                 <DescBlock>
                   <InfoLabel>Description</InfoLabel>
-                  <InfoValue style={{ whiteSpace: 'pre-wrap', overflow: 'visible' }}>{longDesc}</InfoValue>
+                  <InfoValue style={{ whiteSpace: 'pre-wrap', overflow: 'visible', wordBreak: 'break-word' }}>{longDesc}</InfoValue>
                 </DescBlock>
               )}
               {siteUrl && (

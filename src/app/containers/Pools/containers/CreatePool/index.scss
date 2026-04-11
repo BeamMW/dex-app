@@ -110,6 +110,39 @@
   }
 }
 
+.custom-kind {
+  width: 100%;
+  &__control {
+    @include reactSelect.control-base(var(--color-opasity-0-1), 170px);
+    width: 100% !important;
+    height: 41px !important;
+    border-radius: 170px !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    &--menu-is-open,
+    &--is-focused {
+      box-shadow: (0 0 0 1px) var(--color-green) !important;
+    }
+  }
+  @include reactSelect.input-colors(41px);
+  @include reactSelect.indicator-controls;
+  &__value-container {
+    padding: 2px 12px !important;
+  }
+  &__menu {
+    background-color: var(--color-select-list) !important;
+    border-radius: 16px !important;
+    padding: 12px !important;
+    z-index: 10050 !important;
+    @include reactSelect.scrollbar-base;
+  }
+  &__option {
+    padding: 4px 8px !important;
+    margin-bottom: 8px !important;
+    @include reactSelect.option-active-state;
+  }
+  @include reactSelect.simple-value-and-placeholder('ProximaNova', 14px, 17px);
+}
+
 .price-wrapper {
   @include statRow.stat-row('price-title', 'price-value', 18px);
 }

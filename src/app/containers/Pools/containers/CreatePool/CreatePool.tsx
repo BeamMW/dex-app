@@ -22,11 +22,9 @@ import {
   SwapCard,
 } from '@app/containers/Pools/containers/shared/poolFlowLayout';
 import { styled } from '@linaria/react';
-import { outlinedAssetSelectStyles } from '@app/shared/components/reactSelectStyles';
 
 const FeeField = styled.div`
-  width: 100%;
-  max-width: 260px;
+  max-width: 167px;
 `;
 
 export const CreatePool = () => {
@@ -66,7 +64,7 @@ export const CreatePool = () => {
   };
 
   return (
-    <Window hideHeader>
+    <Window title="Create Pool" backButton>
       <Container variant="center">
         <SwapCard>
           <SelectWrapper>
@@ -103,10 +101,8 @@ export const CreatePool = () => {
                 onChange={(e) => setCurrentKind(e)}
                 defaultValue={{ value: Kind.High, label: '1%' }}
                 placeholder={placeHolder.FEE}
-                customPrefix="custom-asset-select"
+                customPrefix="custom-kind"
                 isSearchable={false}
-                isClearable={false}
-                styles={outlinedAssetSelectStyles}
               />
             </FeeField>
           </SwapBlock>

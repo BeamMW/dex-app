@@ -73,6 +73,13 @@ const WarningBadge = styled('span')`
   margin-right: 10px;
 `;
 
+const AssetIdLabel = styled('span')`
+  font-size: 11px;
+  opacity: 0.5;
+  flex-shrink: 0;
+  margin-left: 4px;
+`;
+
 const AssetSelectorButton: React.FC<AssetSelectorButtonProps> = ({
   value,
   onSelect,
@@ -114,6 +121,7 @@ const AssetSelectorButton: React.FC<AssetSelectorButtonProps> = ({
           <>
             {value.value !== -1 && <AssetIcon asset_id={value.value} />}
             <Label>{value.label}</Label>
+            {value && value.value !== -1 && <AssetIdLabel>(id: {value.value})</AssetIdLabel>}
             {showWarning && <WarningBadge>fake</WarningBadge>}
           </>
         ) : (

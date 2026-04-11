@@ -40,8 +40,8 @@ import { navigate } from '@app/shared/store/actions';
 import { ROUTES } from '@app/shared/constants';
 import connector from '@core/connector';
 import { actions as Shared } from '@app/shared/store/index';
-import { actions } from '.';
 import { ShaderRuntimeMap } from '@app/core/shaderRegistry';
+import { actions } from '.';
 
 const DEFAULT_LOCK_OPTIONS = [
   { value: 1, label: '1 month' },
@@ -346,7 +346,7 @@ function parseLpBalance(userView: any): number {
 }
 
 export function* loadAccumulatorRewards(action: ReturnType<typeof mainActions.loadAccumulatorRewards.request>): Generator {
-  const pool = action.payload.pool;
+  const { pool } = action.payload;
   if (!pool) {
     yield put(mainActions.setRewardsState({
       isAvailable: false,

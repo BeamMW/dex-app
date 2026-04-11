@@ -1,7 +1,8 @@
 export const ROUTES = {
   NAV: {
     TRADE: '/trade',
-    EXPLORE: '/explore',
+    POOLS: '/pools',
+    ASSETS: '/assets',
     POOL: '/pool',
     MY: '/my',
     ASSET_INFO: '/asset/:id',
@@ -19,7 +20,7 @@ export const ROUTES = {
 export const ROUTES_PATH = {
   NAV: {
     TRADE: '/trade',
-    EXPLORE: '/explore',
+    POOLS: '/pools',
     POOL: '/pool',
     MY: '/my',
     ASSET_INFO: '/asset/:id',

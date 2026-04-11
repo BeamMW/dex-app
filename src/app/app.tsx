@@ -21,6 +21,7 @@ import {
   AccumulatorRewards,
   MyPools,
   AssetInfo,
+  Assets,
 } from '@app/containers';
 import { ROUTES } from '@app/shared/constants';
 import { AlertWallet, Loader, TopNav } from '@app/shared/components';
@@ -44,12 +45,16 @@ const routes = [
     element: <SwapPoolsHome />,
   },
   {
-    path: ROUTES.NAV.EXPLORE,
+    path: ROUTES.NAV.POOLS,
     element: <ExplorePools />,
   },
   {
     path: ROUTES.NAV.POOL,
     element: <Navigate to={ROUTES.NAV.TRADE} replace />,
+  },
+  {
+    path: ROUTES.NAV.ASSETS,
+    element: <Assets />,
   },
   {
     path: ROUTES.NAV.MY,
