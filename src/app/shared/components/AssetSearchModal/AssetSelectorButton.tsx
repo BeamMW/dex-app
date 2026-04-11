@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { styled } from '@linaria/react';
 import { IOptions } from '@core/types';
-import { rowCenter, warningBadgeBase } from '../../../styles/linariaShared';
 import AssetIcon from '@app/shared/components/AssetsIcon';
 import { IconDropdownDown } from '@app/shared/icons';
+import { rowCenter, warningBadgeBase } from '../../../styles/linariaShared';
 import AssetSearchModal from './AssetSearchModal';
 
 interface AssetSelectorButtonProps {
@@ -22,11 +22,13 @@ interface AssetSelectorButtonProps {
 }
 
 const SelectorBtn = styled('button')`
-  ${rowCenter}
+  display: flex;
+  align-items: center;
   gap: 8px;
   width: 100%;
-  height: 41px;
-  padding: 0 12px 0 14px;
+  min-height: 41px;
+  height: auto;
+  padding: 6px 12px 6px 14px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 170px;
@@ -46,15 +48,46 @@ const SelectorBtn = styled('button')`
   &:focus-visible {
     outline: 1px solid var(--color-green);
   }
+
+  @media (max-width: 480px) {
+    gap: 4px;
+    padding: 6px 8px 6px 10px;
+    font-size: 13px;
+  }
+`;
+
+/** Tighter than default AssetIcon margin so label + id fit in narrow pickers */
+const SelectorAssetIcon = styled(AssetIcon)`
+  && {
+    margin-right: 6px;
+  }
+
+  @media (max-width: 480px) {
+    && {
+      margin-right: 3px;
+    }
+  }
+`;
+
+/** Name + compact id share a row that may wrap so the full ticker can show */
+const ValueRow = styled.span`
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 6px;
+  row-gap: 2px;
+  text-align: left;
 `;
 
 const Label = styled.span`
-  flex: 1;
+  flex: 1 1 auto;
   min-width: 0;
   text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 `;
 
 const Placeholder = styled(Label)`
@@ -71,13 +104,23 @@ const WarningBadge = styled('span')`
   ${warningBadgeBase}
   padding: 1px 6px;
   margin-right: 10px;
+
+  @media (max-width: 480px) {
+    margin-right: 4px;
+  }
 `;
 
 const AssetIdLabel = styled('span')`
-  font-size: 11px;
-  opacity: 0.5;
+  font-size: 10px;
+  line-height: 1.2;
+  font-weight: 500;
+  opacity: 0.45;
   flex-shrink: 0;
-  margin-left: 4px;
+  white-space: nowrap;
+
+  @media (max-width: 480px) {
+    font-size: 9px;
+  }
 `;
 
 const AssetSelectorButton: React.FC<AssetSelectorButtonProps> = ({
@@ -119,9 +162,13 @@ const AssetSelectorButton: React.FC<AssetSelectorButtonProps> = ({
       <SelectorBtn type="button" onClick={handleOpen}>
         {value ? (
           <>
-            {value.value !== -1 && <AssetIcon asset_id={value.value} />}
-            <Label>{value.label}</Label>
-            {value && value.value !== -1 && <AssetIdLabel>(id: {value.value})</AssetIdLabel>}
+            {value.value !== -1 && <SelectorAssetIcon asset_id={value.value} />}
+            <ValueRow>
+              <Label>{value.label}</Label>
+              {value && value.value !== -1 && (
+                <AssetIdLabel title={`Asset id ${value.value}`}>{`(${value.value})`}</AssetIdLabel>
+              )}
+            </ValueRow>
             {showWarning && <WarningBadge>fake</WarningBadge>}
           </>
         ) : (

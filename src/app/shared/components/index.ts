@@ -21,4 +21,5 @@ export { default as PoolStat } from './PoolStat';
 export { default as LoadingSkileton } from './LoadingSkileton';
 export { default as AlertWallet } from './AlertWallet';
 export { default as TopNav } from './TopNav';
+export { default as TableScrollViewport } from './TableScrollViewport';
 export * from './AssetSearchModal';

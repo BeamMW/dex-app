@@ -105,12 +105,11 @@ const ReactSelect = ({
   }
 
   function IndicatorSVG(props) {
-    const { hasValue } = props;
-    return !hasValue ? (
+    return (
       <DropdownIndicator {...props}>
         <IconDropdownDown />
       </DropdownIndicator>
-    ) : null;
+    );
   }
 
   function IndicatorClear(props) {

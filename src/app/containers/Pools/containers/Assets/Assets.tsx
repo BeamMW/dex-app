@@ -3,12 +3,12 @@ import { styled } from '@linaria/react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { IAsset } from '@core/types';
-import { Container, Window } from '@app/shared/components';
+import { Container, TableScrollViewport, Window } from '@app/shared/components';
 import AssetIcon from '@app/shared/components/AssetsIcon';
 import { fromGroths, formatNumber } from '@core/appUtils';
 import { isImposterAsset } from '@app/shared/constants';
-import { warningBadgeBase } from '../../../../styles/linariaShared';
 import { selectAssetsList } from '@app/containers/Pools/store/selectors';
+import { warningBadgeBase } from '../../../../styles/linariaShared';
 
 const Table = styled.table`
   width: 100%;
@@ -77,51 +77,53 @@ export const Assets = () => {
         {!assets || assets.length === 0 ? (
           <EmptyState>No assets found</EmptyState>
         ) : (
-          <Table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Asset</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Emission</th>
-              </tr>
-            </thead>
-            <tbody>
-              {assets.map((asset) => {
-                const id = asset.asset_id ?? asset.aid ?? 0;
-                const m = asset.parsedMetadata as any;
-                const ticker = m?.UN || m?.SN || '';
-                const fullName = m?.N || '';
-                const description = m?.OPT_SHORT_DESC || '';
-                const emissionGroths = Number(asset.emission_str ?? asset.emission ?? 0);
-                const emission = emissionGroths > 0 ? formatNumber(fromGroths(emissionGroths)) : '—';
-                return (
-                  <Row key={id} onClick={() => navigate(`/asset/${id}`)}>
-                    <td>
-                      <DimText>{id}</DimText>
-                    </td>
-                    <td>
-                      <AssetCell>
-                        <AssetIcon asset_id={id} />
-                        <AssetName>{ticker}</AssetName>
-                        {isImposterAsset(id) && <FakeBadge>fake</FakeBadge>}
-                      </AssetCell>
-                    </td>
-                    <td>
-                      <AssetName>{fullName}</AssetName>
-                    </td>
-                    <DescCell>
-                      <DimText>{description}</DimText>
-                    </DescCell>
-                    <td>
-                      <DimText>{emission}</DimText>
-                    </td>
-                  </Row>
-                );
-              })}
-            </tbody>
-          </Table>
+          <TableScrollViewport tableMinWidth={800}>
+            <Table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Asset</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Emission</th>
+                </tr>
+              </thead>
+              <tbody>
+                {assets.map((asset) => {
+                  const id = asset.asset_id ?? asset.aid ?? 0;
+                  const m = asset.parsedMetadata as any;
+                  const ticker = m?.UN || m?.SN || '';
+                  const fullName = m?.N || '';
+                  const description = m?.OPT_SHORT_DESC || '';
+                  const emissionGroths = Number(asset.emission_str ?? asset.emission ?? 0);
+                  const emission = emissionGroths > 0 ? formatNumber(fromGroths(emissionGroths)) : '—';
+                  return (
+                    <Row key={id} onClick={() => navigate(`/asset/${id}`)}>
+                      <td>
+                        <DimText>{id}</DimText>
+                      </td>
+                      <td>
+                        <AssetCell>
+                          <AssetIcon asset_id={id} />
+                          <AssetName>{ticker}</AssetName>
+                          {isImposterAsset(id) && <FakeBadge>fake</FakeBadge>}
+                        </AssetCell>
+                      </td>
+                      <td>
+                        <AssetName>{fullName}</AssetName>
+                      </td>
+                      <DescCell>
+                        <DimText>{description}</DimText>
+                      </DescCell>
+                      <td>
+                        <DimText>{emission}</DimText>
+                      </td>
+                    </Row>
+                  );
+                })}
+              </tbody>
+            </Table>
+          </TableScrollViewport>
         )}
       </Container>
     </Window>

@@ -9,7 +9,9 @@ import {
 import { AssetSelectorButton } from '@app/shared/components/AssetSearchModal';
 import { getFilterPools, onFilter, onFeeFilter } from '@core/appUtils';
 import { CancelIcon, IconPlus } from '@app/shared/icons';
-import { ROUTES, SORT, kindSelect, getRealAssetIdForFake, poolHasImposterAsset } from '@app/shared/constants';
+import {
+  ROUTES, SORT, kindSelect, getRealAssetIdForFake, poolHasImposterAsset,
+} from '@app/shared/constants';
 import {
   selectFavorites, selectFeeFilter, selectFilter, selectPoolsList,
 } from '@app/containers/Pools/store/selectors';
@@ -35,6 +37,13 @@ const Left = styled.div`
   gap: 6px;
   min-width: 0;
   margin-right: 12px;
+
+  @media (max-width: 480px) {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    margin-right: 0;
+  }
 `;
 
 const SelectorWrap = styled.div`
@@ -46,12 +55,22 @@ const Center = styled.div`
   flex: 1;
   display: flex;
   justify-content: center;
+
+  @media (max-width: 480px) {
+    width: 100%;
+    flex: 1 1 100%;
+  }
 `;
 
 const Right = styled.div`
   width: 180px;
   display: flex;
   justify-content: flex-end;
+
+  @media (max-width: 480px) {
+    width: 100%;
+    justify-content: center;
+  }
 `;
 
 const Sort = styled.div`
@@ -166,7 +185,11 @@ export const ExplorePools = () => {
               />
             </SelectorWrap>
             {(assetFilter || pairFilter) && (
-              <ClearBtn onClick={() => { setAssetFilter(null); setPairFilter(null); }} type="button" aria-label="Clear filter">
+              <ClearBtn
+                onClick={() => { setAssetFilter(null); setPairFilter(null); }}
+                type="button"
+                aria-label="Clear filter"
+              >
                 <CancelIcon />
               </ClearBtn>
             )}

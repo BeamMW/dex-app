@@ -2,7 +2,9 @@ import React, { useMemo } from 'react';
 import { styled } from '@linaria/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Button, Container, Window } from '@app/shared/components';
+import {
+  Button, Container, TableScrollViewport, Window,
+} from '@app/shared/components';
 import { ROUTES } from '@app/shared/constants';
 import { selectFavorites, selectMyPools } from '@app/containers/Pools/store/selectors';
 import * as mainActions from '@app/containers/Pools/store/actions';
@@ -83,96 +85,98 @@ export const MyPools = () => {
   return (
     <Window hideHeader>
       <Container>
-        <Table>
-          <thead>
-            <tr>
-              <th>Favorite</th>
-              <th>Pair</th>
-              <th>Token 1</th>
-              <th>Token 2</th>
-              <th>Fee Rate</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {myPools.map((pool) => (
-              <Row
-                key={`${pool.aid1}_${pool.aid2}_${pool.kind}`}
-                onClick={() => onTrade(pool)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    onTrade(pool);
-                  }
-                }}
-                role="button"
-                tabIndex={0}
-              >
-                <td>
-                  <FavButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleFavorite(pool);
-                    }}
-                    type="button"
-                    aria-label="Toggle pool favorite"
-                  >
-                    {favoriteSet.has(`${pool.aid1}-${pool.aid2}-${pool.kind}`)
-                      ? <IconFavoriteFilled />
-                      : <IconFavorite />}
-                  </FavButton>
-                </td>
-                <td>
-                  <PairCell>
-                    <AssetIcon asset_id={pool.aid1} />
-                    <PairText>
-                      {`${truncate(pool.metadata1?.UN || 'Token')} (id:${pool.aid1}) / ${
-                        truncate(pool.metadata2?.UN || 'Token')
-                      } (id:${pool.aid2})`}
-                    </PairText>
-                  </PairCell>
-                </td>
-                <td>
-                  <TokenCell>
-                    <AssetIcon asset_id={pool.aid1} />
-                    {formatNum(fromGroths(pool.tok1))}
-                  </TokenCell>
-                </td>
-                <td>
-                  <TokenCell>
-                    <AssetIcon asset_id={pool.aid2} />
-                    {formatNum(fromGroths(pool.tok2))}
-                  </TokenCell>
-                </td>
-                <td>{getPoolKind(pool.kind)}</td>
-                <td>
-                  <Actions>
-                    <Button
-                      icon={IconExchangeTrade}
-                      variant="control"
+        <TableScrollViewport tableMinWidth={780}>
+          <Table>
+            <thead>
+              <tr>
+                <th>Favorite</th>
+                <th>Pair</th>
+                <th>Token 1</th>
+                <th>Token 2</th>
+                <th>Fee Rate</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {myPools.map((pool) => (
+                <Row
+                  key={`${pool.aid1}_${pool.aid2}_${pool.kind}`}
+                  onClick={() => onTrade(pool)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      onTrade(pool);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                >
+                  <td>
+                    <FavButton
                       onClick={(e) => {
                         e.stopPropagation();
-                        onTrade(pool);
+                        handleFavorite(pool);
                       }}
+                      type="button"
+                      aria-label="Toggle pool favorite"
                     >
-                      Trade
-                    </Button>
-                    <Button
-                      icon={IconShieldChecked}
-                      variant="control"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onAddLiquidity(pool);
-                      }}
-                    >
-                      Add
-                    </Button>
-                  </Actions>
-                </td>
-              </Row>
-            ))}
-          </tbody>
-        </Table>
+                      {favoriteSet.has(`${pool.aid1}-${pool.aid2}-${pool.kind}`)
+                        ? <IconFavoriteFilled />
+                        : <IconFavorite />}
+                    </FavButton>
+                  </td>
+                  <td>
+                    <PairCell>
+                      <AssetIcon asset_id={pool.aid1} />
+                      <PairText>
+                        {`${truncate(pool.metadata1?.UN || 'Token')} (id:${pool.aid1}) / ${
+                          truncate(pool.metadata2?.UN || 'Token')
+                        } (id:${pool.aid2})`}
+                      </PairText>
+                    </PairCell>
+                  </td>
+                  <td>
+                    <TokenCell>
+                      <AssetIcon asset_id={pool.aid1} />
+                      {formatNum(fromGroths(pool.tok1))}
+                    </TokenCell>
+                  </td>
+                  <td>
+                    <TokenCell>
+                      <AssetIcon asset_id={pool.aid2} />
+                      {formatNum(fromGroths(pool.tok2))}
+                    </TokenCell>
+                  </td>
+                  <td>{getPoolKind(pool.kind)}</td>
+                  <td>
+                    <Actions>
+                      <Button
+                        icon={IconExchangeTrade}
+                        variant="control"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onTrade(pool);
+                        }}
+                      >
+                        Trade
+                      </Button>
+                      <Button
+                        icon={IconShieldChecked}
+                        variant="control"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onAddLiquidity(pool);
+                        }}
+                      >
+                        Add
+                      </Button>
+                    </Actions>
+                  </td>
+                </Row>
+              ))}
+            </tbody>
+          </Table>
+        </TableScrollViewport>
       </Container>
     </Window>
   );

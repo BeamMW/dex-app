@@ -24,6 +24,11 @@ const ContainerStyled = styled.div<ContainerProps>`
     return '914px';
   }};
   align-content: center;
+
+  @media (max-width: 600px) {
+    margin: 16px 0;
+    min-height: 0;
+  }
 `;
 
 const Container: React.FC<ContainerProps> = ({

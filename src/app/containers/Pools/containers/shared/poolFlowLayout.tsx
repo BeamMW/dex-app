@@ -226,6 +226,12 @@ export const InlineSelect = styled.div`
   min-width: 200px;
   min-height: 41px;
   flex-shrink: 0;
+
+  @media (max-width: 480px) {
+    width: 148px;
+    max-width: 38%;
+    min-width: 108px;
+  }
 `;
 
 export const SearchHint = styled.div`
@@ -306,7 +312,6 @@ export const RightPanel = styled.div`
   }
 `;
 
-
 export const EmptyPoolState = styled.div`
   color: rgba(255, 255, 255, 0.6);
   font-size: 14px;
@@ -317,6 +322,7 @@ export const EmptyPoolState = styled.div`
 export const EmbeddedActionRow = styled.div`
   width: 100%;
   display: flex;
+  flex-wrap: wrap;
   gap: var(--pool-embedded-action-row-gap);
   margin-top: var(--pool-embedded-action-margin-top);
 `;
