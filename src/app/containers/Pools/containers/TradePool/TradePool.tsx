@@ -79,6 +79,7 @@ import {
   TradeSummaryTdLabel,
   TradeSummaryTdValue,
   TradeSummaryTitleInGrid,
+  TradeSummaryNameId,
   TradeSummaryValueInner,
   SwapBlock,
   SwapCard,
@@ -866,8 +867,10 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                     {displayedBuyRaw >= 0 && (
                       <Amount>{formatNumber(fromGroths(displayedBuyRaw))}</Amount>
                     )}
-                    <PredictTitleStyled>{tokenName_2}</PredictTitleStyled>
-                    <AssetsId>{`(id:${secondToken ?? 0})`}</AssetsId>
+                    <TradeSummaryNameId>
+                      <PredictTitleStyled>{tokenName_2}</PredictTitleStyled>
+                      <AssetsId>{`(id:${secondToken ?? 0})`}</AssetsId>
+                    </TradeSummaryNameId>
                   </TradeSummaryValueInner>
                 </TradeSummaryTdValue>
               </tr>
@@ -885,8 +888,10 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                     {displayedFeeDao >= 0 && (
                       <Amount>{formatNumber(fromGroths(displayedFeeDao))}</Amount>
                     )}
-                    <PredictTitleStyled>{tokenName_1}</PredictTitleStyled>
-                    <AssetsId>{`(id:${payAssetId})`}</AssetsId>
+                    <TradeSummaryNameId>
+                      <PredictTitleStyled>{tokenName_1}</PredictTitleStyled>
+                      <AssetsId>{`(id:${payAssetId})`}</AssetsId>
+                    </TradeSummaryNameId>
                   </TradeSummaryValueInner>
                 </TradeSummaryTdValue>
               </tr>
@@ -904,8 +909,10 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                     {displayedFeePool >= 0 && (
                       <Amount>{formatNumber(fromGroths(displayedFeePool))}</Amount>
                     )}
-                    <PredictTitleStyled>{tokenName_1}</PredictTitleStyled>
-                    <AssetsId>{`(id:${payAssetId})`}</AssetsId>
+                    <TradeSummaryNameId>
+                      <PredictTitleStyled>{tokenName_1}</PredictTitleStyled>
+                      <AssetsId>{`(id:${payAssetId})`}</AssetsId>
+                    </TradeSummaryNameId>
                   </TradeSummaryValueInner>
                 </TradeSummaryTdValue>
               </tr>
@@ -923,8 +930,10 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                     {displayedFeeTotal >= 0 && (
                       <Amount>{formatNumber(fromGroths(displayedFeeTotal))}</Amount>
                     )}
-                    <PredictTitleStyled>{tokenName_1}</PredictTitleStyled>
-                    <AssetsId>{`(id:${payAssetId})`}</AssetsId>
+                    <TradeSummaryNameId>
+                      <PredictTitleStyled>{tokenName_1}</PredictTitleStyled>
+                      <AssetsId>{`(id:${payAssetId})`}</AssetsId>
+                    </TradeSummaryNameId>
                   </TradeSummaryValueInner>
                 </TradeSummaryTdValue>
               </tr>
@@ -942,8 +951,10 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                     {displayedPayRaw >= 0 && (
                       <Amount>{formatNumber(fromGroths(displayedPayRaw))}</Amount>
                     )}
-                    <PredictTitleStyled>{tokenName_1}</PredictTitleStyled>
-                    <AssetsId>{`(id:${payAssetId})`}</AssetsId>
+                    <TradeSummaryNameId>
+                      <PredictTitleStyled>{tokenName_1}</PredictTitleStyled>
+                      <AssetsId>{`(id:${payAssetId})`}</AssetsId>
+                    </TradeSummaryNameId>
                   </TradeSummaryValueInner>
                 </TradeSummaryTdValue>
               </tr>

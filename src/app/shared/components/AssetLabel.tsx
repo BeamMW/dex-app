@@ -48,6 +48,18 @@ export const AssetsId = styled(PredictTitleStyled)`
   color: rgba(255, 255, 255, 0.7);
   text-transform: lowercase;
 `;
+
+const TitleIdGroup = styled.span`
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  min-width: 0;
+`;
+
+const IdBesideTitle = styled(AssetsId)`
+  margin-left: 6px;
+  line-height: inherit;
+`;
 // const AssetsId = styled.h5`
 //   display: flex;
 //   color: rgba(255,255,255, 0.7);
@@ -64,8 +76,10 @@ const AssetLabel = ({
     <AssetStyled variant={variant}>
       <AssetIcon asset_id={assets_id} />
       {amount >= 0 && <Amount>{formatNumber(fromGroths(amount))}</Amount>}
-      <TitleComponent>{title}</TitleComponent>
-      {id && <AssetsId>{`(id:${assets_id})`}</AssetsId>}
+      <TitleIdGroup>
+        <TitleComponent>{title}</TitleComponent>
+        {id && <IdBesideTitle>{`(id:${assets_id})`}</IdBesideTitle>}
+      </TitleIdGroup>
     </AssetStyled>
   );
 };

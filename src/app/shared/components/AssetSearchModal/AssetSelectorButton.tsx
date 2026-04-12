@@ -23,7 +23,10 @@ interface AssetSelectorButtonProps {
 
 const SelectorBtn = styled('button')`
   display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-items: center;
+  justify-content: flex-start;
   gap: 8px;
   width: 100%;
   min-height: 41px;
@@ -69,34 +72,59 @@ const SelectorAssetIcon = styled(AssetIcon)`
   }
 `;
 
-/** Name + compact id share a row that may wrap so the full ticker can show */
-const ValueRow = styled.span`
-  flex: 1;
+/** Icon + label + optional badge; grows so chevron stays at the trailing edge of the button */
+const LeftCluster = styled.span`
+  flex: 1 1 0%;
   min-width: 0;
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  column-gap: 6px;
-  row-gap: 2px;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+`;
+
+const ValueRow = styled.span`
+  flex: 1 1 0%;
+  min-width: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
   text-align: left;
+`;
+
+const labelIdMetrics = `
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
 `;
 
 const Label = styled.span`
-  flex: 1 1 auto;
+  ${labelIdMetrics}
+  flex: 0 1 auto;
   min-width: 0;
   text-align: left;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @media (max-width: 480px) {
+    font-size: 13px;
+    line-height: 18px;
+  }
 `;
 
 const Placeholder = styled(Label)`
+  flex: 1 1 0%;
+  min-width: 0;
   color: rgba(255, 255, 255, 0.5);
 `;
 
 const ChevronWrap = styled('span')`
   ${rowCenter}
   flex-shrink: 0;
+  align-self: center;
   opacity: 0.5;
 `;
 
@@ -111,15 +139,17 @@ const WarningBadge = styled('span')`
 `;
 
 const AssetIdLabel = styled('span')`
-  font-size: 10px;
-  line-height: 1.2;
+  ${labelIdMetrics}
   font-weight: 500;
   opacity: 0.45;
   flex-shrink: 0;
   white-space: nowrap;
+  margin-left: 6px;
 
   @media (max-width: 480px) {
-    font-size: 9px;
+    font-size: 13px;
+    line-height: 18px;
+    margin-left: 5px;
   }
 `;
 
@@ -161,7 +191,7 @@ const AssetSelectorButton: React.FC<AssetSelectorButtonProps> = ({
     <>
       <SelectorBtn type="button" onClick={handleOpen}>
         {value ? (
-          <>
+          <LeftCluster>
             {value.value !== -1 && <SelectorAssetIcon asset_id={value.value} />}
             <ValueRow>
               <Label>{value.label}</Label>
@@ -170,7 +200,7 @@ const AssetSelectorButton: React.FC<AssetSelectorButtonProps> = ({
               )}
             </ValueRow>
             {showWarning && <WarningBadge>fake</WarningBadge>}
-          </>
+          </LeftCluster>
         ) : (
           <Placeholder>{placeholder}</Placeholder>
         )}

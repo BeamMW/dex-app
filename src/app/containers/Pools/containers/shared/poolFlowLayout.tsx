@@ -100,6 +100,27 @@ export const TradeSummaryValueInner = styled.div`
   overflow-wrap: anywhere;
 `;
 
+/** Token title + (id:) stay adjacent; title ellipsizes when the cell is narrow */
+export const TradeSummaryNameId = styled.span`
+  display: inline-flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+
+  & > :first-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  & > :last-child {
+    margin-left: 6px;
+    line-height: inherit;
+  }
+`;
+
 export const TradeSummaryIconInner = styled.div`
   display: flex;
   align-items: flex-start;

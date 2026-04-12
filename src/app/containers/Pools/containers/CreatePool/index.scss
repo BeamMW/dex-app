@@ -112,6 +112,9 @@
 
 .custom-kind {
   width: 100%;
+  &__menu-portal {
+    z-index: 10050 !important;
+  }
   &__control {
     @include reactSelect.control-base(var(--color-opasity-0-1), 170px);
     width: 100% !important;

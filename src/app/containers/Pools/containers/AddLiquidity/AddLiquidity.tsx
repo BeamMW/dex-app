@@ -4,7 +4,7 @@ import {
   emptyPredict, fromGroths, getLPToken, setDataRequest, toGroths, truncate,
 } from '@core/appUtils';
 import {
-  AssetsSection, Button, Container, Input, PoolStat, Window,
+  AssetsSection, Button, Container, Input, Window,
 } from '@app/shared/components';
 import { useDispatch, useSelector } from 'react-redux';
 import * as mainActions from '@app/containers/Pools/store/actions';
@@ -17,8 +17,8 @@ import AssetLabel from '@app/shared/components/AssetLabel';
 import { useNavigate } from 'react-router-dom';
 import { styled } from '@linaria/react';
 import {
-  BlockLabel, ButtonBlock, ButtonWrapper, EmbeddedLayout,
-  EmbeddedTradeButtonWrap, InputRow, RightPanel, SwapBlock, SwapCard,
+  BlockLabel, ButtonBlock, ButtonWrapper,
+  EmbeddedTradeButtonWrap, InputRow, SwapBlock, SwapCard,
 } from '@app/containers/Pools/containers/shared/poolFlowLayout';
 import {
   createAmountFieldHandlers, formatPredictAmount, parseAmount, useAmountInputCaret,
@@ -56,6 +56,13 @@ const LPEstimateValue = styled.div`
   align-items: center;
 `;
 
+const LiquidityFormWrap = styled.div`
+  width: 100%;
+  max-width: 620px;
+  min-width: 0;
+  overflow-x: hidden;
+  margin-top: var(--pool-embedded-layout-margin-top);
+`;
 
 export const AddLiquidity = () => {
   const data = useSelector(selectCurrentPool());
@@ -252,12 +259,7 @@ export const AddLiquidity = () => {
           <BackNav onClick={() => navigate(ROUTES.POOLS.BASE)} />
           <MainCol>
             <PageSubTitle>Add Liquidity</PageSubTitle>
-            <EmbeddedLayout>
-              <div>{form}</div>
-              <RightPanel>
-                <PoolStat data={data} lp={currentLPToken} showFavorite plain />
-              </RightPanel>
-            </EmbeddedLayout>
+            <LiquidityFormWrap>{form}</LiquidityFormWrap>
           </MainCol>
         </PageLayout>
       </Container>

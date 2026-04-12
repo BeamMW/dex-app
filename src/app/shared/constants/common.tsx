@@ -55,16 +55,16 @@ export const poolHasRewards = (lpToken: number | string | null | undefined): boo
 
 export const titleSections = {
   ADD_LIQUIDITY: 'input deposit asset',
-  ADD_LIQUIDITY_SEND: 'Send Amount',
-  TRADE_RECEIVE: 'Receive Amount',
-  TRADE_SEND: 'Send Amount (estimated) ',
-  CREATE_FIRST: 'Select first asset',
-  CREATE_SECOND: 'Select second asset',
-  FEE: 'select FEE TIER',
+  ADD_LIQUIDITY_SEND: 'send amount',
+  TRADE_RECEIVE: 'receive amount',
+  TRADE_SEND: 'send amount (estimated)',
+  CREATE_FIRST: 'select first asset',
+  CREATE_SECOND: 'select second asset',
+  FEE: 'select fee tier',
 };
 
 export const placeHolder = {
-  ASSETS: 'Select asset',
-  FEE: 'select FEE TIER',
-  SEARCH: 'All assets',
+  ASSETS: 'select asset',
+  FEE: 'select fee tier',
+  SEARCH: 'all assets',
 };

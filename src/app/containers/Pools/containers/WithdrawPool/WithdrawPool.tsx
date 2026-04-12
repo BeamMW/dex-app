@@ -4,7 +4,7 @@ import {
   fromGroths, setDataRequest, toGroths, truncate,
 } from '@core/appUtils';
 import {
-  AssetsSection, Button, Container, Input, PoolStat, Window,
+  AssetsSection, Button, Container, Input, Window,
 } from '@app/shared/components';
 import { useInput } from '@app/shared/hooks';
 import * as mainActions from '@app/containers/Pools/store/actions';
@@ -17,7 +17,7 @@ import BackNav, { PageLayout, MainCol } from '@app/shared/components/BackNav';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
-  BlockLabel, ButtonWrapper, EmbeddedLayout, EmbeddedTradeButtonWrap, InputRow, RightPanel, SwapBlock, SwapCard,
+  BlockLabel, ButtonWrapper, EmbeddedTradeButtonWrap, InputRow, SwapBlock, SwapCard,
 } from '@app/containers/Pools/containers/shared/poolFlowLayout';
 import {
   createAmountFieldHandlers, formatPredictedFieldDisplay, parseAmount, useAmountInputCaret,
@@ -32,6 +32,13 @@ const PageSubTitle = styled.h4`
   color: rgba(255, 255, 255, 0.5);
 `;
 
+const LiquidityFormWrap = styled.div`
+  width: 100%;
+  max-width: 620px;
+  min-width: 0;
+  overflow-x: hidden;
+  margin-top: var(--pool-embedded-layout-margin-top);
+`;
 
 const purpleIn = { cursor: 'default' as const, color: 'var(--color-purple)', opacity: 1 };
 const actionsRow = {
@@ -79,7 +86,7 @@ export const WithdrawPool = () => {
           <BackNav onClick={() => navigate(ROUTES.POOLS.BASE)} />
           <MainCol>
             <PageSubTitle>Remove Liquidity</PageSubTitle>
-            <EmbeddedLayout>
+            <LiquidityFormWrap>
               <SwapCard>
                 <SwapBlock>
                   <BlockLabel>Withdraw LP</BlockLabel>
@@ -131,10 +138,7 @@ export const WithdrawPool = () => {
                   </div>
                 </EmbeddedTradeButtonWrap>
               </SwapCard>
-              <RightPanel>
-                <PoolStat data={data} lp={lp} showFavorite plain />
-              </RightPanel>
-            </EmbeddedLayout>
+            </LiquidityFormWrap>
           </MainCol>
         </PageLayout>
       </Container>
