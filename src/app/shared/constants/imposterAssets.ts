@@ -2,17 +2,17 @@ const IMPOSTER_ASSET_ENTRIES: Array<[number, number]> = [
   // [fakeAssetId, realAssetId]
 
   // BEAM ASSETS
-[24, 0], // BEAM
-[26, 7], // BEAMX
-  
-  // BRIDGE ASSETS 
-[40, 36], [17, 36],// bETH
-[41, 37], [18, 37], // bUSDT
-[42, 38], [19, 38], // bWBTC
-[43, 39], [35, 39], // bDAI
+  [24, 0], // BEAM
+  [26, 7], // BEAMX
+
+  // BRIDGE ASSETS
+  [40, 36], [17, 36], // bETH
+  [41, 37], [18, 37], // bUSDT
+  [42, 38], [19, 38], // bWBTC
+  [43, 39], [35, 39], // bDAI
 
   // OTHER
-[25, 9], // TICO
+  [25, 9], // TICO
 ];
 
 const IMPOSTER_ASSET_MAP = new Map<number, number>(IMPOSTER_ASSET_ENTRIES);

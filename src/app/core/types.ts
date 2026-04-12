@@ -147,3 +147,24 @@ export interface IOptions {
   value: number;
   label: string;
 }
+
+export interface IAccumulatorLockOption {
+  value: number;
+  label: string;
+}
+
+export interface IAccumulatorUserLock {
+  lpToken?: number;
+  ['unlock-height']?: number;
+  ['avail-BeamX']?: number;
+}
+
+export interface IAccumulatorRewardsState {
+  isAvailable: boolean;
+  isLoading: boolean;
+  error: string | null;
+  lpTokenBalance: number;
+  estimatedReward: number;
+  lockOptions: IAccumulatorLockOption[];
+  locks: IAccumulatorUserLock[];
+}

@@ -3,6 +3,12 @@ import { call, take } from 'redux-saga/effects';
 import { eventChannel, END } from 'redux-saga';
 import { setSystemState } from '@app/shared/store/actions';
 import { actions as mainActions } from '@app/containers/Pools/store/index';
+import {
+  buildShaderRuntimeMap,
+  getShaderDescriptor,
+  getShaderFeatures,
+  ShaderFeature,
+} from '@app/core/shaderRegistry';
 
 import connector from '@core/connector';
 import { setTxStatus } from '@app/containers/Pools/store/actions';
@@ -10,19 +16,27 @@ import store from '../../../index';
 
 const iFrameDetection = window !== window.parent;
 
-let shaderBytes: number[] | null = null;
+const shaderBytesByFeature: Partial<Record<ShaderFeature, number[]>> = {};
+
+async function warmupShaderCache(): Promise<void> {
+  await Promise.all(
+    getShaderFeatures().map(async (feature) => {
+      const descriptor = getShaderDescriptor(feature);
+      const bytes = await connector.downloadShader(descriptor.wasmPath);
+      shaderBytesByFeature[feature] = Array.from(bytes);
+    }),
+  );
+}
 
 export async function start() {
-  const bytes = await connector.downloadShader('./amm.wasm');
-  shaderBytes = Array.from(bytes);
+  await warmupShaderCache();
   await connector.callApi('ev_subunsub', {
     ev_txs_changed: true,
     ev_system_state: true,
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  store.dispatch(mainActions.loadAppParams.request(shaderBytes as any));
-  store.dispatch(mainActions.loadPoolsList.request(null));
+  store.dispatch(mainActions.loadAppParams.request(buildShaderRuntimeMap(shaderBytesByFeature)));
+  store.dispatch(mainActions.loadPoolsList.request(null, null));
 }
 
 export function remoteEventChannel() {
@@ -55,10 +69,7 @@ function* sharedSaga() {
 
         case 'ev_txs_changed':
           store.dispatch(setTxStatus(payload.result));
-          if (shaderBytes) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            store.dispatch(mainActions.loadAppParams.request(shaderBytes as any));
-          }
+          store.dispatch(mainActions.loadAppParams.request(buildShaderRuntimeMap(shaderBytesByFeature)));
           break;
         default:
           break;

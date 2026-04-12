@@ -2,9 +2,9 @@ import React, {
   ReactElement, useEffect, useRef, useState,
 } from 'react';
 import { styled } from '@linaria/react';
+import { css } from '@linaria/core';
 import { textButtonReset } from '../../styles/linariaShared';
 
-import { css } from '@linaria/core';
 import Angle from './Angle';
 
 const ContainerStyled = styled.div`

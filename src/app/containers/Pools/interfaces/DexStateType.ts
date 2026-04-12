@@ -1,6 +1,17 @@
 import {
-  IAsset, IOptions, IPoolCard, IPredict, ITxStatus,
+  IAsset, IOptions, IPoolCard, IPredict, ITxStatus, KindProcent,
 } from '@core/types';
+import { ShaderRuntimeMap } from '@app/core/shaderRegistry';
+
+export interface AccumulatorRewardsState {
+  isAvailable: boolean;
+  isLoading: boolean;
+  error: string | null;
+  lpTokenBalance: number;
+  estimatedReward: number;
+  locks: any[];
+  lockOptions: IOptions[];
+}
 
 export interface DexStateType {
   assetsList: IAsset[];
@@ -10,11 +21,13 @@ export interface DexStateType {
   predict: IPredict;
   currentPool: IPoolCard;
   filter: string;
+  feeFilter: KindProcent | null;
   options: IOptions[];
   favorites: IPoolCard[];
   favoriteAssets: number[];
   currentLPToken: IPoolCard;
   isLoading: boolean;
-  myPools: IPoolCard[];
   isHeadless: boolean;
+  shaderRuntimeMap: ShaderRuntimeMap | null;
+  rewards: AccumulatorRewardsState;
 }

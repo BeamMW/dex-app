@@ -7,5 +7,6 @@ export * from './PoolsContainer';
 export * from './SwapPoolsHome';
 export * from './ExplorePools';
 export * from './PoolView';
-export * from './MyPools';
 export * from './AssetInfo';
+export * from './AccumulatorRewards';
+export * from './Assets';

@@ -1,41 +1,60 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { css } from '@linaria/core';
 import { ROUTES } from '@app/shared/constants';
 
+const navRoot = css`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 18px 0 10px;
+`;
+
+const navInner = css`
+  width: 100%;
+  max-width: 980px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+`;
+
+const navLink = css`
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 8px 18px;
+  color: rgba(255, 255, 255, 0.6);
+  border-bottom: 2px solid transparent;
+
+  &[aria-current='page'] {
+    color: white;
+    border-bottom-color: var(--color-green);
+  }
+
+  @media (max-width: 600px) {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+`;
+
+const items = [
+  { to: ROUTES.NAV.TRADE, label: 'Swap' },
+  { to: ROUTES.NAV.POOLS, label: 'Pools' },
+  { to: ROUTES.NAV.ASSETS, label: 'Assets' },
+];
+
 export const TopNav = () => (
-  <nav style={{
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    margin: '18px 0 10px',
-  }}
-  >
-    <div style={{
-      width: '100%',
-      maxWidth: 980,
-      display: 'flex',
-      justifyContent: 'center',
-      borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-    }}
-    >
-      {[
-        { to: ROUTES.NAV.TRADE, label: 'Trade' },
-        { to: ROUTES.NAV.EXPLORE, label: 'Explore' },
-        { to: ROUTES.NAV.POOL, label: 'Pool' },
-        { to: ROUTES.NAV.MY, label: 'My' },
-      ].map((item) => (
+  <nav className={navRoot}>
+    <div className={navInner}>
+      {items.map((item) => (
         <NavLink
           key={item.to}
           to={item.to}
-          style={({ isActive }) => ({
-            color: isActive ? 'white' : 'rgba(255, 255, 255, 0.6)',
-            textDecoration: 'none',
-            textTransform: 'uppercase',
-            fontSize: 13,
-            fontWeight: 700,
-            padding: '8px 18px',
-            borderBottom: isActive ? '2px solid var(--color-green)' : '2px solid transparent',
-          })}
+          end={item.to === ROUTES.NAV.TRADE}
+          className={navLink}
         >
           {item.label}
         </NavLink>

@@ -4,7 +4,7 @@ set -euo pipefail
 DAPP_NAME="dex-app"
 MANIFEST_NAME="Beam DEX"
 MANIFEST_DESCRIPTION="AMM based decentralized exchange for Confidential Assets"
-MANIFEST_VERSION_PREFIX="1.0"
+MANIFEST_VERSION_PREFIX="1.1"
 MANIFEST_ICON="localapp/app/logo.svg"
 MANIFEST_URL="localapp/app/index.html"
 MANIFEST_API_VERSION="7.3"

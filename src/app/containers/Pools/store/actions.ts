@@ -9,7 +9,10 @@ import {
   ITrade,
   ITxStatus,
   IWithdraw,
+  KindProcent,
 } from '@core/types';
+import { ShaderRuntimeMap } from '@app/core/shaderRegistry';
+import { AccumulatorRewardsState } from '@app/containers/Pools/interfaces/DexStateType';
 import { MainActionsTypes } from '@app/containers/Pools/store/constants';
 
 export const setAssetsList = createAction(MainActionsTypes.SET_ASSETS_LIST)<IAsset[]>();
@@ -20,6 +23,7 @@ export const setTransactionStatus = createAction(MainActionsTypes.SET_TRANSACTIO
 export const setPredict = createAction(MainActionsTypes.SET_PREDICT)<IPredict>();
 export const setCurrentPool = createAction(MainActionsTypes.SET_CURRENT_POOL)<IPoolCard>();
 export const setFilter = createAction(MainActionsTypes.SET_FILTER)<string>();
+export const setFeeFilter = createAction(MainActionsTypes.SET_FEE_FILTER)<KindProcent | null>();
 export const setOptions = createAction(MainActionsTypes.SET_OPTIONS)<IOptions[]>();
 export const setFavorites = createAction(MainActionsTypes.SET_FAVORITES)<IPoolCard[]>();
 export const setFavoriteAssets = createAction(MainActionsTypes.SET_FAVORITE_ASSETS)<number[]>();
@@ -30,7 +34,6 @@ export const onToggleFavoriteAsset = createAsyncAction(
 )<number, number[], any>();
 export const setCurrentLPToken = createAction(MainActionsTypes.SET_CURRENT_LP_TOKEN)<IPoolCard>();
 export const setIsLoading = createAction(MainActionsTypes.SET_IS_LOADING)<boolean>();
-export const setMyPools = createAction(MainActionsTypes.SET_MY_POOLS)<IPoolCard[]>();
 export const setIsHeadless = createAction(MainActionsTypes.SET_IS_HEADLESS)<boolean>();
 
 export const loadAppParams = createAsyncAction(
@@ -85,3 +88,30 @@ export const onFindBestPool = createAsyncAction(
   MainActionsTypes.FIND_BEST_POOL_SUCCESS,
   MainActionsTypes.FIND_BEST_POOL_FAILURE,
 )<{ pools: IPoolCard[]; aid1: number; aid2: number; val2_pay?: number; val1_buy?: number }, IPoolCard, any>();
+
+export const setShaderRuntimeMap = createAction(MainActionsTypes.SET_SHADER_RUNTIME_MAP)<ShaderRuntimeMap>();
+export const setRewardsState = createAction(MainActionsTypes.SET_REWARDS_STATE)<Partial<AccumulatorRewardsState>>();
+
+export const loadAccumulatorRewards = createAsyncAction(
+  MainActionsTypes.LOAD_ACCUMULATOR_REWARDS,
+  MainActionsTypes.LOAD_ACCUMULATOR_REWARDS_SUCCESS,
+  MainActionsTypes.LOAD_ACCUMULATOR_REWARDS_FAILURE,
+)<{ pool: IPoolCard | null }, void, any>();
+
+export const predictAccumulatorRewards = createAsyncAction(
+  MainActionsTypes.PREDICT_ACCUMULATOR_REWARDS,
+  MainActionsTypes.PREDICT_ACCUMULATOR_REWARDS_SUCCESS,
+  MainActionsTypes.PREDICT_ACCUMULATOR_REWARDS_FAILURE,
+)<{ amountLpToken: number; lockPeriods: number; isNph?: number }, any, any>();
+
+export const lockAccumulatorRewards = createAsyncAction(
+  MainActionsTypes.LOCK_ACCUMULATOR_REWARDS,
+  MainActionsTypes.LOCK_ACCUMULATOR_REWARDS_SUCCESS,
+  MainActionsTypes.LOCK_ACCUMULATOR_REWARDS_FAILURE,
+)<{ amountLpToken: number; lockPeriods: number; isNph?: number }, any, any>();
+
+export const updateAccumulatorRewards = createAsyncAction(
+  MainActionsTypes.UPDATE_ACCUMULATOR_REWARDS,
+  MainActionsTypes.UPDATE_ACCUMULATOR_REWARDS_SUCCESS,
+  MainActionsTypes.UPDATE_ACCUMULATOR_REWARDS_FAILURE,
+)<{ withdrawBeamX: number; withdrawLpToken: number; hEnd: number; isNph?: number }, any, any>();

@@ -5,7 +5,18 @@ import {
   IAsset, IPoolCard, ITxId, ITxResult, ITxStatus, TxStatus,
 } from '@core/types';
 import {
-  AddLiquidityApi, CreatePoolApi, LoadAssetsList, LoadPoolsList, TradePoolApi, WithdrawApi,
+  AddLiquidityApi,
+  CreatePoolApi,
+  LoadAssetsList,
+  LoadPoolsList,
+  LockAccumulatorApi,
+  PredictAccumulatorYieldApi,
+  toContractCallConfig,
+  TradePoolApi,
+  UpdateAccumulatorUserApi,
+  ViewAccumulatorParamsApi,
+  ViewAccumulatorUserApi,
+  WithdrawApi,
 } from '@core/api';
 import {
   checkTxStatus,
@@ -18,23 +29,47 @@ import {
 } from '@core/appUtils';
 import { AppState } from '@app/shared/interface';
 import * as mainActions from '@app/containers/Pools/store/actions';
-import { selectCurrentPool, selectFavorites, selectFilter } from '@app/containers/Pools/store/selectors';
+import {
+  selectCurrentPool,
+  selectFavorites,
+  selectFilter,
+  selectShaderRuntimeMap,
+} from '@app/containers/Pools/store/selectors';
 import { toast } from 'react-toastify';
 import { navigate } from '@app/shared/store/actions';
 import { ROUTES } from '@app/shared/constants';
 import connector from '@core/connector';
 import { actions as Shared } from '@app/shared/store/index';
+import { ShaderRuntimeMap } from '@app/core/shaderRegistry';
 import { actions } from '.';
+
+const DEFAULT_LOCK_OPTIONS = [
+  { value: 1, label: '1 month' },
+  { value: 3, label: '3 months' },
+  { value: 6, label: '6 months' },
+  { value: 12, label: '12 months' },
+];
+
+function* selectAmmCallConfig() {
+  const shaderRuntimeMap = (yield select(selectShaderRuntimeMap())) as ShaderRuntimeMap | null;
+  return toContractCallConfig(shaderRuntimeMap?.amm);
+}
+
+function* selectAccumulatorCallConfig() {
+  const shaderRuntimeMap = (yield select(selectShaderRuntimeMap())) as ShaderRuntimeMap | null;
+  return toContractCallConfig(shaderRuntimeMap?.accumulator);
+}
 
 export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.request>): Generator {
   try {
+    yield put(mainActions.setShaderRuntimeMap(action.payload));
     yield setStorage();
     const favoritesLocal = JSON.parse(localStorage.getItem('favorites')) || [];
     const favoriteAssetsLocal: number[] = JSON.parse(localStorage.getItem('favoriteAssets')) || [];
     const filter = yield select(selectFilter());
     let assetsList: IAsset[] = [];
     try {
-      assetsList = (yield call(LoadAssetsList, action.payload ? action.payload : null)) as IAsset[];
+      assetsList = (yield call(LoadAssetsList)) as IAsset[];
     } catch (_error) {
       // Keep loading contract/pool data even if wallet assets endpoint fails.
       assetsList = [];
@@ -47,10 +82,9 @@ export function* loadParamsSaga(action: ReturnType<typeof actions.loadAppParams.
     yield put(mainActions.setAssetsList(assetsList));
     const options = getOptions(assetsList);
     yield put(mainActions.setOptions(options));
-    const poolsList = (yield call(LoadPoolsList, action.payload ? action.payload : null)) as IPoolCard[];
+    const ammConfig = (yield selectAmmCallConfig()) as ReturnType<typeof toContractCallConfig>;
+    const poolsList = (yield call(LoadPoolsList, ammConfig)) as IPoolCard[];
     const newPoolList: IPoolCard[] = poolsList.map((pool) => parsePoolMetadata(pool, pool.aid1, pool.aid2, assetsList));
-    const myPools = newPoolList.filter((el) => el.creator);
-    yield put(mainActions.setMyPools(myPools));
     const filteredPools = onFilter(newPoolList, filter as string, favoritesLocal) as IPoolCard[];
     yield put(mainActions.setPoolsList(filteredPools));
     yield put(Shared.setIsLoaded(true));
@@ -94,8 +128,9 @@ export function* createPool(action: ReturnType<typeof mainActions.onCreatePool.r
     yield onSwitchToApi();
   } else {
     try {
+      const ammConfig = (yield selectAmmCallConfig()) as ReturnType<typeof toContractCallConfig>;
       // @ts-ignore
-      const { txid } = (yield call(CreatePoolApi, action.payload ? action.payload : null)) as ITxId;
+      const { txid } = (yield call(CreatePoolApi, action.payload ? action.payload : null, ammConfig)) as ITxId;
       if (txid) {
         yield navigateToHome(txid);
         yield getStatus(txid);
@@ -113,11 +148,12 @@ export function* addLiquidity(action: ReturnType<typeof mainActions.onAddLiquidi
     yield onSwitchToApi();
   } else {
     try {
+      const ammConfig = (yield selectAmmCallConfig()) as ReturnType<typeof toContractCallConfig>;
       // @ts-ignore
       const {
         txid,
         res,
-      } = (yield call(AddLiquidityApi, action.payload ? action.payload : null)) as ITxResult;
+      } = (yield call(AddLiquidityApi, action.payload ? action.payload : null, ammConfig)) as ITxResult;
       if (res) {
         yield put(mainActions.setPredict(res));
       }
@@ -142,8 +178,9 @@ export function* addLiquidity(action: ReturnType<typeof mainActions.onAddLiquidi
 }
 export function* predictTrade(action: ReturnType<typeof mainActions.onPredictTrade.request>): Generator {
   try {
+    const ammConfig = (yield selectAmmCallConfig()) as ReturnType<typeof toContractCallConfig>;
     // @ts-ignore
-    const { res } = (yield call(TradePoolApi, action.payload ? action.payload : null)) as ITxResult;
+    const { res } = (yield call(TradePoolApi, action.payload ? action.payload : null, ammConfig)) as ITxResult;
     if (res) {
       yield put(mainActions.setPredict(res));
     }
@@ -157,11 +194,12 @@ export function* tradePool(action: ReturnType<typeof mainActions.onTradePool.req
     yield onSwitchToApi();
   } else {
     try {
+      const ammConfig = (yield selectAmmCallConfig()) as ReturnType<typeof toContractCallConfig>;
       // @ts-ignore
       const {
         res,
         txid,
-      } = (yield call(TradePoolApi, action.payload ? action.payload : null)) as ITxResult;
+      } = (yield call(TradePoolApi, action.payload ? action.payload : null, ammConfig)) as ITxResult;
       if (res) {
         yield put(mainActions.setPredict(res));
       }
@@ -180,11 +218,12 @@ export function* withdrawPool(action: ReturnType<typeof mainActions.onWithdraw.r
     yield onSwitchToApi();
   } else {
     try {
+      const ammConfig = (yield selectAmmCallConfig()) as ReturnType<typeof toContractCallConfig>;
       // @ts-ignore
       const {
         res,
         txid,
-      } = (yield call(WithdrawApi, action.payload ? action.payload : null)) as ITxResult;
+      } = (yield call(WithdrawApi, action.payload ? action.payload : null, ammConfig)) as ITxResult;
       if (res) {
         yield put(mainActions.setPredict(res));
       }
@@ -254,12 +293,13 @@ export function* findBestPool(action: ReturnType<typeof mainActions.onFindBestPo
     val1_buy: val1_buy || 0,
     bPredictOnly: 1,
   };
+  const ammConfig = (yield selectAmmCallConfig()) as ReturnType<typeof toContractCallConfig>;
 
   // @ts-ignore – fire all pool predictions in parallel
   const results: Array<{ pool: IPoolCard; result: ITxResult | null }> = yield all(
     pools.map((pool: IPoolCard) => call(function* () {
       try {
-        const result = (yield call(TradePoolApi, { ...predictParams, kind: pool.kind })) as ITxResult;
+        const result = (yield call(TradePoolApi, { ...predictParams, kind: pool.kind }, ammConfig)) as ITxResult;
         return { pool, result };
       } catch (_) {
         return { pool, result: null };
@@ -288,6 +328,110 @@ export function* findBestPool(action: ReturnType<typeof mainActions.onFindBestPo
   }
 }
 
+function parseAccumulatorLocks(userView: any): any[] {
+  if (!userView) return [];
+  if (Array.isArray(userView.res)) return userView.res;
+  if (Array.isArray(userView['res-nph'])) return userView['res-nph'];
+  if (Array.isArray(userView)) return userView;
+  return [];
+}
+
+function parseLpBalance(userView: any): number {
+  if (!userView) return 0;
+  if (typeof userView['lpToken-post'] === 'number') return userView['lpToken-post'];
+  if (userView.res && typeof userView.res['lpToken-post'] === 'number') return userView.res['lpToken-post'];
+  return 0;
+}
+
+export function* loadAccumulatorRewards(action: ReturnType<typeof mainActions.loadAccumulatorRewards.request>): Generator {
+  const { pool } = action.payload;
+  if (!pool) {
+    yield put(mainActions.setRewardsState({
+      isAvailable: false,
+      isLoading: false,
+      error: null,
+      lpTokenBalance: 0,
+      estimatedReward: 0,
+      locks: [],
+      lockOptions: DEFAULT_LOCK_OPTIONS,
+    }));
+    return;
+  }
+
+  try {
+    yield put(mainActions.setRewardsState({ isLoading: true, error: null }));
+    const accumulatorConfig = (yield selectAccumulatorCallConfig()) as ReturnType<typeof toContractCallConfig>;
+    const params = (yield call(ViewAccumulatorParamsApi, accumulatorConfig)) as Record<string, any>;
+    const userView = (yield call(ViewAccumulatorUserApi, accumulatorConfig)) as Record<string, any>;
+    const locks = parseAccumulatorLocks(userView);
+    const lpTokenBalance = parseLpBalance(userView);
+    const hasRemaining = Number(params?.['farm-remaining-height'] || params?.['farm-nph-remaining-height'] || 0) > 0;
+    yield put(mainActions.setRewardsState({
+      isLoading: false,
+      isAvailable: hasRemaining || lpTokenBalance > 0 || locks.length > 0,
+      lockOptions: DEFAULT_LOCK_OPTIONS,
+      locks,
+      lpTokenBalance,
+      error: null,
+    }));
+  } catch (error: any) {
+    yield put(mainActions.setRewardsState({
+      isLoading: false,
+      isAvailable: false,
+      error: error?.message || 'Failed to load rewards',
+      lockOptions: DEFAULT_LOCK_OPTIONS,
+      locks: [],
+      lpTokenBalance: 0,
+      estimatedReward: 0,
+    }));
+  }
+}
+
+export function* predictAccumulatorRewards(
+  action: ReturnType<typeof mainActions.predictAccumulatorRewards.request>,
+): Generator {
+  try {
+    const accumulatorConfig = (yield selectAccumulatorCallConfig()) as ReturnType<typeof toContractCallConfig>;
+    const response = (yield call(PredictAccumulatorYieldApi, action.payload, accumulatorConfig)) as any;
+    const estimatedReward = Number(response?.res?.reward || response?.reward || 0);
+    yield put(mainActions.setRewardsState({ estimatedReward }));
+  } catch (_) {
+    yield put(mainActions.setRewardsState({ estimatedReward: 0 }));
+  }
+}
+
+export function* lockAccumulatorRewards(
+  action: ReturnType<typeof mainActions.lockAccumulatorRewards.request>,
+): Generator {
+  try {
+    const accumulatorConfig = (yield selectAccumulatorCallConfig()) as ReturnType<typeof toContractCallConfig>;
+    const response = (yield call(LockAccumulatorApi, action.payload, accumulatorConfig)) as { txid?: string };
+    if (response?.txid) {
+      toast('Rewards lock transaction submitted');
+      yield put(mainActions.loadAccumulatorRewards.request({ pool: (yield select(selectCurrentPool())) as IPoolCard }));
+    }
+  } catch (error: any) {
+    yield put(mainActions.lockAccumulatorRewards.failure(error, null));
+    toast(error?.message || 'Failed to lock rewards');
+  }
+}
+
+export function* updateAccumulatorRewards(
+  action: ReturnType<typeof mainActions.updateAccumulatorRewards.request>,
+): Generator {
+  try {
+    const accumulatorConfig = (yield selectAccumulatorCallConfig()) as ReturnType<typeof toContractCallConfig>;
+    const response = (yield call(UpdateAccumulatorUserApi, action.payload, accumulatorConfig)) as { txid?: string };
+    if (response?.txid) {
+      toast('Rewards action transaction submitted');
+      yield put(mainActions.loadAccumulatorRewards.request({ pool: (yield select(selectCurrentPool())) as IPoolCard }));
+    }
+  } catch (error: any) {
+    yield put(mainActions.updateAccumulatorRewards.failure(error, null));
+    toast(error?.message || 'Failed to update rewards');
+  }
+}
+
 function* mainSaga() {
   yield takeLatest(mainActions.loadAppParams.request, loadParamsSaga);
   yield takeLatest(mainActions.onCreatePool.request, createPool);
@@ -298,6 +442,10 @@ function* mainSaga() {
   yield takeLatest(mainActions.onFavorites.request, favorites);
   yield takeLatest(mainActions.onToggleFavoriteAsset.request, favoriteAsset);
   yield takeLatest(mainActions.onFindBestPool.request, findBestPool);
+  yield takeLatest(mainActions.loadAccumulatorRewards.request, loadAccumulatorRewards);
+  yield takeLatest(mainActions.predictAccumulatorRewards.request, predictAccumulatorRewards);
+  yield takeLatest(mainActions.lockAccumulatorRewards.request, lockAccumulatorRewards);
+  yield takeLatest(mainActions.updateAccumulatorRewards.request, updateAccumulatorRewards);
 }
 
 export default mainSaga;

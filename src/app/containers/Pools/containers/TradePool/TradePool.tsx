@@ -4,7 +4,7 @@ import React, {
 import { createPortal } from 'react-dom';
 import { IOptions, ITrade, IPoolCard } from '@core/types';
 import {
-  emptyPredict, fromGroths, getPoolKind, setDataRequest, toGroths, truncate,
+  emptyPredict, formatNumber, fromGroths, getPoolKind, setDataRequest, toGroths, truncate,
 } from '@core/appUtils';
 import { styled } from '@linaria/react';
 import {
@@ -29,15 +29,19 @@ import {
   selectOptions,
   selectPredirect,
   selectPoolsList,
+  selectRewards,
 } from '@app/containers/Pools/store/selectors';
 import {
   CancelIcon, DoneIcon, IconExchange, IconReceive, IconShieldChecked,
 } from '@app/shared/icons';
 import {
-  BEAM_ID, BEAMX_ID, ROUTES, titleSections,
-  getRealAssetIdForFake, isImposterAsset,
+  BEAM_ID, BEAMX_ID, REWARDS_DEV_MODE, ROUTES, titleSections,
+  getRealAssetIdForFake, isImposterAsset, poolHasRewards,
 } from '@app/shared/constants';
-import AssetLabel from '@app/shared/components/AssetLabel';
+import AssetIcon from '@app/shared/components/AssetsIcon';
+import AssetLabel, {
+  Amount, AssetsId, PredictTitleStyled,
+} from '@app/shared/components/AssetLabel';
 import { useNavigate } from 'react-router-dom';
 import {
   AssetAmount,
@@ -58,7 +62,6 @@ import {
   InlineSelect,
   InputRow,
   Line,
-  RateRow,
   RateText,
   RightPanel,
   SearchHint,
@@ -70,6 +73,14 @@ import {
   SummaryPanel,
   SummaryTitle,
   SummaryWrapper,
+  TradeSummaryIconInner,
+  TradeSummaryTable,
+  TradeSummaryTdIcon,
+  TradeSummaryTdLabel,
+  TradeSummaryTdValue,
+  TradeSummaryTitleInGrid,
+  TradeSummaryNameId,
+  TradeSummaryValueInner,
   SwapBlock,
   SwapCard,
   TotalTitle,
@@ -82,6 +93,35 @@ import {
 } from '@app/containers/Pools/containers/shared/poolAmountInput';
 
 const receiveAmountInputStyle = { cursor: 'default', color: 'var(--color-purple)', opacity: 1 } as const;
+
+const RateSwitcherWrap = styled.div`
+  display: flex;
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 0;
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin: 0 !important;
+    padding: 0;
+    line-height: 0;
+    vertical-align: unset;
+
+    > svg {
+      display: block;
+      width: 18px;
+      height: 18px;
+      vertical-align: unset;
+    }
+  }
+`;
 
 /** Mirrors Totals::Trade + FeeSettings::Get from amm/contract.h exactly. */
 function tradeForward(
@@ -237,6 +277,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   const pools = useSelector(selectPoolsList());
   const options = useSelector(selectOptions());
   const predictData = useSelector(selectPredirect());
+  const rewards = useSelector(selectRewards());
   const [currentToken, setCurrentToken] = useState<number | null>(data?.aid1 ?? null);
   const [secondToken, setSecondToken] = useState<number | null>(data?.aid2 ?? null);
   const [currentLPToken, setCurrentLPToken] = useState(null);
@@ -279,6 +320,16 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
     2,
     setLastChangedInput,
   );
+
+  const toPoolPartnerIds = useMemo(() => {
+    if (currentToken === null) return new Set<number>();
+    const partnerIds = (pools || []).flatMap((p) => {
+      if (p.aid1 === currentToken) return [p.aid2];
+      if (p.aid2 === currentToken) return [p.aid1];
+      return [];
+    });
+    return new Set(partnerIds);
+  }, [pools, currentToken]);
 
   const matchedPools = useMemo<IPoolCard[]>(() => {
     if (currentToken === null || secondToken === null) return [];
@@ -362,6 +413,14 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   }, [embedded, pools, options, currentToken, secondToken]);
 
   useEffect(() => {
+    if (currentToken === null || secondToken === null) return;
+    if (!toPoolPartnerIds.has(secondToken)) {
+      const first = toPoolPartnerIds.values().next().value;
+      if (first !== undefined) setSecondToken(first);
+    }
+  }, [currentToken, secondToken, toPoolPartnerIds]);
+
+  useEffect(() => {
     if (!embedded && data?.aid1 && data?.aid2) {
       setCurrentToken(data.aid1);
       setSecondToken(data.aid2);
@@ -437,6 +496,17 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   }, [amountSendInput.value, currentToken, secondToken, lastChangedInput, manualKind]);
 
   const hasActivePool = !!activePool;
+  const hasRewardsPool = poolHasRewards(activePool?.['lp-token'] || activePool?.lp_token);
+  const hasRemainingRewardsBalance = rewards.lpTokenBalance > 0
+    || rewards.locks.some((lock) => Number(lock.lpToken || 0) > 0 || Number(lock['avail-BeamX'] || 0) > 0);
+  const showRewardsButton = REWARDS_DEV_MODE
+    ? true
+    : (hasActivePool && hasRewardsPool && rewards.isAvailable && hasRemainingRewardsBalance);
+
+  useEffect(() => {
+    dispatch(mainActions.loadAccumulatorRewards.request({ pool: activePool || null }));
+  }, [dispatch, activePool]);
+
   useEffect(() => {
     if (!walletRequestData || !hasActivePool || lastChangedInput !== 1) return;
     const willFindBest = !manualKind && matchedPools.length > 1;
@@ -754,74 +824,155 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
   }
 
   function renderEmbeddedTradeSummary() {
+    const payAssetId = currentToken ?? 0;
     return (
       <SummaryPanel>
         <SummaryHeader>trade summary</SummaryHeader>
         <SummaryWrapper style={{ marginTop: 0 }}>
-          <RateRow>
-            <SummaryTitle>Rate</SummaryTitle>
-            <RateText>{`1 ${rateLeft} = ${shownRate.toLocaleString('en-US', { minimumFractionDigits: 8, maximumFractionDigits: 8 })} ${rateRight}`}</RateText>
-            <Button icon={IconExchange} variant="icon" onClick={() => setFlipRate((f) => !f)} />
-          </RateRow>
-          <SummaryContainer>
-            <SummaryTitle>You buy</SummaryTitle>
-            <SummaryAsset>
-              <AssetLabel
-                variant="predict"
-                title={tokenName_2}
-                assets_id={secondToken ?? 0}
-                amount={displayedBuyRaw}
-              />
-            </SummaryAsset>
-          </SummaryContainer>
-          <SummaryContainer>
-            <SummaryTitle>DAO Fee</SummaryTitle>
-            <SummaryAsset>
-              <AssetLabel
-                variant="predict"
-                title={tokenName_1}
-                assets_id={currentToken ?? 0}
-                amount={displayedFeeDao}
-              />
-            </SummaryAsset>
-          </SummaryContainer>
-          <SummaryContainer>
-            <SummaryTitle>LP Fee</SummaryTitle>
-            <SummaryAsset>
-              <AssetLabel
-                variant="predict"
-                title={tokenName_1}
-                assets_id={currentToken ?? 0}
-                amount={displayedFeePool}
-              />
-            </SummaryAsset>
-          </SummaryContainer>
-          <SummaryContainer>
-            <SummaryTitle>Total Fee</SummaryTitle>
-            <SummaryAsset>
-              <AssetLabel
-                variant="predict"
-                title={tokenName_1}
-                assets_id={currentToken ?? 0}
-                amount={displayedFeeTotal}
-              />
-            </SummaryAsset>
-          </SummaryContainer>
-          <SummaryContainer>
-            <SummaryTitle>Total Pay</SummaryTitle>
-            <SummaryAsset>
-              <AssetLabel
-                variant="predict"
-                title={tokenName_1}
-                assets_id={currentToken ?? 0}
-                amount={displayedPayRaw}
-              />
-            </SummaryAsset>
-          </SummaryContainer>
-          <SummaryContainer>
-            <SummaryTitle>Impact</SummaryTitle>
-            <SummaryAsset>{`${displayedImpact.toFixed(2)}%`}</SummaryAsset>
-          </SummaryContainer>
+          <TradeSummaryTable>
+            <colgroup>
+              <col style={{ width: 92 }} />
+              <col style={{ width: 28 }} />
+              <col />
+            </colgroup>
+            <tbody>
+              <tr>
+                <TradeSummaryTdLabel>
+                  <TradeSummaryTitleInGrid>Rate</TradeSummaryTitleInGrid>
+                </TradeSummaryTdLabel>
+                <TradeSummaryTdIcon>
+                  <TradeSummaryIconInner>
+                    <RateSwitcherWrap>
+                      <Button icon={IconExchange} variant="icon" onClick={() => setFlipRate((f) => !f)} />
+                    </RateSwitcherWrap>
+                  </TradeSummaryIconInner>
+                </TradeSummaryTdIcon>
+                <TradeSummaryTdValue>
+                  <TradeSummaryValueInner>
+                    <RateText>{`1 ${rateLeft} = ${shownRate.toLocaleString('en-US', { minimumFractionDigits: 8, maximumFractionDigits: 8 })} ${rateRight}`}</RateText>
+                  </TradeSummaryValueInner>
+                </TradeSummaryTdValue>
+              </tr>
+              <tr>
+                <TradeSummaryTdLabel>
+                  <TradeSummaryTitleInGrid>You buy</TradeSummaryTitleInGrid>
+                </TradeSummaryTdLabel>
+                <TradeSummaryTdIcon>
+                  <TradeSummaryIconInner>
+                    <AssetIcon asset_id={secondToken ?? 0} />
+                  </TradeSummaryIconInner>
+                </TradeSummaryTdIcon>
+                <TradeSummaryTdValue>
+                  <TradeSummaryValueInner>
+                    {displayedBuyRaw >= 0 && (
+                      <Amount>{formatNumber(fromGroths(displayedBuyRaw))}</Amount>
+                    )}
+                    <TradeSummaryNameId>
+                      <PredictTitleStyled>{tokenName_2}</PredictTitleStyled>
+                      <AssetsId>{`(id:${secondToken ?? 0})`}</AssetsId>
+                    </TradeSummaryNameId>
+                  </TradeSummaryValueInner>
+                </TradeSummaryTdValue>
+              </tr>
+              <tr>
+                <TradeSummaryTdLabel>
+                  <TradeSummaryTitleInGrid>DAO Fee</TradeSummaryTitleInGrid>
+                </TradeSummaryTdLabel>
+                <TradeSummaryTdIcon>
+                  <TradeSummaryIconInner>
+                    <AssetIcon asset_id={payAssetId} />
+                  </TradeSummaryIconInner>
+                </TradeSummaryTdIcon>
+                <TradeSummaryTdValue>
+                  <TradeSummaryValueInner>
+                    {displayedFeeDao >= 0 && (
+                      <Amount>{formatNumber(fromGroths(displayedFeeDao))}</Amount>
+                    )}
+                    <TradeSummaryNameId>
+                      <PredictTitleStyled>{tokenName_1}</PredictTitleStyled>
+                      <AssetsId>{`(id:${payAssetId})`}</AssetsId>
+                    </TradeSummaryNameId>
+                  </TradeSummaryValueInner>
+                </TradeSummaryTdValue>
+              </tr>
+              <tr>
+                <TradeSummaryTdLabel>
+                  <TradeSummaryTitleInGrid>LP Fee</TradeSummaryTitleInGrid>
+                </TradeSummaryTdLabel>
+                <TradeSummaryTdIcon>
+                  <TradeSummaryIconInner>
+                    <AssetIcon asset_id={payAssetId} />
+                  </TradeSummaryIconInner>
+                </TradeSummaryTdIcon>
+                <TradeSummaryTdValue>
+                  <TradeSummaryValueInner>
+                    {displayedFeePool >= 0 && (
+                      <Amount>{formatNumber(fromGroths(displayedFeePool))}</Amount>
+                    )}
+                    <TradeSummaryNameId>
+                      <PredictTitleStyled>{tokenName_1}</PredictTitleStyled>
+                      <AssetsId>{`(id:${payAssetId})`}</AssetsId>
+                    </TradeSummaryNameId>
+                  </TradeSummaryValueInner>
+                </TradeSummaryTdValue>
+              </tr>
+              <tr>
+                <TradeSummaryTdLabel>
+                  <TradeSummaryTitleInGrid>Total Fee</TradeSummaryTitleInGrid>
+                </TradeSummaryTdLabel>
+                <TradeSummaryTdIcon>
+                  <TradeSummaryIconInner>
+                    <AssetIcon asset_id={payAssetId} />
+                  </TradeSummaryIconInner>
+                </TradeSummaryTdIcon>
+                <TradeSummaryTdValue>
+                  <TradeSummaryValueInner>
+                    {displayedFeeTotal >= 0 && (
+                      <Amount>{formatNumber(fromGroths(displayedFeeTotal))}</Amount>
+                    )}
+                    <TradeSummaryNameId>
+                      <PredictTitleStyled>{tokenName_1}</PredictTitleStyled>
+                      <AssetsId>{`(id:${payAssetId})`}</AssetsId>
+                    </TradeSummaryNameId>
+                  </TradeSummaryValueInner>
+                </TradeSummaryTdValue>
+              </tr>
+              <tr>
+                <TradeSummaryTdLabel>
+                  <TradeSummaryTitleInGrid>Total Pay</TradeSummaryTitleInGrid>
+                </TradeSummaryTdLabel>
+                <TradeSummaryTdIcon>
+                  <TradeSummaryIconInner>
+                    <AssetIcon asset_id={payAssetId} />
+                  </TradeSummaryIconInner>
+                </TradeSummaryTdIcon>
+                <TradeSummaryTdValue>
+                  <TradeSummaryValueInner>
+                    {displayedPayRaw >= 0 && (
+                      <Amount>{formatNumber(fromGroths(displayedPayRaw))}</Amount>
+                    )}
+                    <TradeSummaryNameId>
+                      <PredictTitleStyled>{tokenName_1}</PredictTitleStyled>
+                      <AssetsId>{`(id:${payAssetId})`}</AssetsId>
+                    </TradeSummaryNameId>
+                  </TradeSummaryValueInner>
+                </TradeSummaryTdValue>
+              </tr>
+              <tr>
+                <TradeSummaryTdLabel>
+                  <TradeSummaryTitleInGrid>Impact</TradeSummaryTitleInGrid>
+                </TradeSummaryTdLabel>
+                <TradeSummaryTdIcon aria-hidden>
+                  <TradeSummaryIconInner />
+                </TradeSummaryTdIcon>
+                <TradeSummaryTdValue>
+                  <TradeSummaryValueInner>
+                    <PredictTitleStyled>{`${displayedImpact.toFixed(2)}%`}</PredictTitleStyled>
+                  </TradeSummaryValueInner>
+                </TradeSummaryTdValue>
+              </tr>
+            </tbody>
+          </TradeSummaryTable>
         </SummaryWrapper>
       </SummaryPanel>
     );
@@ -920,7 +1071,6 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                     </InputRow>
                   </AssetsSection>
                   <HintRow>
-                    <span>Click asset selector to search.</span>
                     {fromAmountError && <ErrorHint>amount exceeds pool reserves</ErrorHint>}
                   </HintRow>
                 </SwapBlock>
@@ -947,6 +1097,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                           value={selectValue(secondToken)}
                           onSelect={onSelectToToken}
                           excludeAssetId={currentToken}
+                          allowedAssetIds={currentToken === null ? null : toPoolPartnerIds}
                           placeholder="Select asset"
                           showWarning={isImposterAsset(secondToken)}
                           isOpen={toSelectorOpen}
@@ -957,15 +1108,9 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                     </InputRow>
                   </AssetsSection>
                   <HintRow>
-                    <span>Click asset selector to search.</span>
                     {toAmountError && <ErrorHint>amount exceeds pool reserves</ErrorHint>}
                   </HintRow>
                 </SwapBlock>
-                {!activePool && (
-                  <div style={{ marginTop: 12 }}>
-                    {renderEmbeddedTradeSummary()}
-                  </div>
-                )}
                 <EmbeddedTradeButtonWrap>
                   <Button
                     disabled={isTradeDisabled}
@@ -984,16 +1129,18 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                   <>
                     <PoolStat data={activePool} lp={currentLPToken} showFavorite plain />
                     {renderFeeTierRow()}
-                    <EmbeddedActionRow>
+                    <EmbeddedActionRow className="trade-embedded-actions">
                       <Button
+                        className="trade-embedded-action-button"
                         icon={IconShieldChecked}
                         variant="control"
                         onClick={() => navigate(ROUTES.POOLS.ADD_LIQUIDITY)}
                         disabled={!activePool}
                       >
-                        Add Liquidity
+                        add 
                       </Button>
                       <Button
+                        className="trade-embedded-action-button"
                         icon={IconReceive}
                         variant="control"
                         pallete="blue"
@@ -1002,17 +1149,26 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                       >
                         Withdraw
                       </Button>
+                      {showRewardsButton && (
+                        <Button
+                          className="trade-embedded-action-button"
+                          variant="control"
+                          pallete="purple"
+                          onClick={() => navigate(ROUTES.POOLS.ACCUMULATOR_REWARDS)}
+                          disabled={!activePool}
+                        >
+                          $ rewards
+                        </Button>
+                      )}
                     </EmbeddedActionRow>
                   </>
                 ) : (
                   <EmptyPoolState>No pool matches this pair and filter combination.</EmptyPoolState>
                 )}
               </RightPanel>
-              {activePool ? (
-                <EmbeddedTradeSummaryBelowPool>
-                  {renderEmbeddedTradeSummary()}
-                </EmbeddedTradeSummaryBelowPool>
-              ) : null}
+              <EmbeddedTradeSummaryBelowPool>
+                {renderEmbeddedTradeSummary()}
+              </EmbeddedTradeSummaryBelowPool>
               </EmbeddedRightStack>
             </EmbeddedLayout>
           </Container>
@@ -1081,6 +1237,7 @@ export const TradePool = ({ embedded = false }: TradePoolProps) => {
                       value={selectValue(secondToken)}
                       onSelect={onSelectToToken}
                       excludeAssetId={currentToken}
+                      allowedAssetIds={currentToken === null ? null : toPoolPartnerIds}
                       placeholder="Select asset"
                       showWarning={isImposterAsset(secondToken)}
                     isOpen={toSelectorOpen}

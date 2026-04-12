@@ -4,7 +4,7 @@ import {
   emptyPredict, fromGroths, getLPToken, setDataRequest, toGroths, truncate,
 } from '@core/appUtils';
 import {
-  AssetsSection, Button, Container, Input, PoolStat, Window,
+  AssetsSection, Button, Container, Input, Window,
 } from '@app/shared/components';
 import { useDispatch, useSelector } from 'react-redux';
 import * as mainActions from '@app/containers/Pools/store/actions';
@@ -12,15 +12,57 @@ import { selectAssetsList, selectCurrentPool, selectPredirect } from '@app/conta
 import { useInput } from '@app/shared/hooks';
 import { ROUTES } from '@app/shared/constants';
 import { CancelIcon, DoneIcon } from '@app/shared/icons';
+import BackNav, { PageLayout, MainCol } from '@app/shared/components/BackNav';
 import AssetLabel from '@app/shared/components/AssetLabel';
 import { useNavigate } from 'react-router-dom';
+import { styled } from '@linaria/react';
 import {
-  BlockLabel, ButtonBlock, ButtonWrapper, EmbeddedLayout,
-  EmbeddedTradeButtonWrap, InputRow, RightPanel, SwapBlock, SwapCard,
+  BlockLabel, ButtonBlock, ButtonWrapper,
+  EmbeddedTradeButtonWrap, InputRow, SwapBlock, SwapCard,
 } from '@app/containers/Pools/containers/shared/poolFlowLayout';
 import {
   createAmountFieldHandlers, formatPredictAmount, parseAmount, useAmountInputCaret,
 } from '@app/containers/Pools/containers/shared/poolAmountInput';
+
+const PageSubTitle = styled.h4`
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: rgba(255, 255, 255, 0.5);
+`;
+
+const LPEstimateRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  margin-top: 6px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.02);
+`;
+
+const LPEstimateLabel = styled.span`
+  font-size: 12px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+`;
+
+const LPEstimateValue = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const LiquidityFormWrap = styled.div`
+  width: 100%;
+  max-width: 620px;
+  min-width: 0;
+  overflow-x: hidden;
+  margin-top: var(--pool-embedded-layout-margin-top);
+`;
 
 export const AddLiquidity = () => {
   const data = useSelector(selectCurrentPool());
@@ -107,8 +149,20 @@ export const AddLiquidity = () => {
     caret2.handleChange(e);
   };
 
+  const lpLabel = currentLPToken?.parsedMetadata?.UN ? truncate(currentLPToken.parsedMetadata.UN) : 'AMML';
+  const lpAid = currentLPToken?.aid ?? data['lp-token'];
+  const estimatedCtl = predictData?.ctl;
+
   const footer = (
     <EmbeddedTradeButtonWrap>
+      {estimatedCtl && (
+        <LPEstimateRow>
+          <LPEstimateLabel>You receive (est.)</LPEstimateLabel>
+          <LPEstimateValue>
+            <AssetLabel title={lpLabel} assets_id={lpAid} variant="predict" amount={estimatedCtl} />
+          </LPEstimateValue>
+        </LPEstimateRow>
+      )}
       <ButtonBlock>
         <ButtonWrapper>
           <Button icon={CancelIcon} variant="cancel" onClick={() => navigate(ROUTES.POOLS.BASE)}>Cancel</Button>
@@ -201,12 +255,13 @@ export const AddLiquidity = () => {
   return (
     <Window hideHeader>
       <Container wide>
-        <EmbeddedLayout>
-          <div>{form}</div>
-          <RightPanel>
-            <PoolStat data={data} lp={currentLPToken} showFavorite plain />
-          </RightPanel>
-        </EmbeddedLayout>
+        <PageLayout>
+          <BackNav onClick={() => navigate(ROUTES.POOLS.BASE)} />
+          <MainCol>
+            <PageSubTitle>Add Liquidity</PageSubTitle>
+            <LiquidityFormWrap>{form}</LiquidityFormWrap>
+          </MainCol>
+        </PageLayout>
       </Container>
     </Window>
   );

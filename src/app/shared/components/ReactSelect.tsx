@@ -105,12 +105,11 @@ const ReactSelect = ({
   }
 
   function IndicatorSVG(props) {
-    const { hasValue } = props;
-    return !hasValue ? (
+    return (
       <DropdownIndicator {...props}>
         <IconDropdownDown />
       </DropdownIndicator>
-    ) : null;
+    );
   }
 
   function IndicatorClear(props) {
@@ -142,7 +141,7 @@ const ReactSelect = ({
       }}
       styles={userStyles}
       {...rest}
-      {...(customPrefix === 'custom-filter'
+      {...((customPrefix === 'custom-filter' || customPrefix === 'custom-asset-select' || customPrefix === 'custom-kind')
         ? {
           menuPortalTarget: typeof document !== 'undefined' ? document.body : null,
           menuPosition: 'fixed' as const,

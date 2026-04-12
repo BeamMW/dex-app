@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { styled } from '@linaria/react';
 import {
   fromGroths, setDataRequest, toGroths, truncate,
 } from '@core/appUtils';
 import {
-  AssetsSection, Button, Container, Input, PoolStat, Window,
+  AssetsSection, Button, Container, Input, Window,
 } from '@app/shared/components';
 import { useInput } from '@app/shared/hooks';
 import * as mainActions from '@app/containers/Pools/store/actions';
@@ -12,14 +13,32 @@ import { selectAssetsList, selectCurrentPool, selectPredirect } from '@app/conta
 import { ROUTES } from '@app/shared/constants';
 import AssetLabel from '@app/shared/components/AssetLabel';
 import { ArrowDownIcon, CancelIcon } from '@app/shared/icons';
+import BackNav, { PageLayout, MainCol } from '@app/shared/components/BackNav';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
-  BlockLabel, ButtonWrapper, EmbeddedLayout, EmbeddedTradeButtonWrap, InputRow, RightPanel, SwapBlock, SwapCard,
+  BlockLabel, ButtonWrapper, EmbeddedTradeButtonWrap, InputRow, SwapBlock, SwapCard,
 } from '@app/containers/Pools/containers/shared/poolFlowLayout';
 import {
   createAmountFieldHandlers, formatPredictedFieldDisplay, parseAmount, useAmountInputCaret,
 } from '@app/containers/Pools/containers/shared/poolAmountInput';
+
+const PageSubTitle = styled.h4`
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: rgba(255, 255, 255, 0.5);
+`;
+
+const LiquidityFormWrap = styled.div`
+  width: 100%;
+  max-width: 620px;
+  min-width: 0;
+  overflow-x: hidden;
+  margin-top: var(--pool-embedded-layout-margin-top);
+`;
 
 const purpleIn = { cursor: 'default' as const, color: 'var(--color-purple)', opacity: 1 };
 const actionsRow = {
@@ -63,62 +82,65 @@ export const WithdrawPool = () => {
   return (
     <Window hideHeader>
       <Container wide>
-        <EmbeddedLayout>
-          <SwapCard>
-            <SwapBlock>
-              <BlockLabel>Withdraw LP</BlockLabel>
-              <AssetsSection>
-                <InputRow>
-                  <Input
-                    ref={caret.inputRef}
-                    value={amt.value}
-                    variant="amount"
-                    pallete="blue"
-                    onChange={caret.handleChange}
-                    onFocus={h.onFocus}
-                    onBlur={h.onBlur}
-                  />
-                  <AssetLabel title={lpLabel} assets_id={lpAid} />
-                </InputRow>
-              </AssetsSection>
-            </SwapBlock>
-            <SwapBlock>
-              <BlockLabel>You receive</BlockLabel>
-              {receive.map((r) => (
-                <AssetsSection key={r.field}>
-                  <InputRow>
-                    <Input
-                      disabled
-                      pallete="purple"
-                      variant="amount"
-                      style={purpleIn}
-                      value={formatPredictedFieldDisplay(predictData, amt.value, r.field)}
-                    />
-                    <AssetLabel title={r.name} assets_id={r.aid} />
-                  </InputRow>
-                </AssetsSection>
-              ))}
-            </SwapBlock>
-            <EmbeddedTradeButtonWrap>
-              <div style={actionsRow}>
-                <ButtonWrapper>
-                  <Button icon={CancelIcon} variant="cancel" onClick={() => navigate(ROUTES.POOLS.BASE)}>Cancel</Button>
-                  <Button
-                    disabled={!amt.isValid}
-                    icon={ArrowDownIcon}
-                    variant="withdraw"
-                    onClick={() => dispatch(mainActions.onWithdraw.request(setDataRequest(req)))}
-                  >
-                    Withdraw
-                  </Button>
-                </ButtonWrapper>
-              </div>
-            </EmbeddedTradeButtonWrap>
-          </SwapCard>
-          <RightPanel>
-            <PoolStat data={data} lp={lp} showFavorite plain />
-          </RightPanel>
-        </EmbeddedLayout>
+        <PageLayout>
+          <BackNav onClick={() => navigate(ROUTES.POOLS.BASE)} />
+          <MainCol>
+            <PageSubTitle>Remove Liquidity</PageSubTitle>
+            <LiquidityFormWrap>
+              <SwapCard>
+                <SwapBlock>
+                  <BlockLabel>Withdraw LP</BlockLabel>
+                  <AssetsSection>
+                    <InputRow>
+                      <Input
+                        ref={caret.inputRef}
+                        value={amt.value}
+                        variant="amount"
+                        pallete="blue"
+                        onChange={caret.handleChange}
+                        onFocus={h.onFocus}
+                        onBlur={h.onBlur}
+                      />
+                      <AssetLabel title={lpLabel} assets_id={lpAid} />
+                    </InputRow>
+                  </AssetsSection>
+                </SwapBlock>
+                <SwapBlock>
+                  <BlockLabel>You receive</BlockLabel>
+                  {receive.map((r) => (
+                    <AssetsSection key={r.field}>
+                      <InputRow>
+                        <Input
+                          disabled
+                          pallete="purple"
+                          variant="amount"
+                          style={purpleIn}
+                          value={formatPredictedFieldDisplay(predictData, amt.value, r.field)}
+                        />
+                        <AssetLabel title={r.name} assets_id={r.aid} />
+                      </InputRow>
+                    </AssetsSection>
+                  ))}
+                </SwapBlock>
+                <EmbeddedTradeButtonWrap>
+                  <div style={actionsRow}>
+                    <ButtonWrapper>
+                      <Button icon={CancelIcon} variant="cancel" onClick={() => navigate(ROUTES.POOLS.BASE)}>Cancel</Button>
+                      <Button
+                        disabled={!amt.isValid}
+                        icon={ArrowDownIcon}
+                        variant="withdraw"
+                        onClick={() => dispatch(mainActions.onWithdraw.request(setDataRequest(req)))}
+                      >
+                        Withdraw
+                      </Button>
+                    </ButtonWrapper>
+                  </div>
+                </EmbeddedTradeButtonWrap>
+              </SwapCard>
+            </LiquidityFormWrap>
+          </MainCol>
+        </PageLayout>
       </Container>
     </Window>
   );

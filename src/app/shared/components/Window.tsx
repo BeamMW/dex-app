@@ -25,10 +25,7 @@ const Container = styled.div<{ bgColor: string }>`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 20px;
-  @media (max-width: 480px) {
-    padding: 0 5px;
-  }
+  padding: 0 var(--page-padding-x);
 `;
 
 const HeaderWrapper = styled.div`

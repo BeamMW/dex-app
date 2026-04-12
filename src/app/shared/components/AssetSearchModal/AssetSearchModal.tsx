@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { IAsset, IOptions } from '@core/types';
 import { assetShortLabel } from '@core/appUtils';
-import { iconButtonReset, rowCenter, warningBadgeBase } from '../../../styles/linariaShared';
 import { selectAssetsList, selectFavoriteAssets, selectPoolsList } from '@app/containers/Pools/store/selectors';
 import * as mainActions from '@app/containers/Pools/store/actions';
 import {
@@ -16,6 +15,7 @@ import {
 } from '@app/shared/constants';
 import AssetIcon from '@app/shared/components/AssetsIcon';
 import { CancelIcon, IconFavorite, IconFavoriteFilled } from '@app/shared/icons';
+import { iconButtonReset, rowCenter, warningBadgeBase } from '../../../styles/linariaShared';
 import { AssetSearchModalProps } from './AssetSearchModal.types';
 
 const BEAM_ASSET: IAsset = {
@@ -26,7 +26,7 @@ const BEAM_ASSET: IAsset = {
 };
 
 type SearchTab = 'ALL' | 'ASSET' | 'POOL';
-type AssetFavTab = 'ALL' | 'FAV';
+type AssetFavTab = 'ALL' | 'FAV' | 'EXCL_AMML';
 const KIND_PCT: Record<number, string> = { 0: '0.05%', 1: '0.3%', 2: '1%' };
 const AMM_META_REGEX = /Amm Liquidity Token (\d+)-(\d+)-(\d+)/;
 
@@ -266,6 +266,7 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
   onClose,
   onSelect,
   excludeAssetId = null,
+  allowedAssetIds = null,
   mode = 'asset-only',
   title,
   onPairSelect,
@@ -377,9 +378,14 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
   }, [allAssets, query, assetsById]);
 
   const displayedAssets = useMemo(() => {
-    if (favTab === 'FAV') return filteredAssets.filter((a) => favoriteSet.has(getAssetId(a)));
-    return filteredAssets;
-  }, [filteredAssets, favTab, favoriteSet]);
+    let list = filteredAssets;
+    if (allowedAssetIds != null) {
+      list = list.filter((a) => allowedAssetIds.has(getAssetId(a)));
+    }
+    if (favTab === 'EXCL_AMML') return list.filter((a) => getAmmMeta(a) === null);
+    if (favTab === 'FAV') return list.filter((a) => favoriteSet.has(getAssetId(a)));
+    return list;
+  }, [filteredAssets, favTab, favoriteSet, allowedAssetIds]);
 
   const poolPairResults = useMemo(() => {
     if (mode !== 'explore' || !query.includes('/')) return [];
@@ -553,7 +559,7 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
 
   const renderAssetList = (onClick: (a: IAsset) => void, action?: string, prefix = '', emptyMsg = 'No assets found') => (
     noResults
-      ? <NoResults>{favTab === 'FAV' ? 'No favorite assets yet. Click ★ to add.' : emptyMsg}</NoResults>
+      ? <NoResults>{favTab === 'FAV' ? 'No favorite assets yet. Click ★ to add.' : favTab === 'EXCL_AMML' ? 'No non-AMML assets found.' : emptyMsg}</NoResults>
       : displayedAssets.map((a) => renderAssetRow(a, onClick, action, prefix))
   );
 
@@ -609,22 +615,22 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
               <FilterWrap ref={filterRef}>
                 <FilterBtn
                   type="button"
-                  active={favTab === 'FAV'}
+                  active={favTab !== 'ALL'}
                   onClick={() => setFilterOpen((o) => !o)}
                 >
-                  {favTab === 'FAV' ? '★ Favorite' : 'All'}
+                  {favTab === 'FAV' ? '★ Favorite' : favTab === 'EXCL_AMML' ? 'Excl. AMML' : 'All'}
                   {' ▾'}
                 </FilterBtn>
                 {filterOpen && (
                   <FilterDropdown>
-                    {(['ALL', 'FAV'] as AssetFavTab[]).map((t) => (
+                    {(['ALL', 'FAV', 'EXCL_AMML'] as AssetFavTab[]).map((t) => (
                       <FilterOption
                         key={t}
                         type="button"
                         selected={favTab === t}
                         onClick={() => { setFavTab(t); setFilterOpen(false); }}
                       >
-                        {t === 'FAV' ? '★ Favorite' : 'All'}
+                        {t === 'FAV' ? '★ Favorite' : t === 'EXCL_AMML' ? 'Excl. AMML' : 'All'}
                       </FilterOption>
                     ))}
                   </FilterDropdown>
@@ -633,9 +639,9 @@ const AssetSearchModal: React.FC<AssetSearchModalProps> = ({
             </>
           ) : (
             <>
-              {(['ALL', 'FAV'] as AssetFavTab[]).map((t) => (
+              {(['ALL', 'FAV', 'EXCL_AMML'] as AssetFavTab[]).map((t) => (
                 <TabButton key={t} active={favTab === t} onClick={() => setFavTab(t)}>
-                  {t === 'FAV' ? 'Favorite' : 'All'}
+                  {t === 'FAV' ? 'Favorite' : t === 'EXCL_AMML' ? 'Excl. AMML' : 'All'}
                 </TabButton>
               ))}
             </>

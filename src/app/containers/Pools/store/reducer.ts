@@ -1,9 +1,19 @@
-import { DexStateType } from '@app/containers/Pools/interfaces/DexStateType';
+import { AccumulatorRewardsState, DexStateType } from '@app/containers/Pools/interfaces/DexStateType';
 import { ActionType, createReducer } from 'typesafe-actions';
 import produce from 'immer';
 import * as actions from './actions';
 
 type Action = ActionType<typeof actions>;
+
+const initialRewardsState: AccumulatorRewardsState = {
+  isAvailable: false,
+  isLoading: false,
+  error: null,
+  lpTokenBalance: 0,
+  estimatedReward: 0,
+  locks: [],
+  lockOptions: [],
+};
 
 const initialState: DexStateType = {
   assetsList: [],
@@ -13,13 +23,15 @@ const initialState: DexStateType = {
   predict: null,
   currentPool: null,
   filter: 'all',
+  feeFilter: null,
   options: [],
   favorites: [],
   favoriteAssets: [],
   currentLPToken: null,
   isLoading: false,
-  myPools: [],
   isHeadless: true,
+  shaderRuntimeMap: null,
+  rewards: initialRewardsState,
 };
 
 const reducer = createReducer<DexStateType, Action>(initialState)
@@ -45,6 +57,9 @@ const reducer = createReducer<DexStateType, Action>(initialState)
   .handleAction(actions.setFilter, (state, action) => produce(state, (nexState) => {
     nexState.filter = action.payload;
   }))
+  .handleAction(actions.setFeeFilter, (state, action) => produce(state, (nexState) => {
+    nexState.feeFilter = action.payload;
+  }))
   .handleAction(actions.setOptions, (state, action) => produce(state, (nexState) => {
     nexState.options = action.payload;
   }))
@@ -60,10 +75,13 @@ const reducer = createReducer<DexStateType, Action>(initialState)
   .handleAction(actions.setIsLoading, (state, action) => produce(state, (nexState) => {
     nexState.isLoading = action.payload;
   }))
-  .handleAction(actions.setMyPools, (state, action) => produce(state, (nexState) => {
-    nexState.myPools = action.payload;
-  }))
   .handleAction(actions.setIsHeadless, (state, action) => produce(state, (nexState) => {
     nexState.isHeadless = action.payload;
+  }))
+  .handleAction(actions.setShaderRuntimeMap, (state, action) => produce(state, (nexState) => {
+    nexState.shaderRuntimeMap = action.payload;
+  }))
+  .handleAction(actions.setRewardsState, (state, action) => produce(state, (nexState) => {
+    nexState.rewards = { ...nexState.rewards, ...action.payload };
   }));
 export { reducer as MainReducer };

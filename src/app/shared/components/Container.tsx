@@ -24,8 +24,10 @@ const ContainerStyled = styled.div<ContainerProps>`
     return '914px';
   }};
   align-content: center;
-  @media (max-width: 480px) {
-    padding: 5px;
+
+  @media (max-width: 600px) {
+    margin: 16px 0;
+    min-height: 0;
   }
 `;
 

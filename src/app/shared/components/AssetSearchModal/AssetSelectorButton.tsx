@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { styled } from '@linaria/react';
 import { IOptions } from '@core/types';
-import { rowCenter, warningBadgeBase } from '../../../styles/linariaShared';
 import AssetIcon from '@app/shared/components/AssetsIcon';
 import { IconDropdownDown } from '@app/shared/icons';
+import { rowCenter, warningBadgeBase } from '../../../styles/linariaShared';
 import AssetSearchModal from './AssetSearchModal';
 
 interface AssetSelectorButtonProps {
@@ -11,6 +11,7 @@ interface AssetSelectorButtonProps {
   onSelect: (option: IOptions) => boolean | void;
   placeholder?: string;
   excludeAssetId?: number | null;
+  allowedAssetIds?: ReadonlySet<number> | null;
   mode?: 'asset-only' | 'explore';
   // controlled open state — when provided, external code manages open/close
   isOpen?: boolean;
@@ -21,11 +22,16 @@ interface AssetSelectorButtonProps {
 }
 
 const SelectorBtn = styled('button')`
-  ${rowCenter}
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
   gap: 8px;
   width: 100%;
-  height: 41px;
-  padding: 0 12px 0 14px;
+  min-height: 41px;
+  height: auto;
+  padding: 6px 12px 6px 14px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 170px;
@@ -45,24 +51,80 @@ const SelectorBtn = styled('button')`
   &:focus-visible {
     outline: 1px solid var(--color-green);
   }
+
+  @media (max-width: 480px) {
+    gap: 4px;
+    padding: 6px 8px 6px 10px;
+    font-size: 13px;
+  }
+`;
+
+/** Tighter than default AssetIcon margin so label + id fit in narrow pickers */
+const SelectorAssetIcon = styled(AssetIcon)`
+  && {
+    margin-right: 6px;
+  }
+
+  @media (max-width: 480px) {
+    && {
+      margin-right: 3px;
+    }
+  }
+`;
+
+/** Icon + label + optional badge; grows so chevron stays at the trailing edge of the button */
+const LeftCluster = styled.span`
+  flex: 1 1 0%;
+  min-width: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+`;
+
+const ValueRow = styled.span`
+  flex: 1 1 0%;
+  min-width: 0;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+`;
+
+const labelIdMetrics = `
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
 `;
 
 const Label = styled.span`
-  flex: 1;
+  ${labelIdMetrics}
+  flex: 0 1 auto;
   min-width: 0;
   text-align: left;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
+
+  @media (max-width: 480px) {
+    font-size: 13px;
+    line-height: 18px;
+  }
 `;
 
 const Placeholder = styled(Label)`
+  flex: 1 1 0%;
+  min-width: 0;
   color: rgba(255, 255, 255, 0.5);
 `;
 
 const ChevronWrap = styled('span')`
   ${rowCenter}
   flex-shrink: 0;
+  align-self: center;
   opacity: 0.5;
 `;
 
@@ -70,6 +132,25 @@ const WarningBadge = styled('span')`
   ${warningBadgeBase}
   padding: 1px 6px;
   margin-right: 10px;
+
+  @media (max-width: 480px) {
+    margin-right: 4px;
+  }
+`;
+
+const AssetIdLabel = styled('span')`
+  ${labelIdMetrics}
+  font-weight: 500;
+  opacity: 0.45;
+  flex-shrink: 0;
+  white-space: nowrap;
+  margin-left: 6px;
+
+  @media (max-width: 480px) {
+    font-size: 13px;
+    line-height: 18px;
+    margin-left: 5px;
+  }
 `;
 
 const AssetSelectorButton: React.FC<AssetSelectorButtonProps> = ({
@@ -77,6 +158,7 @@ const AssetSelectorButton: React.FC<AssetSelectorButtonProps> = ({
   onSelect,
   placeholder = 'Select asset',
   excludeAssetId = null,
+  allowedAssetIds = null,
   mode = 'asset-only',
   isOpen: controlledIsOpen,
   onOpen,
@@ -109,11 +191,16 @@ const AssetSelectorButton: React.FC<AssetSelectorButtonProps> = ({
     <>
       <SelectorBtn type="button" onClick={handleOpen}>
         {value ? (
-          <>
-            {value.value !== -1 && <AssetIcon asset_id={value.value} />}
-            <Label>{value.label}</Label>
+          <LeftCluster>
+            {value.value !== -1 && <SelectorAssetIcon asset_id={value.value} />}
+            <ValueRow>
+              <Label>{value.label}</Label>
+              {value && value.value !== -1 && (
+                <AssetIdLabel title={`Asset id ${value.value}`}>{`(${value.value})`}</AssetIdLabel>
+              )}
+            </ValueRow>
             {showWarning && <WarningBadge>fake</WarningBadge>}
-          </>
+          </LeftCluster>
         ) : (
           <Placeholder>{placeholder}</Placeholder>
         )}
@@ -127,6 +214,7 @@ const AssetSelectorButton: React.FC<AssetSelectorButtonProps> = ({
         onClose={handleClose}
         onSelect={onSelect}
         excludeAssetId={excludeAssetId}
+        allowedAssetIds={allowedAssetIds}
         mode={mode}
         onPairSelect={onPairSelect}
       />

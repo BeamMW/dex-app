@@ -28,38 +28,6 @@
   }
   @include reactSelect.simple-value-and-placeholder('ProximaNova', 20px, 20px, uppercase);
 }
-.custom-kind {
-  &__control {
-    @include reactSelect.control-base(var(--color-opasity-0-1), 10px);
-    max-width: 167px !important;
-    width: 100% !important;
-    height: 42px !important;
-    &--menu-is-open {
-      box-shadow: (0 0 0 1px) var(--color-green) !important;
-    }
-  }
-  @include reactSelect.input-colors(38px);
-  @include reactSelect.indicator-controls;
-  &__menu {
-    background-color: rgba(0, 0, 0, 0.9) !important;
-    box-shadow: none !important;
-    border-radius: 20px !important;
-    padding: 20px 0 0 20px !important;
-    @include reactSelect.scrollbar-base;
-  }
-  &__option {
-    padding: 0;
-    margin-bottom: 14px !important;
-    @include reactSelect.option-active-state;
-  }
-  @include reactSelect.simple-value-and-placeholder(
-    'ProximaNova',
-    14px,
-    14px,
-    uppercase,
-    lowercase
-  );
-}
 .custom-filter {
   width: 100%;
   &__menu-portal {
@@ -140,6 +108,42 @@
   &__placeholder {
     @include reactSelect.text-base('SFProDisplay', 14px, 14px);
   }
+}
+
+.custom-kind {
+  width: 100%;
+  &__menu-portal {
+    z-index: 10050 !important;
+  }
+  &__control {
+    @include reactSelect.control-base(var(--color-opasity-0-1), 170px);
+    width: 100% !important;
+    height: 41px !important;
+    border-radius: 170px !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    &--menu-is-open,
+    &--is-focused {
+      box-shadow: (0 0 0 1px) var(--color-green) !important;
+    }
+  }
+  @include reactSelect.input-colors(41px);
+  @include reactSelect.indicator-controls;
+  &__value-container {
+    padding: 2px 12px !important;
+  }
+  &__menu {
+    background-color: var(--color-select-list) !important;
+    border-radius: 16px !important;
+    padding: 12px !important;
+    z-index: 10050 !important;
+    @include reactSelect.scrollbar-base;
+  }
+  &__option {
+    padding: 4px 8px !important;
+    margin-bottom: 8px !important;
+    @include reactSelect.option-active-state;
+  }
+  @include reactSelect.simple-value-and-placeholder('ProximaNova', 14px, 17px);
 }
 
 .price-wrapper {
