@@ -76,8 +76,11 @@ jobs:
       with:
         node-version: ${{ inputs.node_version }}
 
+    - name: Enable Corepack
+      run: corepack enable
+
     - name: Install dependencies
-      run: yarn install
+      run: yarn install --immutable
 
     - name: Build the project
       run: ${{ inputs.build_command }}
